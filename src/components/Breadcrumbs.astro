@@ -1,0 +1,42 @@
+---
+interface Crumb {
+  label: string;
+  href?: string;
+}
+interface Props {
+  crumbs: Crumb[];
+  light?: boolean;
+}
+const { crumbs, light = false } = Astro.props;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).href },
+    ...crumbs.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 2,
+      name: c.label,
+      ...(c.href ? { item: new URL(c.href.endsWith('/') ? c.href : c.href + '/', Astro.site).href } : {}),
+    })),
+  ],
+};
+---
+
+<nav aria-label="Breadcrumb" class={`text-[13px] ${light ? 'text-cream/70' : 'text-coffee'}`}>
+  <ol class="flex flex-wrap items-center gap-1.5">
+    <li><a href="/" class={light ? 'hover:text-oak-soft transition-colors' : 'hover:text-oak-deep transition-colors'}>Home</a></li>
+    {crumbs.map((c) => (
+      <li class="flex items-center gap-1.5">
+        <span aria-hidden="true" class={light ? 'text-cream/40' : 'text-line'}>/</span>
+        {c.href ? (
+          <a href={c.href} class={light ? 'hover:text-oak-soft transition-colors' : 'hover:text-oak-deep transition-colors'}>{c.label}</a>
+        ) : (
+          <span aria-current="page" class={`font-medium ${light ? 'text-cream' : 'text-bark'}`}>{c.label}</span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

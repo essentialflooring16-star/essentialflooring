@@ -1,0 +1,464 @@
+---
+import { Image, getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import CtaBand from '../components/CtaBand.astro';
+import FaqList from '../components/FaqList.astro';
+import Marquee from '../components/Marquee.astro';
+import Stats from '../components/Stats.astro';
+import ServiceCards from '../components/ServiceCards.astro';
+import VideoStrip from '../components/VideoStrip.astro';
+import ShowcaseSlider from '../components/ShowcaseSlider.tsx';
+import { SITE, ALL_SERVICES, CORE_CITIES, EXTENDED_CITIES } from '../data/site';
+import { photos, photoImage, photoById } from '../lib/photos';
+import faqData from '../data/faq.json';
+import pairsData from '../data/before-after.json';
+
+const heroPhoto = photoById('lvp-vinyl-01');
+const heroImg = photoImage(heroPhoto.id);
+const heroSidePhoto = photoById('stairs-01');
+const heroSideImg = photoImage(heroSidePhoto.id);
+
+// Before/After showcase: real client-labeled pairs, same-spot first.
+const baModules = import.meta.glob<{ default: import('astro').ImageMetadata }>(
+  '../assets/before-after/*.jpg',
+  { eager: true },
+);
+const baImage = (file: string) => {
+  const mod = Object.entries(baModules).find(([p]) => p.endsWith(`/${file}`));
+  if (!mod) throw new Error(`Before/after image missing: ${file}`);
+  return mod[1].default;
+};
+const showcasePairs = await Promise.all(
+  (pairsData as any[])
+    .filter((p) => p.sameSpot)
+    .slice(0, 6)
+    .map(async (p) => {
+      const before = await getImage({ src: baImage(p.before), width: 1400, format: 'webp', quality: 74 });
+      const after = await getImage({ src: baImage(p.after), width: 1400, format: 'webp', quality: 74 });
+      const thumb = await getImage({ src: baImage(p.after), width: 200, format: 'webp', quality: 60 });
+      return {
+        id: p.id,
+        beforeSrc: before.src,
+        afterSrc: after.src,
+        thumbSrc: thumb.src,
+        label: p.label,
+        city: p.city,
+        caption: p.caption,
+      };
+    }),
+);
+
+const previewPhotos = photos
+  .filter((p) => p.state === 'after')
+  .sort((a, b) => b.quality - a.quality)
+  .slice(0, 7);
+
+const faqPreview = (faqData as { q: string; a: string }[]).slice(0, 4);
+
+const steps = [
+  {
+    title: 'Free consultation',
+    text: 'We visit your home, measure the space, and talk through materials, colors and budget. You get a clear written quote with no hidden fees.',
+  },
+  {
+    title: 'Preparation',
+    text: 'We remove old flooring when needed, level and grind the subfloor, and acclimate materials so your new floor stays flat and stable.',
+  },
+  {
+    title: 'Expert installation',
+    text: 'Our crew installs or refinishes with care for the details: tight seams, clean transitions, straight lines and finished baseboards.',
+  },
+  {
+    title: 'Final walkthrough',
+    text: 'We inspect every room together, clean up completely, and hand you a floor that is ready to live on from day one.',
+  },
+];
+
+const marqueeItems = [
+  'Hardwood Refinishing', 'LVP Installation', 'Stairs', 'Laminate', 'Tile',
+  'Carpet', 'Floor Repairs', 'Baseboards', 'Free Estimates',
+];
+---
+
+<Base
+  title="Essential Flooring | Flooring Contractor in Sacramento, CA"
+  description="Licensed Sacramento flooring contractor. Hardwood floor refinishing, waterproof LVP, stairs, laminate and carpet. Free estimates, call (916) 425-1361."
+>
+  <!-- HERO: split editorial composition -->
+  <section class="grain relative bg-ink overflow-hidden">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 grid lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-6 items-center min-h-[88vh] py-16 lg:py-10">
+      <div class="relative z-10">
+        <p class="reveal eyebrow-pill on-dark mb-6">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6L2.5 9.5l6.6-.8z" />
+          </svg>
+          Sacramento flooring contractor
+        </p>
+        <h1 class="reveal font-display font-semibold text-cream text-[44px] sm:text-6xl lg:text-[72px] leading-[1.02] tracking-tight text-balance">
+          Floors built to be <span class="accent-italic-soft">lived</span> on
+        </h1>
+        <p class="reveal mt-7 text-cream/80 text-lg leading-relaxed max-w-md" style="transition-delay:90ms">
+          Hardwood refinishing, waterproof LVP, stairs and carpet. Installed with
+          craftsmanship, finished on schedule, across the greater Sacramento area.
+        </p>
+        <div class="reveal mt-9 flex flex-col sm:flex-row gap-4" style="transition-delay:160ms">
+          <a
+            href="/contact"
+            class="inline-flex justify-center items-center gap-2 rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-8 py-4 text-[16px] transition-colors shadow-lift"
+          >
+            Get a Free Estimate
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+              <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
+          <a
+            href="/portfolio"
+            class="inline-flex justify-center items-center rounded-full border border-cream/25 hover:border-cream/60 text-cream font-semibold px-8 py-4 text-[16px] transition-colors"
+          >
+            See Our Work
+          </a>
+        </div>
+        <ul class="reveal mt-10 flex flex-wrap gap-x-7 gap-y-3 text-cream/70 text-[14px]" style="transition-delay:220ms">
+          <li class="flex items-center gap-2">
+            <span class="size-1.5 rounded-full bg-oak-soft" aria-hidden="true"></span>
+            Licensed &amp; Insured, {SITE.license}
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="size-1.5 rounded-full bg-oak-soft" aria-hidden="true"></span>
+            Mon to Sat, 7 AM to 7 PM
+          </li>
+        </ul>
+      </div>
+
+      <div class="relative h-[44vh] lg:h-[68vh]" aria-hidden="false">
+        <div class="absolute -inset-8 glow-oak motion-reduce:hidden" aria-hidden="true"></div>
+        <div class="absolute inset-y-0 right-0 left-8 sm:left-16" data-parallax="0.06">
+          <div class="reveal-right h-full rounded-3xl overflow-hidden shadow-lift">
+            <Image
+              src={heroImg}
+              alt={heroPhoto.alt}
+              widths={[640, 960, 1400]}
+              sizes="(min-width:1024px) 45vw, 100vw"
+              class="h-full w-full object-cover"
+              loading="eager"
+              fetchpriority="high"
+              format="webp"
+              quality={74}
+            />
+          </div>
+        </div>
+        <div
+          class="reveal-scale absolute -bottom-4 left-0 w-[46%] max-w-[240px] rounded-2xl overflow-hidden border-4 border-ink shadow-lift rotate-[-3deg] motion-safe:animate-float"
+          style="transition-delay:250ms"
+        >
+          <Image
+            src={heroSideImg}
+            alt={heroSidePhoto.alt}
+            widths={[300, 480]}
+            sizes="240px"
+            class="w-full aspect-[4/5] object-cover"
+            loading="eager"
+            format="webp"
+            quality={70}
+          />
+        </div>
+        <p
+          class="reveal absolute top-6 -left-2 sm:left-4 rotate-[-2deg] rounded-xl bg-cream text-ink font-display text-[15px] px-4 py-2.5 shadow-lift"
+          style="transition-delay:350ms"
+        >
+          Real projects, real photos
+        </p>
+      </div>
+    </div>
+
+    <Marquee items={marqueeItems} dark />
+  </section>
+
+  <!-- SERVICES: editorial numbered index -->
+  <section class="py-20 sm:py-28">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
+        <SectionHeading
+          eyebrow="What we do"
+          title="One crew. Every floor."
+          text="From tear-out to the last baseboard, one licensed crew owns the whole job. No handoffs, no finger-pointing."
+        />
+        <a
+          href="/services"
+          class="reveal shrink-0 inline-flex items-center gap-2 font-semibold text-oak-deep hover:text-ink transition-colors"
+        >
+          All 16 services
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+            <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+      </div>
+
+      <ServiceCards />
+
+      <ul class="reveal mt-8 flex flex-wrap gap-2">
+        {ALL_SERVICES.map((s) => (
+          <li class="rounded-full bg-sand border border-line px-3.5 py-1.5 text-[13px] font-medium text-bark">
+            {s}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- BEFORE / AFTER SHOWCASE -->
+  <section class="grain py-20 sm:py-28 bg-ink relative overflow-hidden">
+    <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="grid lg:grid-cols-[380px_1fr] gap-12 items-start">
+        <div class="lg:sticky lg:top-28">
+          <SectionHeading
+            eyebrow="The proof"
+            title="Drag the handle. Same room, same angle."
+            text="Every pair below was shot by our crew on real Sacramento area projects. Pick a project, pull the slider, and see exactly what we walked into and what we left behind."
+            light
+          />
+          <div class="reveal mt-8">
+            <a
+              href="/contact"
+              class="inline-flex items-center gap-2 rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-6 py-3 transition-colors"
+            >
+              Start your transformation
+            </a>
+          </div>
+        </div>
+        <div class="reveal-scale">
+          <ShowcaseSlider client:load pairs={showcasePairs} />
+        </div>
+      </div>
+
+      <div class="reveal mt-16">
+        <Stats dark />
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS: editorial timeline -->
+  <section class="py-20 sm:py-28 relative overflow-hidden">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <SectionHeading
+        eyebrow="How it works"
+        title="A clear process, from first call to final walkthrough"
+        align="center"
+      />
+      <ol class="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-12 relative">
+        <span class="hidden lg:block absolute top-7 left-[12%] right-[12%] h-px bg-line" aria-hidden="true"></span>
+        {steps.map((step, i) => (
+          <li class="reveal relative text-center sm:text-left lg:text-center px-2" style={`transition-delay:${i * 80}ms`}>
+            <span class="relative inline-grid place-items-center size-14 rounded-full bg-ink text-cream font-display font-semibold text-xl mb-5 z-10">
+              {i + 1}
+            </span>
+            <h3 class="font-display font-semibold text-[19px] text-ink">{step.title}</h3>
+            <p class="mt-2.5 text-[14.5px] leading-relaxed text-coffee">{step.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <Marquee items={[...CORE_CITIES.map((c) => c.city)]} />
+
+  <!-- PORTFOLIO MOSAIC -->
+  <section class="py-20 sm:py-28">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
+        <SectionHeading
+          eyebrow="Recent projects"
+          title="Real homes. Real floors."
+          text="Every photo is our own work in the Sacramento area, straight off the crew's phone."
+        />
+        <a
+          href="/portfolio"
+          class="reveal shrink-0 inline-flex items-center gap-2 font-semibold text-oak-deep hover:text-ink transition-colors"
+        >
+          Browse the full portfolio
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+            <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+      </div>
+
+      <ul class="grid grid-cols-2 lg:grid-cols-4 auto-rows-[150px] sm:auto-rows-[190px] gap-3 sm:gap-4">
+        {previewPhotos.map((p, i) => {
+          const spans = [
+            'col-span-2 row-span-2',
+            'row-span-2',
+            '',
+            '',
+            'row-span-2',
+            '',
+            'col-span-2',
+          ];
+          return (
+            <li class={`reveal-scale ${spans[i] ?? ''}`} style={`transition-delay:${i * 45}ms`}>
+              <a href="/portfolio" class="group relative block overflow-hidden rounded-xl h-full">
+                <Image
+                  src={photoImage(p.id)}
+                  alt={p.alt}
+                  widths={[400, 640, 900]}
+                  sizes="(min-width:1024px) 25vw, 50vw"
+                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+                  format="webp"
+                  quality={70}
+                />
+                <span class="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
+                <span class="absolute bottom-0 left-0 right-0 p-4 text-white text-[13.5px] font-medium opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all">
+                  {p.caption}
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  </section>
+
+  <VideoStrip />
+
+  <!-- WHY US + AREAS -->
+  <section class="py-20 sm:py-28">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 grid lg:grid-cols-2 gap-14">
+      <div>
+        <SectionHeading
+          eyebrow="Why Essential Flooring"
+          title="Licensed, insured, and accountable"
+        />
+        <ul class="mt-8 space-y-5">
+          {[
+            {
+              t: 'California licensed contractor',
+              d: `We operate under ${SITE.license}, fully insured. You are protected, and the work is up to code.`,
+            },
+            {
+              t: 'Transparent quotes',
+              d: 'Your written estimate spells out materials, labor and timeline. The price we quote is the price you pay.',
+            },
+            {
+              t: 'On-time completion',
+              d: 'Flooring work disrupts your routine, so we plan carefully and finish when we said we would.',
+            },
+            {
+              t: 'We stand behind our work',
+              d: 'If something is not right on a floor we installed or refinished, we come back and make it right.',
+            },
+          ].map((item) => (
+            <li class="reveal flex gap-4">
+              <span class="shrink-0 grid place-items-center size-9 rounded-full bg-oak/15 text-oak-deep mt-0.5" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                  <path d="m5 13 4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <div>
+                <h3 class="font-semibold text-[17px] text-ink">{item.t}</h3>
+                <p class="mt-1 text-[15px] leading-relaxed text-coffee">{item.d}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="reveal rounded-2xl bg-paper border border-line shadow-card p-7 sm:p-9 h-fit">
+        <h3 class="font-display font-semibold text-2xl text-ink">Where we work</h3>
+        <p class="mt-2 text-[15px] text-coffee leading-relaxed">
+          Based in Sacramento, serving homes across the region.
+        </p>
+        <ul class="mt-6 grid grid-cols-2 gap-x-6 gap-y-2.5 text-[15px]">
+          {CORE_CITIES.map((c) => (
+            <li>
+              <a
+                href={`/service-areas/${c.slug}`}
+                class="inline-flex items-center gap-2 text-bark hover:text-oak-deep transition-colors"
+              >
+                <span class="size-1 rounded-full bg-oak" aria-hidden="true"></span>
+                {c.city}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="mt-5 text-[13.5px] text-coffee/85 leading-relaxed">
+          Select projects also in {EXTENDED_CITIES.map((c) => c.city).join(', ')}.
+        </p>
+        <a href="/service-areas" class="mt-4 inline-flex items-center gap-1.5 font-semibold text-oak-deep hover:text-ink transition-colors text-[15px]">
+          All service areas
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+            <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS TEASER -->
+  <section class="py-16 bg-sand/60">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 text-center">
+      <div class="reveal inline-flex items-center gap-1.5 text-oak" aria-hidden="true">
+        {Array.from({ length: 5 }).map(() => (
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6L2.5 9.5l6.6-.8z" />
+          </svg>
+        ))}
+      </div>
+      <h2 class="reveal mt-4 font-display font-semibold text-2xl sm:text-3xl text-ink">
+        Our clients say it best
+      </h2>
+      <p class="reveal mt-3 text-coffee max-w-lg mx-auto text-[16px]">
+        Read what Sacramento homeowners think about working with us, straight from Google.
+      </p>
+      <a
+        href="/reviews"
+        class="reveal mt-6 inline-flex items-center gap-2 rounded-full bg-ink hover:bg-bark text-cream font-semibold px-6 py-3 transition-colors"
+      >
+        Read our reviews
+      </a>
+    </div>
+  </section>
+
+  <!-- FAQ PREVIEW -->
+  <section class="py-20 sm:py-24">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6">
+      <SectionHeading eyebrow="Good to know" title="Common questions" align="center" />
+      <div class="reveal mt-10">
+        <FaqList items={faqPreview} withSchema={false} />
+      </div>
+      <p class="reveal mt-6 text-center">
+        <a href="/faq" class="font-semibold text-oak-deep hover:text-ink transition-colors">
+          See all questions
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>
+
+<script>
+  // Gentle parallax drift on hero images (transform-only, rAF-throttled).
+  const els = [...document.querySelectorAll<HTMLElement>('[data-parallax]')];
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (els.length && !reduced) {
+    let ticking = false;
+    const apply = () => {
+      ticking = false;
+      const y = window.scrollY;
+      for (const el of els) {
+        const f = Number(el.dataset.parallax || '0');
+        el.style.transform = `translateY(${Math.round(y * f * 100) / 100}px)`;
+      }
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(apply);
+        }
+      },
+      { passive: true },
+    );
+  }
+</script>

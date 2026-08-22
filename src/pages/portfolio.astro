@@ -1,0 +1,50 @@
+---
+import { getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Gallery from '../components/Gallery.tsx';
+import { galleryPhotos, photoImage, CATEGORY_LABELS } from '../lib/photos';
+
+const items = await Promise.all(
+  galleryPhotos.map(async (p) => {
+    const full = await getImage({ src: photoImage(p.id), width: 1600, format: 'webp', quality: 74 });
+    const thumb = await getImage({ src: photoImage(p.id), width: 640, format: 'webp', quality: 68 });
+    return {
+      src: full.src,
+      thumb: thumb.src,
+      alt: p.alt,
+      caption: p.caption,
+      category: p.category,
+    };
+  }),
+);
+---
+
+<Base
+  title="Our Work | Flooring Projects in Sacramento | Essential Flooring"
+  description="Browse real flooring projects by Essential Flooring: hardwood refinishing, LVP installation and stairs across the Sacramento area. Get a free estimate."
+>
+  <section class="pt-10 pb-20">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <Breadcrumbs crumbs={[{ label: 'Our Work' }]} />
+      <div class="mt-8 mb-12 max-w-2xl">
+        <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-ink">
+          Our work, room by room
+        </h1>
+        <p class="mt-5 text-[17px] leading-relaxed text-coffee">
+          Every photo here is a real Essential Flooring project from the Sacramento area.
+          Hardwood brought back to life, waterproof LVP for busy families, and staircases
+          rebuilt tread by tread.
+        </p>
+      </div>
+
+      <Gallery client:load items={items} categories={CATEGORY_LABELS} />
+    </div>
+  </section>
+
+  <CtaBand
+    title="Want your floors in this gallery?"
+    text="Send us a few details about your project and we will come out for a free measurement and estimate."
+  />
+</Base>

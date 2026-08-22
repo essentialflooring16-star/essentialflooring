@@ -1,0 +1,56 @@
+---
+// Photo-first services grid: every card leads with real project imagery.
+import { Image } from 'astro:assets';
+import { SERVICES } from '../data/site';
+import { photoImage, photoById } from '../lib/photos';
+---
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 sm:gap-5 auto-rows-[210px] sm:auto-rows-[230px]">
+  {SERVICES.map((s, i) => {
+    const spans = [
+      'lg:col-span-3 lg:row-span-2 sm:col-span-2',
+      'lg:col-span-3',
+      'lg:col-span-3',
+      'lg:col-span-3',
+      'lg:col-span-3',
+    ];
+    const big = i === 0;
+    return (
+      <a
+        href={`/services/${s.slug}`}
+        class={`reveal-scale group relative overflow-hidden rounded-2xl shadow-card hover:shadow-lift transition-shadow ${spans[i]}`}
+        style={`transition-delay:${i * 60}ms`}
+      >
+        <Image
+          src={photoImage(s.image)}
+          alt={photoById(s.image).alt}
+          widths={[480, 760, 1100]}
+          sizes={big ? '(min-width:1024px) 50vw, 100vw' : '(min-width:1024px) 50vw, (min-width:640px) 50vw, 100vw'}
+          class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+          format="webp"
+          quality={68}
+        />
+        <span class="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-ink/5 transition-opacity" aria-hidden="true"></span>
+
+        <span class="absolute top-4 left-4 grid place-items-center rounded-full bg-cream/15 backdrop-blur-sm text-cream font-display text-[13px] font-medium size-9 border border-cream/25" aria-hidden="true">
+          0{i + 1}
+        </span>
+
+        <span class="absolute top-4 right-4 grid place-items-center size-10 rounded-full bg-cream/15 backdrop-blur-sm border border-cream/25 text-cream transition-all duration-300 group-hover:bg-oak group-hover:border-oak group-hover:rotate-45" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+
+        <span class="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
+          <span class={`block font-display font-semibold text-cream leading-tight ${big ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
+            {s.name}
+          </span>
+          <span class={`mt-2 block text-cream/80 text-[14px] leading-relaxed max-w-md ${big ? '' : 'hidden sm:block'}`}>
+            {s.short}
+          </span>
+        </span>
+      </a>
+    );
+  })}
+</div>

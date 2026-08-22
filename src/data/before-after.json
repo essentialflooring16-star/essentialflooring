@@ -1,0 +1,134 @@
+[
+  {
+    "id": "pair-01",
+    "before": "pair-01-before.jpg",
+    "after": "pair-01-after.jpg",
+    "category": "stairs",
+    "label": "Stairs",
+    "city": "Roseville",
+    "caption": "Bare plywood staircase finished with warm oak treads and crisp white risers",
+    "quality": 9,
+    "sameSpot": true
+  },
+  {
+    "id": "pair-02",
+    "before": "pair-02-before.jpg",
+    "after": "pair-02-after.jpg",
+    "category": "stairs",
+    "label": "Stairs",
+    "city": "Folsom",
+    "caption": "Bare particleboard stairs finished with wood-look plank treads and crisp white risers",
+    "quality": 9,
+    "sameSpot": true
+  },
+  {
+    "id": "pair-03",
+    "before": "pair-03-before.jpg",
+    "after": "pair-03-after.jpg",
+    "category": "stairs",
+    "label": "Stairs",
+    "city": "Citrus Heights",
+    "caption": "Bare OSB winder staircase finished with wide oak-look plank treads",
+    "quality": 9,
+    "sameSpot": true
+  },
+  {
+    "id": "pair-04",
+    "before": "pair-04-before.jpg",
+    "after": "pair-04-after.jpg",
+    "category": "lvp-vinyl",
+    "label": "LVP Installation",
+    "city": "Rancho Cordova",
+    "caption": "Master bedroom leveled and finished with wide plank luxury vinyl",
+    "quality": 9,
+    "sameSpot": true
+  },
+  {
+    "id": "pair-05",
+    "before": "pair-05-before.jpg",
+    "after": "pair-05-after.jpg",
+    "category": "other",
+    "label": "Herringbone Install",
+    "city": "Granite Bay",
+    "caption": "White oak herringbone installed over a fresh subfloor in the front room",
+    "quality": 9,
+    "sameSpot": true
+  },
+  {
+    "id": "pair-06",
+    "before": "pair-06-before.jpg",
+    "after": "pair-06-after.jpg",
+    "category": "lvp-vinyl",
+    "label": "LVP Installation",
+    "city": "Antelope",
+    "caption": "Gutted kitchen subfloor transformed with wide plank oak look flooring",
+    "quality": 8,
+    "sameSpot": true
+  },
+  {
+    "id": "pair-07",
+    "before": "pair-07-before.jpg",
+    "after": "pair-07-after.jpg",
+    "category": "hardwood-refinishing",
+    "label": "Hardwood Refinishing",
+    "city": "Sacramento",
+    "caption": "Worn, stained hallway oak sanded and refinished to a warm natural glow",
+    "quality": 8,
+    "sameSpot": true
+  },
+  {
+    "id": "pair-08",
+    "before": "pair-08-before.jpg",
+    "after": "pair-08-after.jpg",
+    "category": "stairs",
+    "label": "Stairs",
+    "city": "Granite Bay",
+    "caption": "Subfloor stairs and landing transformed with light oak plank flooring",
+    "quality": 8,
+    "sameSpot": false
+  },
+  {
+    "id": "pair-09",
+    "before": "pair-09-before.jpg",
+    "after": "pair-09-after.jpg",
+    "category": "other",
+    "label": "Herringbone Install",
+    "city": "Loomis",
+    "caption": "Bare plywood subfloor transformed with a herringbone oak pattern meeting travertine tile",
+    "quality": 8,
+    "sameSpot": false
+  },
+  {
+    "id": "pair-10",
+    "before": "pair-10-before.jpg",
+    "after": "pair-10-after.jpg",
+    "category": "hardwood-refinishing",
+    "label": "Hardwood Refinishing",
+    "city": "Carmichael",
+    "caption": "Worn dark oak sanded down and refinished in a warm walnut stain",
+    "quality": 8,
+    "sameSpot": false
+  },
+  {
+    "id": "pair-11",
+    "before": "pair-11-before.jpg",
+    "after": "pair-11-after.jpg",
+    "category": "lvp-vinyl",
+    "label": "LVP Installation",
+    "city": "Orangevale",
+    "caption": "Tile demo to a bright open kitchen with new wide plank floors",
+    "quality": 7,
+    "sameSpot": false
+  },
+  {
+    "id": "pair-12",
+    "before": "pair-12-before.jpg",
+    "after": "pair-12-after.jpg",
+    "category": "hardwood-refinishing",
+    "label": "Hardwood Refinishing",
+    "city": "Fair Oaks",
+    "caption": "Scratched and dulled hardwood brought back to a smooth satin finish",
+    "quality": 7,
+    "sameSpot": false
+  }
+]

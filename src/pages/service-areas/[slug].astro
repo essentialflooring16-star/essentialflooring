@@ -1,0 +1,199 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import FaqList from '../../components/FaqList.astro';
+import { SITE, SERVICES, CORE_CITIES, EXTENDED_CITIES, ALL_CITIES } from '../../data/site';
+import { photos, photoImage } from '../../lib/photos';
+import citiesCopy from '../../data/cities.json';
+
+export function getStaticPaths() {
+  return (citiesCopy as any[]).map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+type CityPage = {
+  slug: string;
+  city: string;
+  metaTitle: string;
+  metaDescription: string;
+  h1: string;
+  intro: string;
+  localContext: string;
+  servicesBlock: string;
+  whyUs: string;
+  faq: { q: string; a: string }[];
+};
+
+const { page } = Astro.props as { page: CityPage };
+const introParas = page.intro.split(/\n\n+/);
+
+// Rotate hero photos across city pages so they don't all look identical.
+const heroPool = photos.filter((p) => p.hero);
+const idx = (citiesCopy as any[]).findIndex((c) => c.slug === page.slug);
+const heroPhoto = heroPool[idx % heroPool.length];
+
+const isExtended = EXTENDED_CITIES.some((c) => c.slug === page.slug);
+const nearby = (isExtended ? CORE_CITIES.slice(0, 6) : CORE_CITIES.filter((c) => c.slug !== page.slug).slice(0, 6));
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: `Flooring installation and refinishing in ${page.city}, CA`,
+  serviceType: 'Flooring installation',
+  provider: { '@id': `${SITE.domain}/#business` },
+  areaServed: `${page.city}, CA`,
+  description: page.metaDescription,
+};
+---
+
+<Base title={page.metaTitle} description={page.metaDescription} schema={[serviceSchema]}>
+  <!-- HERO -->
+  <section class="relative overflow-hidden bg-ink">
+    <Image
+      src={photoImage(heroPhoto.id)}
+      alt={heroPhoto.alt}
+      widths={[768, 1280, 1920]}
+      sizes="100vw"
+      class="absolute inset-0 h-full w-full object-cover opacity-35"
+      loading="eager"
+      fetchpriority="high"
+      format="webp"
+      quality={65}
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/30" aria-hidden="true"></div>
+    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 pt-10 pb-20">
+      <Breadcrumbs light crumbs={[{ label: 'Service Areas', href: '/service-areas' }, { label: page.city }]} />
+      <h1 class="mt-10 font-display font-semibold text-cream text-4xl sm:text-5xl leading-[1.08] tracking-tight max-w-2xl text-balance">
+        {page.h1}
+      </h1>
+      <div class="mt-8 flex flex-col sm:flex-row gap-4">
+        <a
+          href="/contact"
+          class="inline-flex justify-center items-center gap-2 rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-7 py-3.5 transition-colors shadow-lift"
+        >
+          Get a Free Estimate
+        </a>
+        <a
+          href={SITE.phoneHref}
+          class="inline-flex justify-center items-center rounded-full border border-cream/30 hover:border-cream/60 text-cream font-semibold px-7 py-3.5 transition-colors"
+        >
+          Call {SITE.phone}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- BODY -->
+  <section class="py-16 sm:py-20">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 grid lg:grid-cols-[1fr_360px] gap-12">
+      <article class="max-w-2xl">
+        {introParas.map((p) => (
+          <p class="text-[17px] leading-relaxed text-bark mb-5">{p}</p>
+        ))}
+
+        <h2 class="mt-10 font-display font-semibold text-2xl text-ink">
+          Flooring that fits {page.city}
+        </h2>
+        <p class="mt-4 text-[16px] leading-relaxed text-coffee">{page.localContext}</p>
+
+        <h2 class="mt-10 font-display font-semibold text-2xl text-ink">
+          What we do for homes here
+        </h2>
+        <p class="mt-4 text-[16px] leading-relaxed text-coffee">{page.servicesBlock}</p>
+
+        <div class="mt-8 grid sm:grid-cols-2 gap-4">
+          {SERVICES.map((s) => (
+            <a
+              href={`/services/${s.slug}`}
+              class="group rounded-xl border border-line bg-paper px-5 py-4 shadow-card hover:shadow-lift transition-shadow"
+            >
+              <span class="font-semibold text-[15px] text-ink group-hover:text-oak-deep transition-colors">
+                {s.name}
+              </span>
+            </a>
+          ))}
+        </div>
+
+        <h2 class="mt-10 font-display font-semibold text-2xl text-ink">
+          Why neighbors trust us
+        </h2>
+        <p class="mt-4 text-[16px] leading-relaxed text-coffee">{page.whyUs}</p>
+      </article>
+
+      <aside class="reveal rounded-2xl bg-paper border border-line shadow-card p-7 h-fit lg:sticky lg:top-24">
+        <h2 class="font-display font-semibold text-xl text-ink">
+          Free estimate in {page.city}
+        </h2>
+        <p class="mt-3 text-[14.5px] leading-relaxed text-coffee">
+          Tell us about your rooms and floors. We measure on site and send a clear written
+          quote, free of charge.
+        </p>
+        <a
+          href="/contact"
+          class="mt-5 w-full inline-flex justify-center items-center rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-6 py-3 transition-colors"
+        >
+          Request an estimate
+        </a>
+        <a
+          href={SITE.phoneHref}
+          class="mt-3 w-full inline-flex justify-center items-center rounded-full border border-line hover:border-oak text-ink font-semibold px-6 py-3 transition-colors"
+        >
+          {SITE.phone}
+        </a>
+        <p class="mt-5 text-[13px] text-coffee/80 text-center">
+          Licensed &amp; Insured, {SITE.license}
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="py-16 bg-sand/60">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6">
+      <h2 class="reveal font-display font-semibold text-3xl text-ink tracking-tight text-center">
+        Flooring in {page.city}: common questions
+      </h2>
+      <div class="reveal mt-10">
+        <FaqList items={page.faq} />
+      </div>
+    </div>
+  </section>
+
+  <!-- NEARBY -->
+  <section class="py-14">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <h2 class="reveal font-semibold text-[15px] uppercase tracking-[0.16em] text-coffee mb-5">
+        Nearby areas we serve
+      </h2>
+      <ul class="flex flex-wrap gap-3">
+        {nearby.map((c) => (
+          <li>
+            <a
+              href={`/service-areas/${c.slug}`}
+              class="inline-flex rounded-full border border-line bg-paper px-4 py-2 text-[14px] font-medium text-bark hover:border-oak hover:text-oak-deep transition-colors"
+            >
+              {c.city}
+            </a>
+          </li>
+        ))}
+        <li>
+          <a
+            href="/service-areas"
+            class="inline-flex rounded-full bg-ink text-cream px-4 py-2 text-[14px] font-medium hover:bg-bark transition-colors"
+          >
+            All areas
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand
+    title={`Ready to upgrade your floors in ${page.city}?`}
+    text="Free estimate, clear timeline, licensed crew. It starts with one call."
+  />
+</Base>

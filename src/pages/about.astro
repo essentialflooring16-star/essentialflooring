@@ -1,0 +1,124 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { SITE } from '../data/site';
+import { photoImage, photoById } from '../lib/photos';
+
+const aboutPhoto = photoById('hardwood-refinishing-02');
+const detailPhoto = photoById('stairs-01');
+
+const values = [
+  {
+    t: 'Craft over shortcuts',
+    d: 'Tight seams, straight lines, clean transitions. The small details are what you notice for the next twenty years.',
+  },
+  {
+    t: 'Straight talk',
+    d: 'We tell you honestly when refinishing beats replacement, and when it does not. The estimate is free either way.',
+  },
+  {
+    t: 'Respect for your home',
+    d: 'We mask, we protect, we clean up. You get new floors, not a mess.',
+  },
+  {
+    t: 'On schedule',
+    d: 'Flooring work turns a home upside down, so we plan tightly and finish when we promised.',
+  },
+];
+---
+
+<Base
+  title="About Us | Essential Flooring, Sacramento CA"
+  description="Essential Flooring was founded in 2023 by Alexandru Szep, a flooring specialist with over 5 years of hands-on experience serving the Sacramento area."
+>
+  <section class="pt-10 pb-20">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <Breadcrumbs crumbs={[{ label: 'About' }]} />
+
+      <div class="mt-8 grid lg:grid-cols-2 gap-12 items-center">
+        <div class="max-w-xl">
+          <p class="text-[13px] font-semibold uppercase tracking-[0.18em] text-oak-deep mb-4">
+            Founded 2023 &middot; Sacramento, CA
+          </p>
+          <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-ink">
+            Quality is the foundation of everything we do
+          </h1>
+          <p class="mt-6 text-[17px] leading-relaxed text-bark">
+            Essential Flooring was founded in 2023 by Alexandru Szep with a clear goal:
+            deliver high-quality flooring through a fast, efficient and stress-free
+            process. With more than 5 years of hands-on experience in the flooring
+            industry, Alexandru brings knowledge, precision and reliability to every
+            project he takes on.
+          </p>
+          <p class="mt-4 text-[17px] leading-relaxed text-bark">
+            We specialize in professional floor preparation, installation and finishing,
+            for both residential and commercial spaces. Every job gets the same focus:
+            speed, precision, attention to detail and results that last. The goal is
+            simple, floors that raise the look, value and comfort of every space we
+            touch.
+          </p>
+          <div class="mt-8 flex flex-wrap gap-x-10 gap-y-4">
+            <div>
+              <p class="font-display font-semibold text-3xl text-ink">2023</p>
+              <p class="text-[13.5px] text-coffee mt-1">Company founded</p>
+            </div>
+            <div>
+              <p class="font-display font-semibold text-3xl text-ink">5+</p>
+              <p class="text-[13.5px] text-coffee mt-1">Years of hands-on experience</p>
+            </div>
+            <div>
+              <p class="font-display font-semibold text-3xl text-ink">{SITE.license}</p>
+              <p class="text-[13.5px] text-coffee mt-1">California licensed &amp; insured</p>
+            </div>
+          </div>
+        </div>
+        <div class="reveal grid gap-5">
+          <Image
+            src={photoImage(aboutPhoto.id)}
+            alt={aboutPhoto.alt}
+            widths={[640, 960]}
+            sizes="(min-width:1024px) 50vw, 100vw"
+            class="rounded-3xl shadow-lift w-full object-cover aspect-[4/3]"
+            format="webp"
+            quality={74}
+          />
+          <div class="grid grid-cols-[1fr_auto] items-center gap-5">
+            <div class="rounded-2xl bg-ink text-cream p-6">
+              <p class="font-display text-xl leading-snug">
+                "Fast, efficient and stress-free. That is the whole philosophy."
+              </p>
+              <p class="mt-3 text-[13.5px] text-cream/70">Alexandru Szep, founder</p>
+            </div>
+            <Image
+              src={photoImage(detailPhoto.id)}
+              alt={detailPhoto.alt}
+              widths={[300]}
+              sizes="160px"
+              class="rounded-2xl shadow-card size-36 object-cover hidden sm:block"
+              format="webp"
+              quality={70}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-20">
+        <h2 class="reveal font-display font-semibold text-3xl text-ink tracking-tight">
+          What we stand for
+        </h2>
+        <ul class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {values.map((v, i) => (
+            <li class="reveal rounded-2xl bg-paper border border-line p-6 shadow-card" style={`transition-delay:${i * 50}ms`}>
+              <h3 class="font-display font-semibold text-[18px] text-ink">{v.t}</h3>
+              <p class="mt-2 text-[14.5px] leading-relaxed text-coffee">{v.d}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>

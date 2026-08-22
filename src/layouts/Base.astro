@@ -1,0 +1,163 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource-variable/fraunces';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import QuickContact from '../components/QuickContact.astro';
+import { SITE } from '../data/site';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  noindex?: boolean;
+  schema?: object[];
+}
+
+const { title, description, ogImage, noindex = false, schema = [] } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImageUrl = new URL(ogImage ?? '/og-default.jpg', Astro.site);
+
+const localBusiness = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': `${SITE.domain}/#business`,
+  name: SITE.name,
+  legalName: SITE.legalName,
+  url: SITE.domain,
+  telephone: '+1-916-425-1361',
+  email: SITE.email,
+  image: ogImageUrl.href,
+  priceRange: '$$',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: SITE.address.locality,
+    addressRegion: SITE.address.region,
+    addressCountry: SITE.address.country,
+  },
+  areaServed: [
+    'Sacramento CA', 'Roseville CA', 'Folsom CA', 'Citrus Heights CA',
+    'Rancho Cordova CA', 'Carmichael CA', 'Antelope CA', 'Orangevale CA',
+    'Fair Oaks CA', 'Granite Bay CA', 'Lincoln CA', 'Loomis CA',
+    'North Highlands CA', 'Rio Linda CA', 'Arden-Arcade CA', 'Yuba City CA',
+  ],
+  sameAs: [SITE.instagram, SITE.facebook],
+  openingHours: SITE.hoursSchema,
+  foundingDate: String(SITE.founded),
+  founder: { '@type': 'Person', name: SITE.founder },
+  knowsAbout: [
+    'Hardwood floor refinishing', 'Hardwood installation', 'LVP flooring installation',
+    'Laminate flooring installation', 'Tile installation', 'Carpet installation',
+    'Stair installation and refinishing',
+  ],
+};
+
+const schemas = [localBusiness, ...schema];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#221a14" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={ogImageUrl.href} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl.href} />
+
+    {schemas.map((s) => (
+      <script type="application/ld+json" set:html={JSON.stringify(s)} />
+    ))}
+
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-ink focus:text-cream focus:px-4 focus:py-2 focus:rounded-md"
+    >
+      Skip to content
+    </a>
+    <Header />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+    <QuickContact />
+
+    <script>
+      // Reveal on scroll (failsafe: visible by default without JS)
+      const els = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+      if ('IntersectionObserver' in window && els.length) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add('is-visible');
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
+        );
+        els.forEach((el) => io.observe(el));
+        // Failsafe: anything still hidden after 2.5s becomes visible
+        setTimeout(() => els.forEach((el) => el.classList.add('is-visible')), 2500);
+      } else {
+        els.forEach((el) => el.classList.add('is-visible'));
+      }
+    </script>
+
+    <script>
+      // Lightweight first-party analytics -> Supabase (no cookies, no PII).
+      import { trackPageView } from '../lib/analytics';
+      trackPageView();
+    </script>
+
+    <script>
+      // Fluid, macOS-like scrolling on desktop pointers only. Phones keep
+      // native scrolling, which is smoother and cheaper on old devices.
+      import Lenis from 'lenis';
+      const fine = window.matchMedia('(pointer: fine)').matches;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (fine && !reduced) {
+        document.documentElement.style.scrollBehavior = 'auto';
+        const lenis = new Lenis({ duration: 1.05, smoothWheel: true });
+        const raf = (time: number) => {
+          lenis.raf(time);
+          requestAnimationFrame(raf);
+        };
+        requestAnimationFrame(raf);
+        // Anchor links go through Lenis so they glide instead of jumping.
+        document.addEventListener('click', (e) => {
+          const a = (e.target as HTMLElement).closest('a[href^="#"]');
+          if (!a) return;
+          const id = a.getAttribute('href')!.slice(1);
+          const el = id && document.getElementById(id);
+          if (el) {
+            e.preventDefault();
+            lenis.scrollTo(el, { offset: -90 });
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

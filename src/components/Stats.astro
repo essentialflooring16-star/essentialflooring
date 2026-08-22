@@ -1,0 +1,64 @@
+---
+// Animated count-up stat band. Numbers are real: founding year, experience,
+// cities from the GBP service area, capabilities list length.
+import { ALL_SERVICES, ALL_CITIES, SITE } from '../data/site';
+
+interface Props {
+  dark?: boolean;
+}
+const { dark = true } = Astro.props;
+
+const stats = [
+  { value: SITE.founded, label: 'Company founded', suffix: '' },
+  { value: 5, label: 'Years of hands-on experience', suffix: '+' },
+  { value: ALL_CITIES.length, label: 'Cities and areas served', suffix: '' },
+  { value: ALL_SERVICES.length, label: 'Services under one roof', suffix: '' },
+];
+---
+
+<dl class={`grid grid-cols-2 lg:grid-cols-4 gap-px rounded-2xl overflow-hidden border ${dark ? 'border-cream/10 bg-cream/10' : 'border-line bg-line'}`}>
+  {stats.map((s) => (
+    <div class={`p-6 sm:p-8 ${dark ? 'bg-ink' : 'bg-paper'}`}>
+      <dd
+        class={`font-display font-semibold text-4xl sm:text-5xl tabular-nums tracking-tight ${dark ? 'text-cream' : 'text-ink'}`}
+        data-countup={s.value}
+      >
+        {s.value}<span class="text-oak">{s.suffix}</span>
+      </dd>
+      <dt class={`mt-2 text-[13.5px] ${dark ? 'text-cream/60' : 'text-coffee'}`}>{s.label}</dt>
+    </div>
+  ))}
+</dl>
+
+<script>
+  // Count up when the band scrolls into view. Respects reduced motion.
+  const els = document.querySelectorAll<HTMLElement>('[data-countup]');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (els.length && !reduced && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          io.unobserve(e.target);
+          const el = e.target as HTMLElement;
+          const target = Number(el.dataset.countup || '0');
+          const suffixEl = el.querySelector('span');
+          const suffix = suffixEl ? suffixEl.outerHTML : '';
+          const start = performance.now();
+          const dur = 1100;
+          const from = Math.max(0, target - Math.min(target, 60));
+          const tick = (now: number) => {
+            const t = Math.min(1, (now - start) / dur);
+            const eased = 1 - Math.pow(1 - t, 3);
+            const val = Math.round(from + (target - from) * eased);
+            el.innerHTML = `${val}${suffix}`;
+            if (t < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+      },
+      { threshold: 0.4 },
+    );
+    els.forEach((el) => io.observe(el));
+  }
+</script>

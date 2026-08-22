@@ -1,0 +1,49 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { SITE } from '../data/site';
+---
+
+<Base
+  title="Privacy Policy | Essential Flooring"
+  description="How Essential Flooring handles the information you share with us through this website."
+  noindex
+>
+  <section class="pt-10 pb-20">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6">
+      <Breadcrumbs crumbs={[{ label: 'Privacy Policy' }]} />
+      <h1 class="mt-8 font-display font-semibold text-4xl leading-[1.1] tracking-tight text-ink">
+        Privacy Policy
+      </h1>
+      <div class="mt-8 space-y-6 text-[15.5px] leading-relaxed text-bark">
+        <p>
+          This website is operated by {SITE.legalName} ("we", "us"). We keep data
+          collection to the minimum needed to respond to your requests.
+        </p>
+        <h2 class="font-display font-semibold text-2xl text-ink pt-2">What we collect</h2>
+        <p>
+          When you submit the contact form, we receive the details you type in: your name,
+          phone number, email address, city and project description. We use them only to
+          contact you about your flooring project.
+        </p>
+        <h2 class="font-display font-semibold text-2xl text-ink pt-2">Analytics</h2>
+        <p>
+          We measure page visits with a privacy-friendly, first-party counter. It stores no
+          cookies, collects no personal data, and does not follow you across other websites.
+        </p>
+        <h2 class="font-display font-semibold text-2xl text-ink pt-2">Sharing</h2>
+        <p>
+          We do not sell or share your information with third parties for marketing. Form
+          submissions are delivered to us by our email and database providers acting on our
+          behalf.
+        </p>
+        <h2 class="font-display font-semibold text-2xl text-ink pt-2">Your choices</h2>
+        <p>
+          Want your inquiry deleted? Email us at
+          <a href={`mailto:${SITE.email}`} class="text-oak-deep font-medium">{SITE.email}</a>
+          or call {SITE.phone} and we will remove it.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,247 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import FaqList from '../../components/FaqList.astro';
+import { SITE, SERVICES } from '../../data/site';
+import { photos, photoImage, photoById } from '../../lib/photos';
+import servicesCopy from '../../data/services-copy.json';
+
+export function getStaticPaths() {
+  return (servicesCopy as any[]).map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+type FaqItem = { q: string; a: string };
+type ServicePage = {
+  slug: string;
+  name: string;
+  metaTitle: string;
+  metaDescription: string;
+  h1: string;
+  intro: string;
+  benefits: { title: string; text: string }[];
+  process: { title: string; text: string }[];
+  details: string;
+  faq: FaqItem[];
+};
+
+const { page } = Astro.props as { page: ServicePage };
+const meta = SERVICES.find((s) => s.slug === page.slug)!;
+
+// Photos that visually match this service.
+const categoryMap: Record<string, string[]> = {
+  'hardwood-floor-refinishing': ['hardwood-refinishing'],
+  'lvp-vinyl-plank-flooring': ['lvp-vinyl'],
+  'stairs-installation-refinishing': ['stairs'],
+  'laminate-flooring': ['lvp-vinyl'],
+  'carpet-installation': ['lvp-vinyl'],
+};
+const related = photos
+  .filter((p) => categoryMap[page.slug]?.includes(p.category) && p.state === 'after')
+  .sort((a, b) => b.quality - a.quality)
+  .slice(0, 6);
+
+const introParas = page.intro.split(/\n\n+/);
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: page.name,
+  serviceType: page.name,
+  provider: { '@id': `${SITE.domain}/#business` },
+  areaServed: 'Sacramento CA and surrounding areas',
+  description: page.metaDescription,
+};
+
+const otherServices = SERVICES.filter((s) => s.slug !== page.slug);
+---
+
+<Base title={page.metaTitle} description={page.metaDescription} schema={[serviceSchema]}>
+  <!-- HERO -->
+  <section class="relative overflow-hidden bg-ink">
+    <Image
+      src={photoImage(meta.image)}
+      alt={photoById(meta.image).alt}
+      widths={[768, 1280, 1920]}
+      sizes="100vw"
+      class="absolute inset-0 h-full w-full object-cover opacity-35"
+      loading="eager"
+      fetchpriority="high"
+      format="webp"
+      quality={65}
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/30" aria-hidden="true"></div>
+    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 pt-10 pb-20">
+      <Breadcrumbs light crumbs={[{ label: 'Services', href: '/services' }, { label: page.name }]} />
+      <h1 class="mt-10 font-display font-semibold text-cream text-4xl sm:text-5xl leading-[1.08] tracking-tight max-w-2xl text-balance">
+        {page.h1}
+      </h1>
+      <div class="mt-8 flex flex-col sm:flex-row gap-4">
+        <a
+          href="/contact"
+          class="inline-flex justify-center items-center gap-2 rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-7 py-3.5 transition-colors shadow-lift"
+        >
+          Get a Free Estimate
+        </a>
+        <a
+          href={SITE.phoneHref}
+          class="inline-flex justify-center items-center rounded-full border border-cream/30 hover:border-cream/60 text-cream font-semibold px-7 py-3.5 transition-colors"
+        >
+          Call {SITE.phone}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTRO -->
+  <section class="py-16 sm:py-20">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 grid lg:grid-cols-[1fr_360px] gap-12">
+      <div class="max-w-2xl">
+        {introParas.map((p) => (
+          <p class="text-[17px] leading-relaxed text-bark mb-5 last:mb-0">{p}</p>
+        ))}
+        <div class="mt-10 rounded-2xl bg-sand/70 border border-line p-6">
+          <h2 class="font-display font-semibold text-xl text-ink">What to expect</h2>
+          <p class="mt-2 text-[15.5px] leading-relaxed text-coffee">{page.details}</p>
+        </div>
+      </div>
+
+      <aside class="reveal rounded-2xl bg-paper border border-line shadow-card p-7 h-fit lg:sticky lg:top-24">
+        <h2 class="font-display font-semibold text-xl text-ink">Quick facts</h2>
+        <ul class="mt-4 space-y-3 text-[14.5px] text-coffee">
+          <li class="flex gap-2.5">
+            <span class="text-oak-deep font-bold" aria-hidden="true">&check;</span>
+            Licensed &amp; Insured, {SITE.license}
+          </li>
+          <li class="flex gap-2.5">
+            <span class="text-oak-deep font-bold" aria-hidden="true">&check;</span>
+            Free on-site estimates
+          </li>
+          <li class="flex gap-2.5">
+            <span class="text-oak-deep font-bold" aria-hidden="true">&check;</span>
+            Transparent written quotes
+          </li>
+          <li class="flex gap-2.5">
+            <span class="text-oak-deep font-bold" aria-hidden="true">&check;</span>
+            Mon to Sat, 7 AM to 7 PM
+          </li>
+        </ul>
+        <a
+          href="/contact"
+          class="mt-6 w-full inline-flex justify-center items-center rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-6 py-3 transition-colors"
+        >
+          Request an estimate
+        </a>
+        <p class="mt-4 text-[13px] text-coffee/80 text-center">
+          Or call <a href={SITE.phoneHref} class="font-semibold text-oak-deep">{SITE.phone}</a>
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- BENEFITS -->
+  <section class="py-16 bg-sand/60">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <h2 class="reveal font-display font-semibold text-3xl text-ink tracking-tight">
+        Why homeowners choose this
+      </h2>
+      <ul class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {page.benefits.map((b, i) => (
+          <li class="reveal rounded-2xl bg-paper border border-line p-6 shadow-card" style={`transition-delay:${i * 50}ms`}>
+            <h3 class="font-display font-semibold text-[18px] text-ink">{b.title}</h3>
+            <p class="mt-2 text-[14.5px] leading-relaxed text-coffee">{b.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="py-16 sm:py-20">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <h2 class="reveal font-display font-semibold text-3xl text-ink tracking-tight">How we work</h2>
+      <ol class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {page.process.map((step, i) => (
+          <li class="reveal rounded-2xl border border-line bg-paper p-6 shadow-card" style={`transition-delay:${i * 50}ms`}>
+            <span class="font-display font-semibold text-4xl text-oak">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="mt-3 font-display font-semibold text-[18px] text-ink">{step.title}</h3>
+            <p class="mt-2 text-[14.5px] leading-relaxed text-coffee">{step.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- RELATED WORK -->
+  {related.length > 0 && (
+    <section class="py-16 bg-ink">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="flex items-end justify-between gap-6 mb-10">
+          <h2 class="reveal font-display font-semibold text-3xl text-cream tracking-tight">
+            Our recent work
+          </h2>
+          <a href="/portfolio" class="reveal shrink-0 font-semibold text-oak-soft hover:text-cream transition-colors">
+            Full portfolio
+          </a>
+        </div>
+        <ul class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+          {related.map((p) => (
+            <li class="reveal">
+              <a href="/portfolio" class="group block overflow-hidden rounded-xl aspect-[4/3]">
+                <Image
+                  src={photoImage(p.id)}
+                  alt={p.alt}
+                  widths={[400, 640]}
+                  sizes="(min-width:1024px) 33vw, 50vw"
+                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+                  format="webp"
+                  quality={68}
+                />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- FAQ -->
+  <section class="py-16 sm:py-20">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6">
+      <h2 class="reveal font-display font-semibold text-3xl text-ink tracking-tight text-center">
+        {page.name}: your questions
+      </h2>
+      <div class="reveal mt-10">
+        <FaqList items={page.faq} />
+      </div>
+    </div>
+  </section>
+
+  <!-- OTHER SERVICES -->
+  <section class="pb-20">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <h2 class="reveal font-display font-semibold text-2xl text-ink tracking-tight mb-8">
+        Other services
+      </h2>
+      <div class="grid sm:grid-cols-3 gap-5">
+        {otherServices.map((s) => (
+          <a
+            href={`/services/${s.slug}`}
+            class="reveal group rounded-2xl border border-line bg-paper p-6 shadow-card hover:shadow-lift transition-shadow"
+          >
+            <h3 class="font-display font-semibold text-[18px] text-ink group-hover:text-oak-deep transition-colors">
+              {s.name}
+            </h3>
+            <p class="mt-2 text-[14px] leading-relaxed text-coffee">{s.short}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>

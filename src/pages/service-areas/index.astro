@@ -1,0 +1,84 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { CORE_CITIES, EXTENDED_CITIES } from '../../data/site';
+import citiesCopy from '../../data/cities.json';
+
+const blurbs = new Map(
+  (citiesCopy as any[]).map((c) => [c.slug, c.metaDescription as string]),
+);
+---
+
+<Base
+  title="Service Areas | Flooring Across Greater Sacramento | Essential Flooring"
+  description="Essential Flooring installs and refinishes floors across the Sacramento region: Roseville, Folsom, Citrus Heights, Carmichael and more. Free estimates."
+>
+  <section class="pt-10 pb-20">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <Breadcrumbs crumbs={[{ label: 'Service Areas' }]} />
+      <div class="mt-8 mb-12 max-w-2xl">
+        <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-ink">
+          Where we work
+        </h1>
+        <p class="mt-5 text-[17px] leading-relaxed text-coffee">
+          Essential Flooring is based in Sacramento and works across the region every week.
+          Pick your city below to see how we can help with hardwood refinishing, LVP,
+          laminate and carpet where you live.
+        </p>
+      </div>
+
+      <h2 class="reveal font-display font-semibold text-2xl text-ink mb-6">Greater Sacramento</h2>
+      <ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {CORE_CITIES.map((c, i) => (
+          <li class="reveal" style={`transition-delay:${(i % 6) * 40}ms`}>
+            <a
+              href={`/service-areas/${c.slug}`}
+              class="group flex flex-col h-full rounded-2xl border border-line bg-paper p-6 shadow-card hover:shadow-lift transition-shadow"
+            >
+              <h3 class="font-display font-semibold text-[19px] text-ink group-hover:text-oak-deep transition-colors">
+                {c.city}, CA
+              </h3>
+              <p class="mt-2 text-[14px] leading-relaxed text-coffee line-clamp-2">
+                {blurbs.get(c.slug)}
+              </p>
+              <span class="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold text-oak-deep">
+                Flooring in {c.city}
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true">
+                  <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <h2 class="reveal font-display font-semibold text-2xl text-ink mt-14 mb-3">
+        Extended service areas
+      </h2>
+      <p class="reveal text-[15px] text-coffee max-w-2xl mb-6">
+        For larger projects we also travel beyond the Sacramento region, scheduled per project.
+      </p>
+      <ul class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {EXTENDED_CITIES.map((c) => (
+          <li class="reveal">
+            <a
+              href={`/service-areas/${c.slug}`}
+              class="group block rounded-2xl border border-line bg-sand/50 p-5 hover:bg-paper hover:shadow-card transition-all"
+            >
+              <h3 class="font-semibold text-[16px] text-ink group-hover:text-oak-deep transition-colors">
+                {c.city}
+              </h3>
+              <span class="mt-1 block text-[13.5px] text-coffee">Select projects</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand
+    title="Not sure if we cover your street?"
+    text="If you are anywhere near Sacramento, the answer is almost certainly yes. Call us and ask."
+  />
+</Base>

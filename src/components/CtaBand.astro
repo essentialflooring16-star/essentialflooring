@@ -1,0 +1,48 @@
+---
+import { SITE } from '../data/site';
+
+interface Props {
+  title?: string;
+  text?: string;
+}
+const {
+  title = 'Ready for floors you will love walking on?',
+  text = 'Tell us about your project. We come out, measure, and give you a clear written quote. No pressure, no hidden fees.',
+} = Astro.props;
+---
+
+<section class="grain relative overflow-hidden bg-ink">
+  <div class="absolute inset-0 opacity-[0.07]" aria-hidden="true">
+    <svg width="100%" height="100%">
+      <pattern id="planks" width="220" height="46" patternUnits="userSpaceOnUse">
+        <rect width="220" height="46" fill="none" />
+        <path d="M0 45.5h220M110 0v46" stroke="#faf6ef" stroke-width="1" />
+      </pattern>
+      <rect width="100%" height="100%" fill="url(#planks)" />
+    </svg>
+  </div>
+  <div class="relative mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-20 text-center">
+    <h2 class="reveal font-display font-semibold text-3xl sm:text-4xl text-cream tracking-tight max-w-2xl mx-auto">
+      {title}
+    </h2>
+    <p class="reveal mt-4 text-cream/75 text-[17px] max-w-xl mx-auto leading-relaxed">{text}</p>
+    <div class="reveal mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a
+        href="/contact"
+        class="inline-flex items-center gap-2 rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-7 py-3.5 transition-colors shadow-lift"
+      >
+        Get a Free Estimate
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+          <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+      <a
+        href={SITE.phoneHref}
+        class="inline-flex items-center gap-2 rounded-full border border-cream/25 hover:border-cream/50 text-cream font-semibold px-7 py-3.5 transition-colors"
+      >
+        Call {SITE.phone}
+      </a>
+    </div>
+    <p class="reveal mt-6 text-[13px] text-cream/50">Licensed &amp; Insured, {SITE.license}</p>
+  </div>
+</section>

@@ -1,0 +1,37 @@
+---
+interface Props {
+  items: { q: string; a: string }[];
+  withSchema?: boolean;
+}
+const { items, withSchema = true } = Astro.props;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: items.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<div class="divide-y divide-line rounded-2xl border border-line bg-paper shadow-card overflow-hidden">
+  {items.map((f) => (
+    <details class="group">
+      <summary class="flex items-center justify-between gap-4 cursor-pointer list-none px-5 sm:px-7 py-5 text-[16px] sm:text-[17px] font-semibold text-ink hover:bg-sand/40 transition-colors [&::-webkit-details-marker]:hidden">
+        {f.q}
+        <span
+          class="shrink-0 grid place-items-center size-7 rounded-full border border-line text-coffee transition-transform group-open:rotate-45"
+          aria-hidden="true"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+            <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+          </svg>
+        </span>
+      </summary>
+      <p class="px-5 sm:px-7 pb-6 -mt-1 text-[15.5px] leading-relaxed text-coffee max-w-3xl">{f.a}</p>
+    </details>
+  ))}
+</div>
+{withSchema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
