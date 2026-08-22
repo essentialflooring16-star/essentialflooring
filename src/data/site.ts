@@ -4,6 +4,8 @@ export const SITE = {
   domain: 'https://essentialflooringinc.com',
   phone: '(916) 425-1361',
   phoneHref: 'tel:+19164251361',
+  // E.164, for structured data. Keep in sync with phoneHref.
+  phoneSchema: '+1-916-425-1361',
   email: 'essentialflooring16@gmail.com',
   license: 'CSLB #1117565',
   licenseNumber: '1117565',
@@ -98,11 +100,19 @@ export const CORE_CITIES = [
   { slug: 'yuba-city', city: 'Yuba City' },
 ] as const;
 
+// `region: true` marks an area that is not a single city, so structured data
+// does not emit a malformed place name like "Orange County CA".
 export const EXTENDED_CITIES = [
   { slug: 'san-francisco', city: 'San Francisco' },
-  { slug: 'san-francisco-bay-area', city: 'San Francisco Bay Area' },
-  { slug: 'orange-county', city: 'Orange County' },
+  { slug: 'san-francisco-bay-area', city: 'San Francisco Bay Area', region: true },
+  { slug: 'orange-county', city: 'Orange County', region: true },
   { slug: 'south-lake-tahoe', city: 'South Lake Tahoe' },
 ] as const;
 
 export const ALL_CITIES = [...CORE_CITIES, ...EXTENDED_CITIES];
+
+// Schema.org areaServed names, derived so the list cannot drift from the
+// city pages the site actually publishes.
+export const AREA_SERVED = ALL_CITIES.map((c) =>
+  'region' in c && c.region ? c.city : `${c.city}, CA`,
+);

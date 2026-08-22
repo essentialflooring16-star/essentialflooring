@@ -69,9 +69,9 @@ const posts = await getPublishedPosts();
                 )}
                 <span class="flex flex-col flex-1 p-6">
                   <span class="text-[13px] text-coffee">{postDate(post)}</span>
-                  <span class="mt-2 font-display font-semibold text-xl leading-snug text-ink group-hover:text-oak-deep transition-colors">
+                  <h2 class="mt-2 font-display font-semibold text-xl leading-snug text-ink group-hover:text-oak-deep transition-colors">
                     {post.title}
-                  </span>
+                  </h2>
                   {post.excerpt && (
                     <span class="mt-2.5 text-[14.5px] leading-relaxed text-coffee line-clamp-3">
                       {post.excerpt}

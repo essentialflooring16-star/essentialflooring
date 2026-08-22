@@ -5,19 +5,23 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import QuickContact from '../components/QuickContact.astro';
-import { SITE } from '../data/site';
+import { SITE, AREA_SERVED } from '../data/site';
 
 interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  ogType?: string;
   noindex?: boolean;
   schema?: object[];
 }
 
-const { title, description, ogImage, noindex = false, schema = [] } = Astro.props;
+const { title, description, ogImage, ogType = 'website', noindex = false, schema = [] } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImageUrl = new URL(ogImage ?? '/og-default.jpg', Astro.site);
+// The business entity keeps one stable image. Without this, a blog post cover
+// would redefine the image of the same @id on every article.
+const businessImage = new URL('/og-default.jpg', Astro.site).href;
 
 const localBusiness = {
   '@context': 'https://schema.org',
@@ -25,24 +29,18 @@ const localBusiness = {
   '@id': `${SITE.domain}/#business`,
   name: SITE.name,
   legalName: SITE.legalName,
-  url: SITE.domain,
-  telephone: '+1-916-425-1361',
+  url: `${SITE.domain}/`,
+  telephone: SITE.phoneSchema,
   email: SITE.email,
-  image: ogImageUrl.href,
-  priceRange: '$$',
+  image: businessImage,
   address: {
     '@type': 'PostalAddress',
     addressLocality: SITE.address.locality,
     addressRegion: SITE.address.region,
     addressCountry: SITE.address.country,
   },
-  areaServed: [
-    'Sacramento CA', 'Roseville CA', 'Folsom CA', 'Citrus Heights CA',
-    'Rancho Cordova CA', 'Carmichael CA', 'Antelope CA', 'Orangevale CA',
-    'Fair Oaks CA', 'Granite Bay CA', 'Lincoln CA', 'Loomis CA',
-    'North Highlands CA', 'Rio Linda CA', 'Arden-Arcade CA', 'Yuba City CA',
-  ],
-  sameAs: [SITE.instagram, SITE.facebook],
+  areaServed: AREA_SERVED,
+  sameAs: [SITE.instagram, SITE.facebook, SITE.googleProfile],
   openingHours: SITE.hoursSchema,
   foundingDate: String(SITE.founded),
   founder: { '@type': 'Person', name: SITE.founder },
@@ -70,8 +68,9 @@ const schemas = [localBusiness, ...schema];
     <meta name="theme-color" content="#221a14" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical.href} />
@@ -97,7 +96,7 @@ const schemas = [localBusiness, ...schema];
       Skip to content
     </a>
     <Header />
-    <main id="main" class="flex-1">
+    <main id="main" tabindex="-1" class="flex-1">
       <slot />
     </main>
     <Footer />
@@ -148,7 +147,8 @@ const schemas = [localBusiness, ...schema];
         requestAnimationFrame(raf);
         // Anchor links go through Lenis so they glide instead of jumping.
         document.addEventListener('click', (e) => {
-          const a = (e.target as HTMLElement).closest('a[href^="#"]');
+          // The skip link must stay native so focus actually moves into <main>.
+          const a = (e.target as HTMLElement).closest('a[href^="#"]:not([href="#main"])');
           if (!a) return;
           const id = a.getAttribute('href')!.slice(1);
           const el = id && document.getElementById(id);

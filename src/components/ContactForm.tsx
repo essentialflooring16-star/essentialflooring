@@ -17,6 +17,8 @@ type Status = 'idle' | 'sending' | 'sent' | 'error';
 export default function ContactForm() {
   const [status, setStatus] = useState<Status>('idle');
   const doneRef = useRef<HTMLHeadingElement>(null);
+  // How long the visitor spent on the form. Bots submit almost instantly.
+  const openedAt = useRef<number>(Date.now());
 
   useEffect(() => {
     if (status === 'sent') doneRef.current?.focus();
@@ -44,21 +46,24 @@ export default function ContactForm() {
     };
 
     let delivered = false;
+    let rateLimited = false;
 
-    // Primary channel: email via serverless function.
+    // Primary channel: the serverless function stores the lead AND emails it.
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(lead),
+        body: JSON.stringify({ ...lead, elapsedMs: Date.now() - openedAt.current }),
       });
       if (res.ok) delivered = true;
+      if (res.status === 429) rateLimited = true;
     } catch {
-      /* fall through to Supabase */
+      /* fall through to the Supabase fallback below */
     }
 
-    // Always also store the lead in the admin cabinet when configured.
-    if (supaUrl && supaKey) {
+    // Fallback only. If the function already accepted the lead it is stored,
+    // so writing again from the browser would duplicate the request.
+    if (!delivered && !rateLimited && supaUrl && supaKey) {
       try {
         const res = await fetch(`${supaUrl}/rest/v1/leads`, {
           method: 'POST',
