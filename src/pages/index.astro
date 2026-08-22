@@ -13,6 +13,10 @@ import { SITE, ALL_SERVICES, CORE_CITIES, EXTENDED_CITIES } from '../data/site';
 import { photos, photoImage, photoById } from '../lib/photos';
 import faqData from '../data/faq.json';
 import pairsData from '../data/before-after.json';
+import reviewsData from '../data/reviews.json';
+
+// No real reviews yet, so the teaser must not show stars or claim a rating.
+const hasReviews = (reviewsData as unknown[]).length > 0;
 
 const heroPhoto = photoById('lvp-vinyl-01');
 const heroImg = photoImage(heroPhoto.id);
@@ -67,7 +71,7 @@ const steps = [
   },
   {
     title: 'Expert installation',
-    text: 'Our crew installs or refinishes with care for the details: tight seams, clean transitions, straight lines and finished baseboards.',
+    text: 'Every floor is installed or refinished with care for the details: tight seams, clean transitions, straight lines and finished baseboards.',
   },
   {
     title: 'Final walkthrough',
@@ -181,8 +185,8 @@ const marqueeItems = [
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
         <SectionHeading
           eyebrow="What we do"
-          title="One crew. Every floor."
-          text="From tear-out to the last baseboard, one licensed crew owns the whole job. No handoffs, no finger-pointing."
+          title="One contractor. Every floor."
+          text="From tear-out to the last baseboard, one licensed contractor owns the whole job. No handoffs, no finger-pointing."
         />
         <a
           href="/services"
@@ -215,7 +219,7 @@ const marqueeItems = [
           <SectionHeading
             eyebrow="The proof"
             title="Drag the handle. Same room, same angle."
-            text="Every pair below was shot by our crew on real Sacramento area projects. Pick a project, pull the slider, and see exactly what we walked into and what we left behind."
+            text="Every pair below was shot on real Sacramento area projects. Pick a project, pull the slider, and see exactly what we walked into and what we left behind."
             light
           />
           <div class="reveal mt-8">
@@ -270,7 +274,7 @@ const marqueeItems = [
         <SectionHeading
           eyebrow="Recent projects"
           title="Real homes. Real floors."
-          text="Every photo is our own work in the Sacramento area, straight off the crew's phone."
+          text="Every photo is our own work in the Sacramento area, straight off the phone, on the job."
         />
         <a
           href="/portfolio"
@@ -343,8 +347,8 @@ const marqueeItems = [
               d: 'Flooring work disrupts your routine, so we plan carefully and finish when we said we would.',
             },
             {
-              t: 'We stand behind our work',
-              d: 'If something is not right on a floor we installed or refinished, we come back and make it right.',
+              t: 'Prep work done properly',
+              d: 'Old flooring out, subfloor levelled and cleaned, moisture checked. The part you never see is what keeps a floor flat.',
             },
           ].map((item) => (
             <li class="reveal flex gap-4">
@@ -393,27 +397,35 @@ const marqueeItems = [
     </div>
   </section>
 
-  <!-- REVIEWS TEASER -->
+  <!-- REVIEWS TEASER: the star row and the rating claim only appear once real
+       reviews exist in reviews.json. With none, we link out to Google instead
+       of implying a rating we cannot show. -->
   <section class="py-16 bg-sand/60">
     <div class="mx-auto max-w-6xl px-4 sm:px-6 text-center">
-      <div class="reveal inline-flex items-center gap-1.5 text-oak" aria-hidden="true">
-        {Array.from({ length: 5 }).map(() => (
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6L2.5 9.5l6.6-.8z" />
-          </svg>
-        ))}
-      </div>
+      {hasReviews && (
+        <div class="reveal inline-flex items-center gap-1.5 text-oak" aria-hidden="true">
+          {Array.from({ length: 5 }).map(() => (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6L2.5 9.5l6.6-.8z" />
+            </svg>
+          ))}
+        </div>
+      )}
       <h2 class="reveal mt-4 font-display font-semibold text-2xl sm:text-3xl text-ink">
-        Our clients say it best
+        {hasReviews ? 'Our clients say it best' : 'Checking us out?'}
       </h2>
       <p class="reveal mt-3 text-coffee max-w-lg mx-auto text-[16px]">
-        Read what Sacramento homeowners think about working with us, straight from Google.
+        {hasReviews
+          ? 'Read what Sacramento homeowners think about working with us, straight from Google.'
+          : 'Our reviews live on our Google Business Profile, along with photos from recent jobs around Sacramento.'}
       </p>
       <a
-        href="/reviews"
+        href={hasReviews ? '/reviews' : SITE.googleProfile}
+        target={hasReviews ? undefined : '_blank'}
+        rel={hasReviews ? undefined : 'noopener'}
         class="reveal mt-6 inline-flex items-center gap-2 rounded-full bg-ink hover:bg-bark text-cream font-semibold px-6 py-3 transition-colors"
       >
-        Read our reviews
+        {hasReviews ? 'Read our reviews' : 'See us on Google'}
       </a>
     </div>
   </section>
