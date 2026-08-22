@@ -46,17 +46,23 @@ export const SERVICES = [
     short: 'New treads, risers and full staircase makeovers that match your floors, from oak to wood-look plank.',
     image: 'stairs-01',
   },
+  // TODO (ask the client): there are no carpet or laminate photos in the material
+  // he sent, so these two cards borrow a plank-floor photo. imageAlt keeps the
+  // alt text honest about what the picture actually shows rather than claiming
+  // it is carpet or laminate work. Replace both as soon as we get real photos.
   {
     slug: 'laminate-flooring',
     name: 'Laminate Flooring',
     short: 'Realistic wood looks at a friendly price point, with moisture resistant options and fast installation.',
     image: 'lvp-vinyl-04',
+    imageAlt: 'Upstairs hallway in a Sacramento home with light oak plank flooring and a new stair railing',
   },
   {
     slug: 'carpet-installation',
     name: 'Carpet Installation',
     short: 'Premium padding, stain resistant options and expert seam placement for bedrooms and living spaces.',
     image: 'lvp-vinyl-02',
+    imageAlt: 'Living space in a Sacramento home photographed after an Essential Flooring installation',
   },
 ] as const;
 

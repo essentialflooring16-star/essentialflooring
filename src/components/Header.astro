@@ -2,17 +2,23 @@
 import { SITE } from '../data/site';
 
 const nav = [
-  { href: '/services', label: 'Services' },
-  { href: '/portfolio', label: 'Our Work' },
-  { href: '/service-areas', label: 'Service Areas' },
-  { href: '/reviews', label: 'Reviews' },
-  { href: '/about', label: 'About' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/faq', label: 'FAQ' },
+  { href: '/services/', label: 'Services' },
+  { href: '/portfolio/', label: 'Our Work' },
+  { href: '/service-areas/', label: 'Service Areas' },
+  { href: '/reviews/', label: 'Reviews' },
+  { href: '/about/', label: 'About' },
+  { href: '/blog/', label: 'Blog' },
+  { href: '/faq/', label: 'FAQ' },
 ];
 
-const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const isActive = (href: string) => path === href || path.startsWith(href + '/');
+// Compare with trailing slashes stripped from both sides: the nav hrefs end in
+// '/' to match vercel.json trailingSlash, the pathname may or may not.
+const strip = (v: string) => v.replace(/\/+$/, '') || '/';
+const path = strip(Astro.url.pathname);
+const isActive = (href: string) => {
+  const h = strip(href);
+  return path === h || (h !== '/' && path.startsWith(h + '/'));
+};
 ---
 
 <div class="bg-ink text-cream/90 text-[13px]">
@@ -66,7 +72,7 @@ const isActive = (href: string) => path === href || path.startsWith(href + '/');
 
     <div class="flex items-center gap-3">
       <a
-        href="/contact"
+        href="/contact/"
         class="hidden sm:inline-flex items-center gap-2 rounded-full bg-oak hover:bg-oak-deep text-white font-semibold text-[15px] px-5 py-2.5 transition-colors shadow-card"
       >
         Free Estimate
@@ -105,7 +111,7 @@ const isActive = (href: string) => path === href || path.startsWith(href + '/');
         </a>
       ))}
       <a
-        href="/contact"
+        href="/contact/"
         class="mt-4 inline-flex justify-center items-center rounded-full bg-oak text-white font-semibold px-5 py-3"
       >
         Get a Free Estimate

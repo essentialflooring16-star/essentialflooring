@@ -1,22 +1,39 @@
 ---
-// Real job site videos, muted and looping. Kept tiny (under 0.5MB
-// each) and lazy: they only start once scrolled into view.
+// Real job site videos, muted and looping. Kept tiny (under 0.5MB each) and
+// lazy: nothing downloads until the strip is scrolled into view. Each clip has
+// a poster frame so the boxes are never empty, which also means visitors who
+// asked for reduced motion still see the work instead of three blank panels.
 const videos = [
-  { src: '/videos/work-01.mp4', label: 'Plank install in progress' },
-  { src: '/videos/work-02.mp4', label: 'On site, mid install' },
-  { src: '/videos/work-03.mp4', label: 'Finishing touches' },
+  { src: '/videos/work-01.mp4', poster: '/videos/work-01-poster.jpg', label: 'Plank install in progress' },
+  { src: '/videos/work-02.mp4', poster: '/videos/work-02-poster.jpg', label: 'Subfloor stripped back before the new floor goes down' },
+  { src: '/videos/work-03.mp4', poster: '/videos/work-03-poster.jpg', label: 'Finishing touches' },
 ];
 ---
 
-<section class="py-16 sm:py-20 bg-sand/60 overflow-hidden">
+<section class="py-16 sm:py-20 bg-sand/60 overflow-hidden" data-video-strip>
   <div class="mx-auto max-w-6xl px-4 sm:px-6">
-    <div class="flex items-end justify-between gap-6 mb-9">
+    <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-4 mb-9">
       <div class="reveal">
         <p class="text-[13px] font-semibold uppercase tracking-[0.18em] text-oak-deep mb-3">Straight from the job site</p>
         <h2 class="font-display font-semibold text-3xl sm:text-4xl text-ink tracking-tight">
           No stock footage. <span class="accent-italic">Our</span> hands, our work.
         </h2>
       </div>
+      <button
+        type="button"
+        data-video-toggle
+        hidden
+        class="inline-flex items-center gap-2 rounded-full border border-line hover:border-oak bg-paper text-ink text-[14px] font-medium px-4 py-2 transition-colors"
+        aria-pressed="false"
+      >
+        <svg data-icon-pause width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M7 5h3v14H7zm7 0h3v14h-3z" />
+        </svg>
+        <svg data-icon-play class="hidden" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M8 5.5v13l11-6.5z" />
+        </svg>
+        <span data-video-toggle-label>Pause videos</span>
+      </button>
     </div>
     <div class="grid sm:grid-cols-3 gap-4 sm:gap-5">
       {videos.map((v, i) => (
@@ -27,8 +44,8 @@ const videos = [
             loop
             playsinline
             preload="none"
+            poster={v.poster}
             data-lazy-video={v.src}
-            aria-label={v.label}
           ></video>
           <figcaption class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/65 to-transparent px-4 pt-8 pb-3.5 text-white text-[13.5px] font-medium">
             {v.label}
@@ -40,24 +57,58 @@ const videos = [
 </section>
 
 <script>
-  // Start/stop videos as they enter and leave the viewport.
-  const vids = document.querySelectorAll<HTMLVideoElement>('video[data-lazy-video]');
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (vids.length && 'IntersectionObserver' in window) {
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          const v = e.target as HTMLVideoElement;
-          if (e.isIntersecting) {
-            if (!v.src) v.src = v.dataset.lazyVideo!;
-            if (!reduced) v.play().catch(() => {});
-          } else {
-            v.pause();
-          }
+  const strip = document.querySelector('[data-video-strip]');
+  if (strip) {
+    const vids = strip.querySelectorAll<HTMLVideoElement>('video[data-lazy-video]');
+    const toggle = strip.querySelector<HTMLButtonElement>('[data-video-toggle]');
+    const label = strip.querySelector<HTMLElement>('[data-video-toggle-label]');
+    const iconPause = strip.querySelector<HTMLElement>('[data-icon-pause]');
+    const iconPlay = strip.querySelector<HTMLElement>('[data-icon-play]');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Visitors who asked for reduced motion keep the poster frames and are not
+    // offered a control they do not need.
+    let paused = reduced;
+    let visible = new Set<HTMLVideoElement>();
+
+    const sync = () => {
+      for (const v of vids) {
+        if (paused || !visible.has(v)) {
+          v.pause();
+        } else {
+          if (!v.src) v.src = v.dataset.lazyVideo!;
+          v.play().catch(() => {});
         }
-      },
-      { threshold: 0.35 },
-    );
-    vids.forEach((v) => io.observe(v));
+      }
+      if (toggle && label && iconPause && iconPlay) {
+        toggle.setAttribute('aria-pressed', String(paused));
+        label.textContent = paused ? 'Play videos' : 'Pause videos';
+        iconPause.classList.toggle('hidden', paused);
+        iconPlay.classList.toggle('hidden', !paused);
+      }
+    };
+
+    if (toggle && !reduced) {
+      toggle.hidden = false;
+      toggle.addEventListener('click', () => {
+        paused = !paused;
+        sync();
+      });
+    }
+
+    if (vids.length && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            const v = e.target as HTMLVideoElement;
+            if (e.isIntersecting) visible.add(v);
+            else visible.delete(v);
+          }
+          sync();
+        },
+        { threshold: 0.35 },
+      );
+      vids.forEach((v) => io.observe(v));
+    }
   }
 </script>

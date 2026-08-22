@@ -129,7 +129,9 @@ h1, h2, h3, .font-display {
   width: max-content;
   animation: var(--animate-marquee);
 }
-.marquee:hover .marquee-track {
+/* Pause on hover for mice, and on focus so keyboard users can stop it too. */
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
   animation-play-state: paused;
 }
 

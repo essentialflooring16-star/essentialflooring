@@ -31,7 +31,7 @@ const schema = {
       <li class="flex items-center gap-1.5">
         <span aria-hidden="true" class={light ? 'text-cream/40' : 'text-line'}>/</span>
         {c.href ? (
-          <a href={c.href} class={light ? 'hover:text-oak-soft transition-colors' : 'hover:text-oak-deep transition-colors'}>{c.label}</a>
+          <a href={c.href.endsWith('/') ? c.href : c.href + '/'} class={light ? 'hover:text-oak-soft transition-colors' : 'hover:text-oak-deep transition-colors'}>{c.label}</a>
         ) : (
           <span aria-current="page" class={`font-medium ${light ? 'text-cream' : 'text-bark'}`}>{c.label}</span>
         )}

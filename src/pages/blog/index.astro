@@ -25,8 +25,8 @@ const posts = await getPublishedPosts();
           Floor talk
         </h1>
         <p class="mt-5 text-[17px] leading-relaxed text-coffee">
-          Project stories, honest advice and floor care tips from the Essential Flooring
-          team behind Essential Flooring in Sacramento.
+          Project stories, honest advice and floor care tips from Essential Flooring
+          in Sacramento.
         </p>
       </div>
 
@@ -38,10 +38,10 @@ const posts = await getPublishedPosts();
             or ask us anything directly.
           </p>
           <div class="mt-6 flex flex-wrap justify-center gap-4">
-            <a href="/portfolio" class="inline-flex items-center rounded-full bg-ink hover:bg-bark text-cream font-semibold px-6 py-3 transition-colors">
+            <a href="/portfolio/" class="inline-flex items-center rounded-full bg-ink hover:bg-bark text-cream font-semibold px-6 py-3 transition-colors">
               See our work
             </a>
-            <a href="/contact" class="inline-flex items-center rounded-full border border-line hover:border-oak text-ink font-semibold px-6 py-3 transition-colors">
+            <a href="/contact/" class="inline-flex items-center rounded-full border border-line hover:border-oak text-ink font-semibold px-6 py-3 transition-colors">
               Ask a question
             </a>
           </div>
@@ -51,7 +51,7 @@ const posts = await getPublishedPosts();
           {posts.map((post, i) => (
             <li class="reveal-scale" style={`transition-delay:${(i % 3) * 60}ms`}>
               <a
-                href={`/blog/${post.slug}`}
+                href={`/blog/${post.slug}/`}
                 class="group flex flex-col h-full rounded-2xl overflow-hidden bg-paper border border-line shadow-card hover:shadow-lift transition-shadow"
               >
                 {post.cover_url ? (

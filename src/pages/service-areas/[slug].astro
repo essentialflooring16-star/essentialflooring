@@ -66,13 +66,13 @@ const serviceSchema = {
     />
     <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/30" aria-hidden="true"></div>
     <div class="relative mx-auto max-w-6xl px-4 sm:px-6 pt-10 pb-20">
-      <Breadcrumbs light crumbs={[{ label: 'Service Areas', href: '/service-areas' }, { label: page.city }]} />
+      <Breadcrumbs light crumbs={[{ label: 'Service Areas', href: '/service-areas/' }, { label: page.city }]} />
       <h1 class="mt-10 font-display font-semibold text-cream text-4xl sm:text-5xl leading-[1.08] tracking-tight max-w-2xl text-balance">
         {page.h1}
       </h1>
       <div class="mt-8 flex flex-col sm:flex-row gap-4">
         <a
-          href="/contact"
+          href="/contact/"
           class="inline-flex justify-center items-center gap-2 rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-7 py-3.5 transition-colors shadow-lift"
         >
           Get a Free Estimate
@@ -108,7 +108,7 @@ const serviceSchema = {
         <div class="mt-8 grid sm:grid-cols-2 gap-4">
           {SERVICES.map((s) => (
             <a
-              href={`/services/${s.slug}`}
+              href={`/services/${s.slug}/`}
               class="group rounded-xl border border-line bg-paper px-5 py-4 shadow-card hover:shadow-lift transition-shadow"
             >
               <span class="font-semibold text-[15px] text-ink group-hover:text-oak-deep transition-colors">
@@ -133,7 +133,7 @@ const serviceSchema = {
           quote, free of charge.
         </p>
         <a
-          href="/contact"
+          href="/contact/"
           class="mt-5 w-full inline-flex justify-center items-center rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-6 py-3 transition-colors"
         >
           Request an estimate
@@ -173,7 +173,7 @@ const serviceSchema = {
         {nearby.map((c) => (
           <li>
             <a
-              href={`/service-areas/${c.slug}`}
+              href={`/service-areas/${c.slug}/`}
               class="inline-flex rounded-full border border-line bg-paper px-4 py-2 text-[14px] font-medium text-bark hover:border-oak hover:text-oak-deep transition-colors"
             >
               {c.city}
@@ -182,7 +182,7 @@ const serviceSchema = {
         ))}
         <li>
           <a
-            href="/service-areas"
+            href="/service-areas/"
             class="inline-flex rounded-full bg-ink text-cream px-4 py-2 text-[14px] font-medium hover:bg-bark transition-colors"
           >
             All areas

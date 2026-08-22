@@ -65,7 +65,7 @@ const otherServices = SERVICES.filter((s) => s.slug !== page.slug);
   <section class="relative overflow-hidden bg-ink">
     <Image
       src={photoImage(meta.image)}
-      alt={photoById(meta.image).alt}
+      alt={'imageAlt' in meta ? meta.imageAlt : photoById(meta.image).alt}
       widths={[768, 1280, 1920]}
       sizes="100vw"
       class="absolute inset-0 h-full w-full object-cover opacity-35"
@@ -76,13 +76,13 @@ const otherServices = SERVICES.filter((s) => s.slug !== page.slug);
     />
     <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/30" aria-hidden="true"></div>
     <div class="relative mx-auto max-w-6xl px-4 sm:px-6 pt-10 pb-20">
-      <Breadcrumbs light crumbs={[{ label: 'Services', href: '/services' }, { label: page.name }]} />
+      <Breadcrumbs light crumbs={[{ label: 'Services', href: '/services/' }, { label: page.name }]} />
       <h1 class="mt-10 font-display font-semibold text-cream text-4xl sm:text-5xl leading-[1.08] tracking-tight max-w-2xl text-balance">
         {page.h1}
       </h1>
       <div class="mt-8 flex flex-col sm:flex-row gap-4">
         <a
-          href="/contact"
+          href="/contact/"
           class="inline-flex justify-center items-center gap-2 rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-7 py-3.5 transition-colors shadow-lift"
         >
           Get a Free Estimate
@@ -131,7 +131,7 @@ const otherServices = SERVICES.filter((s) => s.slug !== page.slug);
           </li>
         </ul>
         <a
-          href="/contact"
+          href="/contact/"
           class="mt-6 w-full inline-flex justify-center items-center rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-6 py-3 transition-colors"
         >
           Request an estimate
@@ -184,14 +184,14 @@ const otherServices = SERVICES.filter((s) => s.slug !== page.slug);
           <h2 class="reveal font-display font-semibold text-3xl text-cream tracking-tight">
             Our recent work
           </h2>
-          <a href="/portfolio" class="reveal shrink-0 font-semibold text-oak-soft hover:text-cream transition-colors">
+          <a href="/portfolio/" class="reveal shrink-0 font-semibold text-oak-soft hover:text-cream transition-colors">
             Full portfolio
           </a>
         </div>
         <ul class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
           {related.map((p) => (
             <li class="reveal">
-              <a href="/portfolio" class="group block overflow-hidden rounded-xl aspect-[4/3]">
+              <a href="/portfolio/" class="group block overflow-hidden rounded-xl aspect-[4/3]">
                 <Image
                   src={photoImage(p.id)}
                   alt={p.alt}
@@ -230,7 +230,7 @@ const otherServices = SERVICES.filter((s) => s.slug !== page.slug);
       <div class="grid sm:grid-cols-3 gap-5">
         {otherServices.map((s) => (
           <a
-            href={`/services/${s.slug}`}
+            href={`/services/${s.slug}/`}
             class="reveal group rounded-2xl border border-line bg-paper p-6 shadow-card hover:shadow-lift transition-shadow"
           >
             <h3 class="font-display font-semibold text-[18px] text-ink group-hover:text-oak-deep transition-colors">

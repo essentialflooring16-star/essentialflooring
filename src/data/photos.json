@@ -502,5 +502,17 @@
     "state": "before",
     "orig": "00000044-PHOTO-2026-08-11-04-08-49.jpg",
     "city": "Folsom"
+  },
+  {
+    "id": "stairs-15",
+    "file": "stairs-15.jpg",
+    "category": "stairs",
+    "caption": "Grey oak plank treads and landing with white risers and black metal balusters, Folsom",
+    "alt": "Staircase landing finished with grey oak look plank treads, white risers and black metal balusters in a Folsom home",
+    "quality": 9,
+    "hero": false,
+    "state": "after",
+    "orig": "00000090-PHOTO-2026-08-16-03-16-58.jpg",
+    "city": "Folsom"
   }
 ]
