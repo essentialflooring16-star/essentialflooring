@@ -52,7 +52,7 @@ const serviceSchema = {
 
 <Base title={page.metaTitle} description={page.metaDescription} schema={[serviceSchema]}>
   <!-- HERO -->
-  <section class="relative overflow-hidden bg-ink">
+  <section class="relative overflow-hidden bg-surface-dark">
     <Image
       src={photoImage(heroPhoto.id)}
       alt={heroPhoto.alt}
@@ -64,22 +64,22 @@ const serviceSchema = {
       format="webp"
       quality={65}
     />
-    <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/30" aria-hidden="true"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-scrim via-scrim/60 to-scrim/30" aria-hidden="true"></div>
     <div class="relative mx-auto max-w-6xl px-4 sm:px-6 pt-10 pb-20">
       <Breadcrumbs light crumbs={[{ label: 'Service Areas', href: '/service-areas/' }, { label: page.city }]} />
-      <h1 class="mt-10 font-display font-semibold text-cream text-4xl sm:text-5xl leading-[1.08] tracking-tight max-w-2xl text-balance">
+      <h1 class="mt-10 font-display font-semibold text-fg-on-dark text-4xl sm:text-5xl leading-[1.08] tracking-tight max-w-2xl text-balance">
         {page.h1}
       </h1>
       <div class="mt-8 flex flex-col sm:flex-row gap-4">
         <a
           href="/contact/"
-          class="inline-flex justify-center items-center gap-2 rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-7 py-3.5 transition-colors shadow-lift"
+          class="inline-flex justify-center items-center gap-2 rounded-full bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-7 py-3.5 transition-colors shadow-lift"
         >
           Get a Free Estimate
         </a>
         <a
           href={SITE.phoneHref}
-          class="inline-flex justify-center items-center rounded-full border border-cream/30 hover:border-cream/60 text-cream font-semibold px-7 py-3.5 transition-colors"
+          class="inline-flex justify-center items-center rounded-full border border-hairline-on-dark/30 hover:border-hairline-on-dark/60 text-fg-on-dark font-semibold px-7 py-3.5 transition-colors"
         >
           Call {SITE.phone}
         </a>
@@ -92,59 +92,59 @@ const serviceSchema = {
     <div class="mx-auto max-w-6xl px-4 sm:px-6 grid lg:grid-cols-[1fr_360px] gap-12">
       <article class="max-w-2xl">
         {introParas.map((p) => (
-          <p class="text-[17px] leading-relaxed text-bark mb-5">{p}</p>
+          <p class="text-[17px] leading-relaxed text-fg-body mb-5">{p}</p>
         ))}
 
-        <h2 class="mt-10 font-display font-semibold text-2xl text-ink">
+        <h2 class="mt-10 font-display font-semibold text-2xl text-fg">
           Flooring that fits {page.city}
         </h2>
-        <p class="mt-4 text-[16px] leading-relaxed text-coffee">{page.localContext}</p>
+        <p class="mt-4 text-[16px] leading-relaxed text-fg-muted">{page.localContext}</p>
 
-        <h2 class="mt-10 font-display font-semibold text-2xl text-ink">
+        <h2 class="mt-10 font-display font-semibold text-2xl text-fg">
           What we do for homes here
         </h2>
-        <p class="mt-4 text-[16px] leading-relaxed text-coffee">{page.servicesBlock}</p>
+        <p class="mt-4 text-[16px] leading-relaxed text-fg-muted">{page.servicesBlock}</p>
 
         <div class="mt-8 grid sm:grid-cols-2 gap-4">
           {SERVICES.map((s) => (
             <a
               href={`/services/${s.slug}/`}
-              class="group rounded-xl border border-line bg-paper px-5 py-4 shadow-card hover:shadow-lift transition-shadow"
+              class="group rounded-xl border border-hairline bg-surface-raised px-5 py-4 shadow-card hover:shadow-lift transition-shadow"
             >
-              <span class="font-semibold text-[15px] text-ink group-hover:text-oak-deep transition-colors">
+              <span class="font-semibold text-[15px] text-fg group-hover:text-accent-on-light transition-colors">
                 {s.name}
               </span>
             </a>
           ))}
         </div>
 
-        <h2 class="mt-10 font-display font-semibold text-2xl text-ink">
+        <h2 class="mt-10 font-display font-semibold text-2xl text-fg">
           Why neighbors trust us
         </h2>
-        <p class="mt-4 text-[16px] leading-relaxed text-coffee">{page.whyUs}</p>
+        <p class="mt-4 text-[16px] leading-relaxed text-fg-muted">{page.whyUs}</p>
       </article>
 
-      <aside class="reveal rounded-2xl bg-paper border border-line shadow-card p-7 h-fit lg:sticky lg:top-24">
-        <h2 class="font-display font-semibold text-xl text-ink">
+      <aside class="reveal rounded-2xl bg-surface-raised border border-hairline shadow-card p-7 h-fit lg:sticky lg:top-24">
+        <h2 class="font-display font-semibold text-xl text-fg">
           Free estimate in {page.city}
         </h2>
-        <p class="mt-3 text-[14.5px] leading-relaxed text-coffee">
+        <p class="mt-3 text-[14.5px] leading-relaxed text-fg-muted">
           Tell us about your rooms and floors. We measure on site and send a clear written
           quote, free of charge.
         </p>
         <a
           href="/contact/"
-          class="mt-5 w-full inline-flex justify-center items-center rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-6 py-3 transition-colors"
+          class="mt-5 w-full inline-flex justify-center items-center rounded-full bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-6 py-3 transition-colors"
         >
           Request an estimate
         </a>
         <a
           href={SITE.phoneHref}
-          class="mt-3 w-full inline-flex justify-center items-center rounded-full border border-line hover:border-oak text-ink font-semibold px-6 py-3 transition-colors"
+          class="mt-3 w-full inline-flex justify-center items-center rounded-full border border-hairline hover:border-accent text-fg font-semibold px-6 py-3 transition-colors"
         >
           {SITE.phone}
         </a>
-        <p class="mt-5 text-[13px] text-coffee/80 text-center">
+        <p class="mt-5 text-[13px] text-fg-muted/80 text-center">
           Licensed &amp; Insured, {SITE.license}
         </p>
       </aside>
@@ -152,9 +152,9 @@ const serviceSchema = {
   </section>
 
   <!-- FAQ -->
-  <section class="py-16 bg-sand/60">
+  <section class="py-16 bg-surface-sunken/60">
     <div class="mx-auto max-w-3xl px-4 sm:px-6">
-      <h2 class="reveal font-display font-semibold text-3xl text-ink tracking-tight text-center">
+      <h2 class="reveal font-display font-semibold text-3xl text-fg tracking-tight text-center">
         Flooring in {page.city}: common questions
       </h2>
       <div class="reveal mt-10">
@@ -166,7 +166,7 @@ const serviceSchema = {
   <!-- NEARBY -->
   <section class="py-14">
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
-      <h2 class="reveal font-semibold text-[15px] uppercase tracking-[0.16em] text-coffee mb-5">
+      <h2 class="reveal font-semibold text-[15px] uppercase tracking-[0.16em] text-fg-muted mb-5">
         Nearby areas we serve
       </h2>
       <ul class="flex flex-wrap gap-3">
@@ -174,7 +174,7 @@ const serviceSchema = {
           <li>
             <a
               href={`/service-areas/${c.slug}/`}
-              class="inline-flex rounded-full border border-line bg-paper px-4 py-2 text-[14px] font-medium text-bark hover:border-oak hover:text-oak-deep transition-colors"
+              class="inline-flex rounded-full border border-hairline bg-surface-raised px-4 py-2 text-[14px] font-medium text-fg-body hover:border-accent hover:text-accent-on-light transition-colors"
             >
               {c.city}
             </a>
@@ -183,7 +183,7 @@ const serviceSchema = {
         <li>
           <a
             href="/service-areas/"
-            class="inline-flex rounded-full bg-ink text-cream px-4 py-2 text-[14px] font-medium hover:bg-bark transition-colors"
+            class="inline-flex rounded-full bg-surface-dark text-fg-on-dark px-4 py-2 text-[14px] font-medium hover:bg-control-dark-hover transition-colors"
           >
             All areas
           </a>

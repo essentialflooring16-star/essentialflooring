@@ -124,9 +124,9 @@ export default function BlogManager() {
 
   if (creating || editing) {
     return (
-      <form onSubmit={onSave} className="rounded-2xl border border-line bg-paper p-6 sm:p-8 shadow-card grid gap-4 max-w-2xl">
+      <form onSubmit={onSave} className="rounded-2xl border border-hairline bg-surface-raised p-6 sm:p-8 shadow-card grid gap-4 max-w-2xl">
         <div className="flex items-center justify-between">
-          <h1 className="font-display font-semibold text-2xl text-ink">
+          <h1 className="font-display font-semibold text-2xl text-fg">
             {editing ? 'Edit article' : 'New article'}
           </h1>
           <button
@@ -136,25 +136,25 @@ export default function BlogManager() {
               setCreating(false);
               setMsg(null);
             }}
-            className="text-[14px] font-semibold text-coffee hover:text-ink"
+            className="text-[14px] font-semibold text-fg-muted hover:text-fg"
           >
             Back to list
           </button>
         </div>
 
         <label className="grid gap-1.5">
-          <span className="text-[14px] font-semibold text-bark">Title *</span>
+          <span className="text-[14px] font-semibold text-fg-body">Title *</span>
           <input
             name="title"
             required
             defaultValue={editing?.title}
             maxLength={140}
-            className="rounded-xl border border-line bg-cream px-4 py-3 text-[15px] outline-none focus:border-oak focus:ring-2 focus:ring-oak/25 transition"
+            className="rounded-xl border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
 
         <label className="grid gap-1.5">
-          <span className="text-[14px] font-semibold text-bark">
+          <span className="text-[14px] font-semibold text-fg-body">
             Short summary (shown on the blog page and Google)
           </span>
           <textarea
@@ -162,12 +162,12 @@ export default function BlogManager() {
             rows={2}
             maxLength={200}
             defaultValue={editing?.excerpt}
-            className="rounded-xl border border-line bg-cream px-4 py-3 text-[15px] outline-none focus:border-oak focus:ring-2 focus:ring-oak/25 transition resize-y"
+            className="rounded-xl border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition resize-y"
           />
         </label>
 
         <label className="grid gap-1.5">
-          <span className="text-[14px] font-semibold text-bark">Cover photo</span>
+          <span className="text-[14px] font-semibold text-fg-body">Cover photo</span>
           {editing?.cover_url && (
             <img src={editing.cover_url} alt="" className="w-48 aspect-[16/10] object-cover rounded-lg mb-1" />
           )}
@@ -175,13 +175,13 @@ export default function BlogManager() {
             type="file"
             name="cover"
             accept="image/jpeg,image/png,image/webp"
-            className="rounded-xl border border-line bg-cream px-4 py-2.5 text-[14px] file:mr-3 file:rounded-full file:border-0 file:bg-ink file:text-cream file:px-4 file:py-1.5 file:text-[13px] file:font-semibold"
+            className="rounded-xl border border-hairline bg-field px-4 py-2.5 text-[14px] file:mr-3 file:rounded-full file:border-0 file:bg-control-dark file:text-fg-on-dark file:px-4 file:py-1.5 file:text-[13px] file:font-semibold"
           />
         </label>
 
         <label className="grid gap-1.5">
-          <span className="text-[14px] font-semibold text-bark">Article text *</span>
-          <span className="text-[12.5px] text-coffee -mt-1">
+          <span className="text-[14px] font-semibold text-fg-body">Article text *</span>
+          <span className="text-[12.5px] text-fg-muted -mt-1">
             Plain text works fine. For a subheading start a line with ## and for a list start lines with -
           </span>
           <textarea
@@ -189,21 +189,21 @@ export default function BlogManager() {
             rows={14}
             required
             defaultValue={editing?.content}
-            className="rounded-xl border border-line bg-cream px-4 py-3 text-[15px] outline-none focus:border-oak focus:ring-2 focus:ring-oak/25 transition resize-y font-mono"
+            className="rounded-xl border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition resize-y font-mono"
           />
         </label>
 
         <label className="flex items-center gap-2.5">
-          <input type="checkbox" name="published" defaultChecked={editing?.published ?? true} className="size-4 accent-[#b5773a]" />
-          <span className="text-[14.5px] font-semibold text-bark">Published (visible on the website)</span>
+          <input type="checkbox" name="published" defaultChecked={editing?.published ?? true} className="size-4 accent-[var(--ef-accent-fill)]" />
+          <span className="text-[14.5px] font-semibold text-fg-body">Published (visible on the website)</span>
         </label>
 
-        {msg && <p className="rounded-xl bg-sand border border-line text-bark text-[14px] px-4 py-3">{msg}</p>}
+        {msg && <p className="rounded-xl bg-surface-sunken border border-hairline text-fg-body text-[14px] px-4 py-3">{msg}</p>}
 
         <button
           type="submit"
           disabled={busy}
-          className="justify-self-start rounded-full bg-oak hover:bg-oak-deep disabled:opacity-60 text-white font-semibold px-6 py-3 transition-colors"
+          className="justify-self-start rounded-full bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-6 py-3 transition-colors"
         >
           {busy ? 'Saving...' : editing ? 'Save changes' : 'Publish article'}
         </button>
@@ -214,41 +214,41 @@ export default function BlogManager() {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
-        <h1 className="font-display font-semibold text-2xl text-ink">Blog articles</h1>
+        <h1 className="font-display font-semibold text-2xl text-fg">Blog articles</h1>
         <button
           type="button"
           onClick={() => {
             setCreating(true);
             setMsg(null);
           }}
-          className="rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-5 py-2.5 transition-colors"
+          className="rounded-full bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-5 py-2.5 transition-colors"
         >
           New article
         </button>
       </div>
-      <p className="text-[14.5px] text-coffee mb-6">
+      <p className="text-[14.5px] text-fg-muted mb-6">
         Articles help the website rank on Google. Photos plus a few honest paragraphs about a
         recent project work great.
       </p>
 
-      {msg && <p className="mb-4 rounded-xl bg-sand border border-line text-bark text-[14px] px-4 py-3">{msg}</p>}
+      {msg && <p className="mb-4 rounded-xl bg-surface-sunken border border-hairline text-fg-body text-[14px] px-4 py-3">{msg}</p>}
 
       {posts.length === 0 ? (
-        <div className="rounded-2xl border border-line bg-paper p-8 shadow-card text-center text-coffee">
+        <div className="rounded-2xl border border-hairline bg-surface-raised p-8 shadow-card text-center text-fg-muted">
           No articles yet. Write the first one, a before and after story is a great start.
         </div>
       ) : (
         <ul className="grid gap-3">
           {posts.map((post) => (
-            <li key={post.id} className="flex flex-wrap items-center gap-4 rounded-2xl border border-line bg-paper p-4 shadow-card">
+            <li key={post.id} className="flex flex-wrap items-center gap-4 rounded-2xl border border-hairline bg-surface-raised p-4 shadow-card">
               {post.cover_url ? (
                 <img src={post.cover_url} alt="" className="w-20 aspect-[4/3] object-cover rounded-lg" />
               ) : (
-                <span className="w-20 aspect-[4/3] rounded-lg bg-sand" aria-hidden="true"></span>
+                <span className="w-20 aspect-[4/3] rounded-lg bg-surface-sunken" aria-hidden="true"></span>
               )}
               <div className="flex-1 min-w-[200px]">
-                <p className="font-semibold text-[16px] text-ink">{post.title}</p>
-                <p className="text-[13px] text-coffee mt-0.5">
+                <p className="font-semibold text-[16px] text-fg">{post.title}</p>
+                <p className="text-[13px] text-fg-muted mt-0.5">
                   {new Date(post.created_at).toLocaleDateString('en-US', { dateStyle: 'medium' })}
                   {' · '}/blog/{post.slug}
                 </p>
@@ -258,7 +258,7 @@ export default function BlogManager() {
                   type="button"
                   onClick={() => togglePublished(post)}
                   className={`rounded-full px-3 py-1.5 text-[12.5px] font-semibold transition-colors ${
-                    post.published ? 'bg-oak/15 text-oak-deep' : 'bg-sand text-coffee'
+                    post.published ? 'bg-accent-wash text-accent-on-light' : 'bg-surface-sunken text-fg-muted'
                   }`}
                 >
                   {post.published ? 'Published' : 'Draft'}
@@ -266,7 +266,7 @@ export default function BlogManager() {
                 <button
                   type="button"
                   onClick={() => setEditing(post)}
-                  className="rounded-full border border-line px-3 py-1.5 text-[12.5px] font-semibold text-bark hover:border-oak"
+                  className="rounded-full border border-hairline px-3 py-1.5 text-[12.5px] font-semibold text-fg-body hover:border-accent"
                 >
                   Edit
                 </button>

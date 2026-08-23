@@ -23,10 +23,10 @@ const extras = [
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
       <Breadcrumbs crumbs={[{ label: 'Services' }]} />
       <div class="mt-8 max-w-2xl">
-        <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-ink">
+        <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-fg">
           Flooring services, done right
         </h1>
-        <p class="mt-5 text-[17px] leading-relaxed text-coffee">
+        <p class="mt-5 text-[17px] leading-relaxed text-fg-muted">
           From reviving original hardwood to installing waterproof LVP in a busy family
           kitchen, we handle the whole project with one licensed contractor. Every job starts
           with a free estimate and a transparent written quote.
@@ -37,7 +37,7 @@ const extras = [
         {SERVICES.map((s, i) => (
           <a
             href={`/services/${s.slug}/`}
-            class={`reveal group grid md:grid-cols-2 rounded-3xl overflow-hidden bg-paper border border-line shadow-card hover:shadow-lift transition-shadow`}
+            class={`reveal group grid md:grid-cols-2 rounded-3xl overflow-hidden bg-surface-raised border border-hairline shadow-card hover:shadow-lift transition-shadow`}
           >
             <div class={`aspect-[16/10] md:aspect-auto md:min-h-[300px] overflow-hidden ${i % 2 ? 'md:order-2' : ''}`}>
               <Image
@@ -51,11 +51,11 @@ const extras = [
               />
             </div>
             <div class="p-8 sm:p-10 flex flex-col justify-center">
-              <h2 class="font-display font-semibold text-2xl sm:text-3xl text-ink group-hover:text-oak-deep transition-colors">
+              <h2 class="font-display font-semibold text-2xl sm:text-3xl text-fg group-hover:text-accent-on-light transition-colors">
                 {s.name}
               </h2>
-              <p class="mt-3 text-[16px] leading-relaxed text-coffee max-w-md">{s.short}</p>
-              <span class="mt-6 inline-flex items-center gap-2 font-semibold text-oak-deep">
+              <p class="mt-3 text-[16px] leading-relaxed text-fg-muted max-w-md">{s.short}</p>
+              <span class="mt-6 inline-flex items-center gap-2 font-semibold text-accent-on-light">
                 Explore this service
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
                   <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
@@ -68,7 +68,7 @@ const extras = [
     </div>
   </section>
 
-  <section class="py-16 bg-sand/60">
+  <section class="py-16 bg-surface-sunken/60">
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
       <SectionHeading
         eyebrow="Also included"
@@ -77,20 +77,20 @@ const extras = [
       />
       <ul class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {extras.map((e) => (
-          <li class="reveal rounded-2xl bg-paper border border-line p-6 shadow-card">
-            <h3 class="font-display font-semibold text-[18px] text-ink">{e.t}</h3>
-            <p class="mt-2 text-[14.5px] leading-relaxed text-coffee">{e.d}</p>
+          <li class="reveal rounded-2xl bg-surface-raised border border-hairline p-6 shadow-card">
+            <h3 class="font-display font-semibold text-[18px] text-fg">{e.t}</h3>
+            <p class="mt-2 text-[14.5px] leading-relaxed text-fg-muted">{e.d}</p>
           </li>
         ))}
       </ul>
 
       <div class="reveal mt-12">
-        <h3 class="font-semibold text-[15px] uppercase tracking-[0.16em] text-coffee mb-5">
+        <h3 class="font-semibold text-[15px] uppercase tracking-[0.16em] text-fg-muted mb-5">
           The complete list, all under one roof
         </h3>
         <ul class="flex flex-wrap gap-2">
           {ALL_SERVICES.map((s) => (
-            <li class="rounded-full bg-paper border border-line px-3.5 py-1.5 text-[13.5px] font-medium text-bark">
+            <li class="rounded-full bg-surface-raised border border-hairline px-3.5 py-1.5 text-[13.5px] font-medium text-fg-body">
               {s}
             </li>
           ))}

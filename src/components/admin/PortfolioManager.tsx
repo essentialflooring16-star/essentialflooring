@@ -101,29 +101,29 @@ export default function PortfolioManager() {
     <div className="grid gap-8">
       <form
         onSubmit={onUpload}
-        className="rounded-2xl border border-line bg-paper p-6 sm:p-8 shadow-card grid gap-4"
+        className="rounded-2xl border border-hairline bg-surface-raised p-6 sm:p-8 shadow-card grid gap-4"
       >
-        <h1 className="font-display font-semibold text-2xl text-ink">Add a project photo</h1>
-        <p className="text-[14.5px] text-coffee -mt-2">
+        <h1 className="font-display font-semibold text-2xl text-fg">Add a project photo</h1>
+        <p className="text-[14.5px] text-fg-muted -mt-2">
           Photos you publish here appear instantly in the website portfolio, no developer needed.
         </p>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <label className="grid gap-1.5">
-            <span className="text-[14px] font-semibold text-bark">Photo (JPG/PNG, max 8 MB)</span>
+            <span className="text-[14px] font-semibold text-fg-body">Photo (JPG/PNG, max 8 MB)</span>
             <input
               type="file"
               name="photo"
               accept="image/jpeg,image/png,image/webp"
               required
-              className="rounded-xl border border-line bg-cream px-4 py-2.5 text-[14px] file:mr-3 file:rounded-full file:border-0 file:bg-ink file:text-cream file:px-4 file:py-1.5 file:text-[13px] file:font-semibold"
+              className="rounded-xl border border-hairline bg-field px-4 py-2.5 text-[14px] file:mr-3 file:rounded-full file:border-0 file:bg-control-dark file:text-fg-on-dark file:px-4 file:py-1.5 file:text-[13px] file:font-semibold"
             />
           </label>
           <label className="grid gap-1.5">
-            <span className="text-[14px] font-semibold text-bark">Category</span>
+            <span className="text-[14px] font-semibold text-fg-body">Category</span>
             <select
               name="category"
-              className="rounded-xl border border-line bg-cream px-4 py-3 text-[15px] outline-none focus:border-oak"
+              className="rounded-xl border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent"
               defaultValue="lvp-vinyl"
             >
               {CATEGORIES.map(([value, label]) => (
@@ -136,42 +136,42 @@ export default function PortfolioManager() {
         </div>
 
         <label className="grid gap-1.5">
-          <span className="text-[14px] font-semibold text-bark">
+          <span className="text-[14px] font-semibold text-fg-body">
             Caption (shown in the gallery, e.g. "LVP installation in Roseville")
           </span>
           <input
             name="caption"
             required
             maxLength={120}
-            className="rounded-xl border border-line bg-cream px-4 py-3 text-[15px] outline-none focus:border-oak focus:ring-2 focus:ring-oak/25 transition"
+            className="rounded-xl border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
 
         {msg && (
-          <p className="rounded-xl bg-sand border border-line text-bark text-[14px] px-4 py-3">{msg}</p>
+          <p className="rounded-xl bg-surface-sunken border border-hairline text-fg-body text-[14px] px-4 py-3">{msg}</p>
         )}
 
         <button
           type="submit"
           disabled={busy}
-          className="justify-self-start rounded-full bg-oak hover:bg-oak-deep disabled:opacity-60 text-white font-semibold px-6 py-3 transition-colors"
+          className="justify-self-start rounded-full bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-6 py-3 transition-colors"
         >
           {busy ? 'Uploading...' : 'Publish photo'}
         </button>
       </form>
 
       <div>
-        <h2 className="font-display font-semibold text-xl text-ink mb-4">
+        <h2 className="font-display font-semibold text-xl text-fg mb-4">
           Uploaded photos ({items.length})
         </h2>
         {items.length === 0 ? (
-          <p className="text-coffee text-[15px]">
+          <p className="text-fg-muted text-[15px]">
             Nothing uploaded yet. The website still shows the built-in project gallery.
           </p>
         ) : (
           <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {items.map((item) => (
-              <li key={item.id} className="rounded-xl border border-line bg-paper shadow-card overflow-hidden">
+              <li key={item.id} className="rounded-xl border border-hairline bg-surface-raised shadow-card overflow-hidden">
                 <img
                   src={item.image_url}
                   alt={item.alt}
@@ -179,15 +179,15 @@ export default function PortfolioManager() {
                   className={`aspect-[4/3] w-full object-cover ${item.published ? '' : 'opacity-40'}`}
                 />
                 <div className="p-3">
-                  <p className="text-[13px] text-bark line-clamp-2 min-h-[2.4em]">{item.caption}</p>
+                  <p className="text-[13px] text-fg-body line-clamp-2 min-h-[2.4em]">{item.caption}</p>
                   <div className="mt-2 flex items-center justify-between gap-2">
                     <button
                       type="button"
                       onClick={() => togglePublished(item)}
                       className={`rounded-full px-3 py-1 text-[12px] font-semibold transition-colors ${
                         item.published
-                          ? 'bg-oak/15 text-oak-deep'
-                          : 'bg-sand text-coffee'
+                          ? 'bg-accent-wash text-accent-on-light'
+                          : 'bg-surface-sunken text-fg-muted'
                       }`}
                     >
                       {item.published ? 'Published' : 'Hidden'}

@@ -87,19 +87,19 @@ export default function ContactForm() {
 
   if (status === 'sent') {
     return (
-      <div className="rounded-2xl border border-line bg-paper p-8 text-center shadow-card" role="status">
-        <span className="mx-auto grid place-items-center size-14 rounded-full bg-oak/15 text-oak-deep mb-4">
+      <div className="rounded-2xl border border-hairline bg-surface-raised p-8 text-center shadow-card" role="status">
+        <span className="mx-auto grid place-items-center size-14 rounded-full bg-accent-wash text-accent-on-light mb-4">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
             <path d="m5 13 4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </span>
-        <h3 ref={doneRef} tabIndex={-1} className="font-display font-semibold text-2xl text-ink outline-none">
+        <h3 ref={doneRef} tabIndex={-1} className="font-display font-semibold text-2xl text-fg outline-none">
           Request received
         </h3>
-        <p className="mt-2 text-coffee leading-relaxed">
+        <p className="mt-2 text-fg-muted leading-relaxed">
           Thank you. We will get back to you shortly to schedule your free estimate.
           For anything urgent, call us at{' '}
-          <a href="tel:+19164251361" className="font-semibold text-oak-deep">
+          <a href="tel:+19164251361" className="font-semibold text-accent-on-light">
             (916) 425-1361
           </a>
           .
@@ -112,55 +112,55 @@ export default function ContactForm() {
     <form onSubmit={onSubmit} className="grid gap-4" noValidate={false}>
       <div className="grid sm:grid-cols-2 gap-4">
         <label className="grid gap-1.5">
-          <span className="text-[14px] font-semibold text-bark">Full name *</span>
+          <span className="text-[14px] font-semibold text-fg-body">Full name *</span>
           <input
             required
             name="name"
             autoComplete="name"
             placeholder="John Smith"
-            className="rounded-xl border border-line bg-paper px-4 py-3 text-[15px] outline-none focus:border-oak focus:ring-2 focus:ring-oak/25 transition"
+            className="rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
         <label className="grid gap-1.5">
-          <span className="text-[14px] font-semibold text-bark">Phone *</span>
+          <span className="text-[14px] font-semibold text-fg-body">Phone *</span>
           <input
             required
             name="phone"
             type="tel"
             autoComplete="tel"
             placeholder="(916) 555-0123"
-            className="rounded-xl border border-line bg-paper px-4 py-3 text-[15px] outline-none focus:border-oak focus:ring-2 focus:ring-oak/25 transition"
+            className="rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
         <label className="grid gap-1.5">
-          <span className="text-[14px] font-semibold text-bark">Email</span>
+          <span className="text-[14px] font-semibold text-fg-body">Email</span>
           <input
             name="email"
             type="email"
             autoComplete="email"
             placeholder="you@email.com"
-            className="rounded-xl border border-line bg-paper px-4 py-3 text-[15px] outline-none focus:border-oak focus:ring-2 focus:ring-oak/25 transition"
+            className="rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
         <label className="grid gap-1.5">
-          <span className="text-[14px] font-semibold text-bark">City</span>
+          <span className="text-[14px] font-semibold text-fg-body">City</span>
           <input
             name="city"
             autoComplete="address-level2"
             placeholder="Sacramento"
-            className="rounded-xl border border-line bg-paper px-4 py-3 text-[15px] outline-none focus:border-oak focus:ring-2 focus:ring-oak/25 transition"
+            className="rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
       </div>
 
       <label className="grid gap-1.5">
-        <span className="text-[14px] font-semibold text-bark">What do you need?</span>
+        <span className="text-[14px] font-semibold text-fg-body">What do you need?</span>
         <select
           name="service"
-          className="rounded-xl border border-line bg-paper px-4 py-3 text-[15px] outline-none focus:border-oak focus:ring-2 focus:ring-oak/25 transition"
+          className="rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           defaultValue=""
         >
           <option value="" disabled>
@@ -175,12 +175,12 @@ export default function ContactForm() {
       </label>
 
       <label className="grid gap-1.5">
-        <span className="text-[14px] font-semibold text-bark">Tell us about the project</span>
+        <span className="text-[14px] font-semibold text-fg-body">Tell us about the project</span>
         <textarea
           name="message"
           rows={4}
           placeholder="Rooms, approximate square footage, current floor, timeline..."
-          className="rounded-xl border border-line bg-paper px-4 py-3 text-[15px] outline-none focus:border-oak focus:ring-2 focus:ring-oak/25 transition resize-y"
+          className="rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition resize-y"
         />
       </label>
 
@@ -204,11 +204,11 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={status === 'sending'}
-        className="mt-1 inline-flex justify-center items-center gap-2 rounded-full bg-oak hover:bg-oak-deep disabled:opacity-60 text-white font-semibold px-7 py-3.5 transition-colors shadow-card"
+        className="mt-1 inline-flex justify-center items-center gap-2 rounded-full bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-7 py-3.5 transition-colors shadow-card"
       >
         {status === 'sending' ? 'Sending...' : 'Request Free Estimate'}
       </button>
-      <p className="text-[13px] text-coffee/80">
+      <p className="text-[13px] text-fg-muted/80">
         We only use your details to respond to your request. No spam, ever.
       </p>
     </form>

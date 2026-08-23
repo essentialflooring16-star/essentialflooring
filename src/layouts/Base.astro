@@ -65,6 +65,8 @@ const schemas = [localBusiness, ...schema];
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {/* Browsers do not resolve CSS variables here, so this one hex stays literal.
+        Update it alongside --ef-surface-dark when the direction is chosen. */}
     <meta name="theme-color" content="#221a14" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
@@ -91,7 +93,7 @@ const schemas = [localBusiness, ...schema];
   <body class="min-h-screen flex flex-col">
     <a
       href="#main"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-ink focus:text-cream focus:px-4 focus:py-2 focus:rounded-md"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-control-dark focus:text-fg-on-dark focus:px-4 focus:py-2 focus:rounded-md"
     >
       Skip to content
     </a>

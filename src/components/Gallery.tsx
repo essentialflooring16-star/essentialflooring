@@ -101,8 +101,8 @@ export default function Gallery({ items, categories }: Props) {
           onClick={() => setFilter('all')}
           className={`rounded-full px-4.5 py-2 text-[14px] font-semibold transition-colors px-5 ${
             filter === 'all'
-              ? 'bg-ink text-cream'
-              : 'bg-paper border border-line text-bark hover:border-oak'
+              ? 'bg-control-dark text-fg-on-dark'
+              : 'bg-surface-raised border border-hairline text-fg-body hover:border-accent'
           }`}
         >
           All projects
@@ -115,8 +115,8 @@ export default function Gallery({ items, categories }: Props) {
             onClick={() => setFilter(key)}
             className={`rounded-full px-5 py-2 text-[14px] font-semibold transition-colors ${
               filter === key
-                ? 'bg-ink text-cream'
-                : 'bg-paper border border-line text-bark hover:border-oak'
+                ? 'bg-control-dark text-fg-on-dark'
+                : 'bg-surface-raised border border-hairline text-fg-body hover:border-accent'
             }`}
           >
             {label}
@@ -133,7 +133,7 @@ export default function Gallery({ items, categories }: Props) {
                 triggerRef.current = e.currentTarget;
                 setOpenIdx(i);
               }}
-              className="group relative block w-full overflow-hidden rounded-xl aspect-[4/3] shadow-card focus-visible:outline-2 focus-visible:outline-oak"
+              className="group relative block w-full overflow-hidden rounded-xl aspect-[4/3] shadow-card focus-visible:outline-2 focus-visible:outline-accent"
               aria-label={`Open photo: ${item.caption || item.alt}`}
             >
               <img
@@ -143,8 +143,8 @@ export default function Gallery({ items, categories }: Props) {
                 decoding="async"
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
               />
-              <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <span className="absolute bottom-0 left-0 right-0 p-3.5 text-left text-white text-[13.5px] font-medium leading-snug opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all">
+              <span className="absolute inset-0 bg-gradient-to-t from-scrim-media/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="absolute bottom-0 left-0 right-0 p-3.5 text-left text-fg-on-media text-[13.5px] font-medium leading-snug opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all">
                 {item.caption}
               </span>
             </button>
@@ -155,7 +155,7 @@ export default function Gallery({ items, categories }: Props) {
       {openIdx !== null && visible[openIdx] && (
         <div
           ref={dialogRef}
-          className="fixed inset-0 z-[90] bg-black/90 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[90] bg-scrim-media/90 flex items-center justify-center p-4"
           role="dialog"
           aria-modal="true"
           aria-label="Photo viewer"
@@ -170,7 +170,7 @@ export default function Gallery({ items, categories }: Props) {
               alt={visible[openIdx].alt}
               className="w-full max-h-[78vh] object-contain rounded-lg"
             />
-            <figcaption className="mt-3 text-center text-white/85 text-[15px]">
+            <figcaption className="mt-3 text-center text-fg-on-media/85 text-[15px]">
               {visible[openIdx].caption}
             </figcaption>
           </figure>
@@ -179,7 +179,7 @@ export default function Gallery({ items, categories }: Props) {
             ref={closeBtnRef}
             type="button"
             onClick={() => setOpenIdx(null)}
-            className="absolute top-4 right-4 grid place-items-center size-11 rounded-full bg-white/10 hover:bg-white/25 text-white transition-colors"
+            className="absolute top-4 right-4 grid place-items-center size-11 rounded-full bg-fg-on-media/10 hover:bg-fg-on-media/25 text-fg-on-media transition-colors"
             aria-label="Close viewer"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -192,7 +192,7 @@ export default function Gallery({ items, categories }: Props) {
               e.stopPropagation();
               setOpenIdx((openIdx - 1 + visible.length) % visible.length);
             }}
-            className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 grid place-items-center size-11 rounded-full bg-white/10 hover:bg-white/25 text-white transition-colors"
+            className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 grid place-items-center size-11 rounded-full bg-fg-on-media/10 hover:bg-fg-on-media/25 text-fg-on-media transition-colors"
             aria-label="Previous photo"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
@@ -205,7 +205,7 @@ export default function Gallery({ items, categories }: Props) {
               e.stopPropagation();
               setOpenIdx((openIdx + 1) % visible.length);
             }}
-            className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 grid place-items-center size-11 rounded-full bg-white/10 hover:bg-white/25 text-white transition-colors"
+            className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 grid place-items-center size-11 rounded-full bg-fg-on-media/10 hover:bg-fg-on-media/25 text-fg-on-media transition-colors"
             aria-label="Next photo"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">

@@ -29,9 +29,9 @@ export default function AdminApp() {
   if (!isConfigured) {
     return (
       <Shell>
-        <div className="mx-auto max-w-lg mt-24 rounded-2xl border border-line bg-paper p-8 shadow-card text-center">
-          <h1 className="font-display font-semibold text-2xl text-ink">Admin is not connected yet</h1>
-          <p className="mt-3 text-[15px] text-coffee leading-relaxed">
+        <div className="mx-auto max-w-lg mt-24 rounded-2xl border border-hairline bg-surface-raised p-8 shadow-card text-center">
+          <h1 className="font-display font-semibold text-2xl text-fg">Admin is not connected yet</h1>
+          <p className="mt-3 text-[15px] text-fg-muted leading-relaxed">
             Supabase environment variables are missing. Add PUBLIC_SUPABASE_URL and
             PUBLIC_SUPABASE_ANON_KEY, then redeploy. See docs/SETUP-RO.md in the project.
           </p>
@@ -43,7 +43,7 @@ export default function AdminApp() {
   if (!ready) {
     return (
       <Shell>
-        <p className="text-center mt-24 text-coffee">Loading...</p>
+        <p className="text-center mt-24 text-fg-muted">Loading...</p>
       </Shell>
     );
   }
@@ -52,22 +52,22 @@ export default function AdminApp() {
 
   return (
     <Shell>
-      <header className="flex flex-wrap items-center justify-between gap-4 py-6 border-b border-line">
+      <header className="flex flex-wrap items-center justify-between gap-4 py-6 border-b border-hairline">
         <div>
-          <p className="font-display font-semibold text-2xl text-ink">Essential Flooring</p>
-          <p className="text-[13px] uppercase tracking-[0.16em] text-coffee mt-0.5">Admin cabinet</p>
+          <p className="font-display font-semibold text-2xl text-fg">Essential Flooring</p>
+          <p className="text-[13px] uppercase tracking-[0.16em] text-fg-muted mt-0.5">Admin cabinet</p>
         </div>
         <div className="flex items-center gap-3">
           <a
             href="/"
-            className="rounded-full border border-line px-4 py-2 text-[14px] font-medium text-bark hover:border-oak transition-colors"
+            className="rounded-full border border-hairline px-4 py-2 text-[14px] font-medium text-fg-body hover:border-accent transition-colors"
           >
             View website
           </a>
           <button
             type="button"
             onClick={() => supabase!.auth.signOut()}
-            className="rounded-full bg-ink text-cream px-4 py-2 text-[14px] font-medium hover:bg-bark transition-colors"
+            className="rounded-full bg-control-dark text-fg-on-dark px-4 py-2 text-[14px] font-medium hover:bg-control-dark-hover transition-colors"
           >
             Sign out
           </button>
@@ -88,7 +88,7 @@ export default function AdminApp() {
             type="button"
             onClick={() => setTab(key)}
             className={`rounded-full px-5 py-2.5 text-[14.5px] font-semibold transition-colors ${
-              tab === key ? 'bg-oak text-white' : 'bg-paper border border-line text-bark hover:border-oak'
+              tab === key ? 'bg-accent text-fg-on-accent' : 'bg-surface-raised border border-hairline text-fg-body hover:border-accent'
             }`}
           >
             {label}
@@ -129,30 +129,30 @@ function Login() {
     <div className="min-h-screen grid place-items-center px-4">
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-sm rounded-3xl border border-line bg-paper p-8 shadow-lift"
+        className="w-full max-w-sm rounded-3xl border border-hairline bg-surface-raised p-8 shadow-lift"
       >
-        <p className="font-display font-semibold text-2xl text-ink text-center">Essential Flooring</p>
-        <p className="text-[13px] uppercase tracking-[0.16em] text-coffee text-center mt-1 mb-7">
+        <p className="font-display font-semibold text-2xl text-fg text-center">Essential Flooring</p>
+        <p className="text-[13px] uppercase tracking-[0.16em] text-fg-muted text-center mt-1 mb-7">
           Admin sign in
         </p>
         <label className="grid gap-1.5 mb-4">
-          <span className="text-[14px] font-semibold text-bark">Email</span>
+          <span className="text-[14px] font-semibold text-fg-body">Email</span>
           <input
             name="email"
             type="email"
             required
             autoComplete="username"
-            className="rounded-xl border border-line bg-cream px-4 py-3 text-[15px] outline-none focus:border-oak focus:ring-2 focus:ring-oak/25 transition"
+            className="rounded-xl border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
         <label className="grid gap-1.5 mb-6">
-          <span className="text-[14px] font-semibold text-bark">Password</span>
+          <span className="text-[14px] font-semibold text-fg-body">Password</span>
           <input
             name="password"
             type="password"
             required
             autoComplete="current-password"
-            className="rounded-xl border border-line bg-cream px-4 py-3 text-[15px] outline-none focus:border-oak focus:ring-2 focus:ring-oak/25 transition"
+            className="rounded-xl border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
         {error && (
@@ -163,7 +163,7 @@ function Login() {
         <button
           type="submit"
           disabled={busy}
-          className="w-full rounded-full bg-oak hover:bg-oak-deep disabled:opacity-60 text-white font-semibold py-3 transition-colors"
+          className="w-full rounded-full bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold py-3 transition-colors"
         >
           {busy ? 'Signing in...' : 'Sign in'}
         </button>

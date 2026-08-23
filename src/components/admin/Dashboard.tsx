@@ -74,14 +74,14 @@ export default function Dashboard() {
       </p>
     );
   }
-  if (!stats) return <p className="text-coffee">Loading traffic data...</p>;
+  if (!stats) return <p className="text-fg-muted">Loading traffic data...</p>;
 
   const max = Math.max(1, ...stats.daily.map(([, v]) => v));
 
   return (
     <div className="grid gap-6">
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="font-display font-semibold text-2xl text-ink">Website traffic</h1>
+        <h1 className="font-display font-semibold text-2xl text-fg">Website traffic</h1>
         <div className="flex gap-2">
           {RANGES.map((r) => (
             <button
@@ -89,7 +89,7 @@ export default function Dashboard() {
               type="button"
               onClick={() => setDays(r.days)}
               className={`rounded-full px-4 py-1.5 text-[13.5px] font-semibold transition-colors ${
-                days === r.days ? 'bg-ink text-cream' : 'bg-paper border border-line text-bark'
+                days === r.days ? 'bg-control-dark text-fg-on-dark' : 'bg-surface-raised border border-hairline text-fg-body'
               }`}
             >
               {r.label}
@@ -108,8 +108,8 @@ export default function Dashboard() {
       </div>
 
       {/* Daily bar chart */}
-      <div className="rounded-2xl border border-line bg-paper p-6 shadow-card">
-        <h2 className="font-semibold text-[15px] text-bark mb-4">Daily page views</h2>
+      <div className="rounded-2xl border border-hairline bg-surface-raised p-6 shadow-card">
+        <h2 className="font-semibold text-[15px] text-fg-body mb-4">Daily page views</h2>
         <svg viewBox={`0 0 ${stats.daily.length * 12} 120`} className="w-full h-36" role="img" aria-label="Daily page views chart">
           {stats.daily.map(([day, v], i) => {
             const h = Math.max(2, (v / max) * 100);
@@ -121,7 +121,7 @@ export default function Dashboard() {
                   width={8}
                   height={h}
                   rx={2}
-                  fill={v > 0 ? '#b5773a' : '#e2d5c2'}
+                  fill={v > 0 ? 'var(--ef-accent-fill)' : 'var(--ef-hairline)'}
                 >
                   <title>{`${day}: ${v} views`}</title>
                 </rect>
@@ -129,7 +129,7 @@ export default function Dashboard() {
             );
           })}
         </svg>
-        <div className="flex justify-between text-[12px] text-coffee mt-1">
+        <div className="flex justify-between text-[12px] text-fg-muted mt-1">
           <span>{stats.daily[0]?.[0]}</span>
           <span>{stats.daily[stats.daily.length - 1]?.[0]}</span>
         </div>
@@ -163,9 +163,9 @@ export default function Dashboard() {
 
 function StatCard({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-2xl border border-line bg-paper p-6 shadow-card">
-      <p className="text-[13px] uppercase tracking-[0.14em] text-coffee">{label}</p>
-      <p className="mt-2 font-display font-semibold text-4xl text-ink">{value}</p>
+    <div className="rounded-2xl border border-hairline bg-surface-raised p-6 shadow-card">
+      <p className="text-[13px] uppercase tracking-[0.14em] text-fg-muted">{label}</p>
+      <p className="mt-2 font-display font-semibold text-4xl text-fg">{value}</p>
     </div>
   );
 }
@@ -182,21 +182,21 @@ function ListCard({
   empty: string;
 }) {
   return (
-    <div className="rounded-2xl border border-line bg-paper p-6 shadow-card">
-      <h2 className="font-semibold text-[15px] text-bark mb-4">{title}</h2>
+    <div className="rounded-2xl border border-hairline bg-surface-raised p-6 shadow-card">
+      <h2 className="font-semibold text-[15px] text-fg-body mb-4">{title}</h2>
       {rows.length === 0 ? (
-        <p className="text-[14px] text-coffee">{empty}</p>
+        <p className="text-[14px] text-fg-muted">{empty}</p>
       ) : (
         <ul className="space-y-2.5">
           {rows.map(([label, count]) => (
             <li key={label} className="text-[14px]">
               <div className="flex justify-between gap-3 mb-1">
-                <span className="truncate text-bark">{label}</span>
-                <span className="shrink-0 font-semibold text-ink">{count}</span>
+                <span className="truncate text-fg-body">{label}</span>
+                <span className="shrink-0 font-semibold text-fg">{count}</span>
               </div>
-              <div className="h-1.5 rounded-full bg-sand overflow-hidden">
+              <div className="h-1.5 rounded-full bg-surface-sunken overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-oak"
+                  className="h-full rounded-full bg-accent"
                   style={{ width: `${Math.min(100, (count / Math.max(1, total)) * 100 * 2)}%` }}
                 />
               </div>

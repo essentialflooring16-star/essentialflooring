@@ -67,8 +67,8 @@ const schema = {
     <div class="mx-auto max-w-3xl px-4 sm:px-6">
       <Breadcrumbs crumbs={[{ label: 'Blog', href: '/blog/' }, { label: post.title }]} />
       <header class="mt-8">
-        <p class="text-[14px] text-coffee">{postDate(post)}</p>
-        <h1 class="mt-3 font-display font-semibold text-4xl sm:text-[44px] leading-[1.1] tracking-tight text-ink text-balance">
+        <p class="text-[14px] text-fg-muted">{postDate(post)}</p>
+        <h1 class="mt-3 font-display font-semibold text-4xl sm:text-[44px] leading-[1.1] tracking-tight text-fg text-balance">
           {post.title}
         </h1>
       </header>
@@ -83,26 +83,26 @@ const schema = {
       )}
 
       <div
-        class="mt-10 max-w-none text-[17px] leading-relaxed text-bark
-          [&_h2]:font-display [&_h2]:font-semibold [&_h2]:text-2xl [&_h2]:text-ink [&_h2]:mt-10 [&_h2]:mb-3
-          [&_h3]:font-display [&_h3]:font-semibold [&_h3]:text-xl [&_h3]:text-ink [&_h3]:mt-8 [&_h3]:mb-2
-          [&_p]:mb-5 [&_a]:text-oak-deep [&_a]:font-medium [&_a]:underline [&_a]:underline-offset-2
+        class="mt-10 max-w-none text-[17px] leading-relaxed text-fg-body
+          [&_h2]:font-display [&_h2]:font-semibold [&_h2]:text-2xl [&_h2]:text-fg [&_h2]:mt-10 [&_h2]:mb-3
+          [&_h3]:font-display [&_h3]:font-semibold [&_h3]:text-xl [&_h3]:text-fg [&_h3]:mt-8 [&_h3]:mb-2
+          [&_p]:mb-5 [&_a]:text-accent-on-light [&_a]:font-medium [&_a]:underline [&_a]:underline-offset-2
           [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-5 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-5 [&_li]:mb-1.5
           [&_img]:rounded-xl [&_img]:shadow-card [&_img]:my-6
-          [&_blockquote]:border-l-4 [&_blockquote]:border-oak [&_blockquote]:pl-5 [&_blockquote]:italic [&_blockquote]:text-coffee"
+          [&_blockquote]:border-l-4 [&_blockquote]:border-accent [&_blockquote]:pl-5 [&_blockquote]:italic [&_blockquote]:text-fg-muted"
         set:html={html}
       />
 
-      <footer class="mt-12 rounded-2xl bg-sand/70 border border-line p-7 text-center">
-        <p class="font-display font-semibold text-xl text-ink">
+      <footer class="mt-12 rounded-2xl bg-surface-sunken/70 border border-hairline p-7 text-center">
+        <p class="font-display font-semibold text-xl text-fg">
           Thinking about your own floors?
         </p>
-        <p class="mt-2 text-[15px] text-coffee">
+        <p class="mt-2 text-[15px] text-fg-muted">
           Estimates are free and honest. Call {SITE.phone} or send us your project.
         </p>
         <a
           href="/contact/"
-          class="mt-4 inline-flex items-center rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-6 py-3 transition-colors"
+          class="mt-4 inline-flex items-center rounded-full bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-6 py-3 transition-colors"
         >
           Get a Free Estimate
         </a>

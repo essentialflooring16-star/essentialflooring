@@ -10,29 +10,29 @@ import { SITE } from '../data/site';
 >
   <section class="py-28">
     <div class="mx-auto max-w-2xl px-4 sm:px-6 text-center">
-      <p class="font-display font-semibold text-7xl text-oak">404</p>
-      <h1 class="mt-4 font-display font-semibold text-3xl sm:text-4xl text-ink tracking-tight">
+      <p class="font-display font-semibold text-7xl text-accent-display">404</p>
+      <h1 class="mt-4 font-display font-semibold text-3xl sm:text-4xl text-fg tracking-tight">
         This page got sanded away
       </h1>
-      <p class="mt-4 text-[17px] text-coffee leading-relaxed">
+      <p class="mt-4 text-[17px] text-fg-muted leading-relaxed">
         The address you followed does not exist. Let's get you back on solid ground.
       </p>
       <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
         <a
           href="/"
-          class="inline-flex justify-center items-center rounded-full bg-oak hover:bg-oak-deep text-white font-semibold px-7 py-3.5 transition-colors"
+          class="inline-flex justify-center items-center rounded-full bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-7 py-3.5 transition-colors"
         >
           Back to the homepage
         </a>
         <a
           href="/contact/"
-          class="inline-flex justify-center items-center rounded-full border border-ink/20 hover:border-ink/50 text-ink font-semibold px-7 py-3.5 transition-colors"
+          class="inline-flex justify-center items-center rounded-full border border-hairline-strong/20 hover:border-hairline-strong/50 text-fg font-semibold px-7 py-3.5 transition-colors"
         >
           Get a free estimate
         </a>
       </div>
-      <p class="mt-8 text-[14px] text-coffee">
-        Or call us: <a href={SITE.phoneHref} class="font-semibold text-oak-deep">{SITE.phone}</a>
+      <p class="mt-8 text-[14px] text-fg-muted">
+        Or call us: <a href={SITE.phoneHref} class="font-semibold text-accent-on-light">{SITE.phone}</a>
       </p>
     </div>
   </section>

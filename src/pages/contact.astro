@@ -19,63 +19,63 @@ const contactPhoto = photoById('hardwood-refinishing-03');
 
       <div class="mt-8 grid lg:grid-cols-[1fr_420px] gap-14">
         <div>
-          <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-ink max-w-xl">
+          <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-fg max-w-xl">
             Let's talk about your floors
           </h1>
-          <p class="mt-5 text-[17px] leading-relaxed text-coffee max-w-lg">
+          <p class="mt-5 text-[17px] leading-relaxed text-fg-muted max-w-lg">
             Send a few details and we will get back to you to schedule a free on-site
             estimate. Prefer to talk? Call us directly, we answer.
           </p>
 
           <div class="mt-10 space-y-6">
             <a href={SITE.phoneHref} class="flex items-center gap-4 group w-fit">
-              <span class="grid place-items-center size-12 rounded-2xl bg-ink text-cream group-hover:bg-oak transition-colors" aria-hidden="true">
+              <span class="grid place-items-center size-12 rounded-2xl bg-control-dark text-fg-on-dark group-hover:bg-accent transition-colors" aria-hidden="true">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                   <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </span>
               <span>
-                <span class="block text-[13px] uppercase tracking-[0.14em] text-coffee">Phone</span>
-                <span class="block font-semibold text-[18px] text-ink group-hover:text-oak-deep transition-colors">{SITE.phone}</span>
+                <span class="block text-[13px] uppercase tracking-[0.14em] text-fg-muted">Phone</span>
+                <span class="block font-semibold text-[18px] text-fg group-hover:text-accent-on-light transition-colors">{SITE.phone}</span>
               </span>
             </a>
 
             <a href={`mailto:${SITE.email}`} class="flex items-center gap-4 group w-fit">
-              <span class="grid place-items-center size-12 rounded-2xl bg-ink text-cream group-hover:bg-oak transition-colors" aria-hidden="true">
+              <span class="grid place-items-center size-12 rounded-2xl bg-control-dark text-fg-on-dark group-hover:bg-accent transition-colors" aria-hidden="true">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                   <rect x="3" y="5" width="18" height="14" rx="2.5" />
                   <path d="m4 7 8 6 8-6" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </span>
               <span>
-                <span class="block text-[13px] uppercase tracking-[0.14em] text-coffee">Email</span>
-                <span class="block font-semibold text-[17px] text-ink group-hover:text-oak-deep transition-colors break-all">{SITE.email}</span>
+                <span class="block text-[13px] uppercase tracking-[0.14em] text-fg-muted">Email</span>
+                <span class="block font-semibold text-[17px] text-fg group-hover:text-accent-on-light transition-colors break-all">{SITE.email}</span>
               </span>
             </a>
 
             <div class="flex items-center gap-4">
-              <span class="grid place-items-center size-12 rounded-2xl bg-ink text-cream" aria-hidden="true">
+              <span class="grid place-items-center size-12 rounded-2xl bg-control-dark text-fg-on-dark" aria-hidden="true">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                   <path d="M12 21s-7-5.1-7-11a7 7 0 0 1 14 0c0 5.9-7 11-7 11" stroke-linecap="round" stroke-linejoin="round" />
                   <circle cx="12" cy="10" r="2.5" />
                 </svg>
               </span>
               <span>
-                <span class="block text-[13px] uppercase tracking-[0.14em] text-coffee">Service area</span>
-                <span class="block font-semibold text-[17px] text-ink">Sacramento, CA and surrounding cities</span>
+                <span class="block text-[13px] uppercase tracking-[0.14em] text-fg-muted">Service area</span>
+                <span class="block font-semibold text-[17px] text-fg">Sacramento, CA and surrounding cities</span>
               </span>
             </div>
 
             <div class="flex items-center gap-4">
-              <span class="grid place-items-center size-12 rounded-2xl bg-ink text-cream" aria-hidden="true">
+              <span class="grid place-items-center size-12 rounded-2xl bg-control-dark text-fg-on-dark" aria-hidden="true">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                   <circle cx="12" cy="12" r="9" />
                   <path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </span>
               <span>
-                <span class="block text-[13px] uppercase tracking-[0.14em] text-coffee">Hours</span>
-                <span class="block font-semibold text-[17px] text-ink">Monday to Saturday, 7 AM to 7 PM</span>
+                <span class="block text-[13px] uppercase tracking-[0.14em] text-fg-muted">Hours</span>
+                <span class="block font-semibold text-[17px] text-fg">Monday to Saturday, 7 AM to 7 PM</span>
               </span>
             </div>
           </div>
@@ -90,10 +90,10 @@ const contactPhoto = photoById('hardwood-refinishing-03');
               format="webp"
               quality={70}
             />
-            <div class="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" aria-hidden="true"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-scrim/85 via-scrim/20 to-transparent" aria-hidden="true"></div>
             <div class="absolute bottom-0 left-0 right-0 p-6">
-              <h2 class="font-display font-semibold text-lg text-cream">What happens next?</h2>
-              <ol class="mt-2 space-y-1.5 text-[14px] text-cream/85 list-decimal list-inside">
+              <h2 class="font-display font-semibold text-lg text-fg-on-dark">What happens next?</h2>
+              <ol class="mt-2 space-y-1.5 text-[14px] text-fg-on-dark/85 list-decimal list-inside">
                 <li>We reply to confirm a time for the free on-site visit.</li>
                 <li>We measure, look at the space and talk options.</li>
                 <li>You receive a clear written quote. No hidden fees.</li>
@@ -102,8 +102,8 @@ const contactPhoto = photoById('hardwood-refinishing-03');
           </div>
         </div>
 
-        <div class="reveal rounded-3xl bg-paper border border-line shadow-lift p-7 sm:p-9 h-fit">
-          <h2 class="font-display font-semibold text-2xl text-ink mb-6">Request a free estimate</h2>
+        <div class="reveal rounded-3xl bg-surface-raised border border-hairline shadow-lift p-7 sm:p-9 h-fit">
+          <h2 class="font-display font-semibold text-2xl text-fg mb-6">Request a free estimate</h2>
           <ContactForm client:load />
         </div>
       </div>

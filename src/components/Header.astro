@@ -21,16 +21,16 @@ const isActive = (href: string) => {
 };
 ---
 
-<div class="bg-ink text-cream/90 text-[13px]">
+<div class="bg-surface-dark text-fg-on-dark/90 text-[13px]">
   <div class="mx-auto max-w-6xl px-4 sm:px-6 flex items-center justify-between gap-4 h-9">
     <p class="hidden sm:block tracking-wide">
-      Licensed &amp; Insured <span class="text-oak-soft font-medium">{SITE.license}</span>
+      Licensed &amp; Insured <span class="text-accent-on-dark font-medium">{SITE.license}</span>
     </p>
     <div class="flex items-center gap-5">
-      <a href={SITE.phoneHref} class="hover:text-oak-soft transition-colors font-medium">
+      <a href={SITE.phoneHref} class="hover:text-accent-on-dark transition-colors font-medium">
         {SITE.phone}
       </a>
-      <span class="hidden sm:inline text-cream/40">|</span>
+      <span class="hidden sm:inline text-fg-on-dark/40">|</span>
       <p class="hidden sm:block">Free estimates, Sacramento CA</p>
     </div>
   </div>
@@ -38,12 +38,12 @@ const isActive = (href: string) => {
 
 <header
   id="site-header"
-  class="sticky top-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-line transition-shadow"
+  class="sticky top-0 z-50 bg-surface/95 backdrop-blur-sm border-b border-hairline transition-shadow"
 >
   <div class="mx-auto max-w-6xl px-4 sm:px-6 flex items-center justify-between h-[72px]">
     <a href="/" class="flex items-center gap-3 group" aria-label="Essential Flooring, home">
       <span
-        class="grid place-items-center size-10 rounded-[10px] bg-ink text-cream group-hover:bg-oak transition-colors"
+        class="grid place-items-center size-10 rounded-[10px] bg-control-dark text-fg-on-dark group-hover:bg-accent transition-colors"
         aria-hidden="true"
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -53,8 +53,8 @@ const isActive = (href: string) => {
         </svg>
       </span>
       <span class="leading-none">
-        <span class="block font-display font-semibold text-[19px] tracking-tight text-ink">Essential Flooring</span>
-        <span class="block text-[11px] uppercase tracking-[0.18em] text-coffee mt-1">Sacramento, California</span>
+        <span class="block font-display font-semibold text-[19px] tracking-tight text-fg">Essential Flooring</span>
+        <span class="block text-[11px] uppercase tracking-[0.18em] text-fg-muted mt-1">Sacramento, California</span>
       </span>
     </a>
 
@@ -62,7 +62,7 @@ const isActive = (href: string) => {
       {nav.map((item) => (
         <a
           href={item.href}
-          class="nav-link text-[15px] font-medium text-bark hover:text-ink transition-colors"
+          class="nav-link text-[15px] font-medium text-fg-body hover:text-fg transition-colors"
           aria-current={isActive(item.href) ? 'page' : undefined}
         >
           {item.label}
@@ -73,7 +73,7 @@ const isActive = (href: string) => {
     <div class="flex items-center gap-3">
       <a
         href="/contact/"
-        class="hidden sm:inline-flex items-center gap-2 rounded-full bg-oak hover:bg-oak-deep text-white font-semibold text-[15px] px-5 py-2.5 transition-colors shadow-card"
+        class="hidden sm:inline-flex items-center gap-2 rounded-full bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold text-[15px] px-5 py-2.5 transition-colors shadow-card"
       >
         Free Estimate
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
@@ -84,7 +84,7 @@ const isActive = (href: string) => {
       <button
         id="menu-toggle"
         type="button"
-        class="lg:hidden grid place-items-center size-11 rounded-lg border border-line text-ink"
+        class="lg:hidden grid place-items-center size-11 rounded-lg border border-hairline text-fg"
         aria-expanded="false"
         aria-controls="mobile-menu"
         aria-label="Open menu"
@@ -99,12 +99,12 @@ const isActive = (href: string) => {
     </div>
   </div>
 
-  <div id="mobile-menu" class="hidden lg:hidden border-t border-line bg-cream">
+  <div id="mobile-menu" class="hidden lg:hidden border-t border-hairline bg-surface">
     <nav class="mx-auto max-w-6xl px-4 sm:px-6 py-4 flex flex-col" aria-label="Mobile">
       {nav.map((item) => (
         <a
           href={item.href}
-          class="py-3 text-[17px] font-medium text-bark border-b border-line/60 last:border-0"
+          class="py-3 text-[17px] font-medium text-fg-body border-b border-hairline/60 last:border-0"
           aria-current={isActive(item.href) ? 'page' : undefined}
         >
           {item.label}
@@ -112,11 +112,11 @@ const isActive = (href: string) => {
       ))}
       <a
         href="/contact/"
-        class="mt-4 inline-flex justify-center items-center rounded-full bg-oak text-white font-semibold px-5 py-3"
+        class="mt-4 inline-flex justify-center items-center rounded-full bg-accent text-fg-on-accent font-semibold px-5 py-3"
       >
         Get a Free Estimate
       </a>
-      <a href={SITE.phoneHref} class="mt-3 text-center text-bark font-medium py-2">
+      <a href={SITE.phoneHref} class="mt-3 text-center text-fg-body font-medium py-2">
         Call {SITE.phone}
       </a>
     </nav>

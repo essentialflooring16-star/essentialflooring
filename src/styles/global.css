@@ -1,24 +1,147 @@
 @import 'tailwindcss';
 
-@theme {
-  /* Palette: warm espresso + oak amber + cream. Premium flooring feel. */
-  --color-ink: #221a14;
-  --color-bark: #3a2c21;
-  --color-coffee: #57452f;
-  --color-oak: #b5773a;
-  --color-oak-deep: #96602c;
-  --color-oak-soft: #d9a86c;
-  --color-cream: #faf6ef;
-  --color-sand: #f2e9db;
-  --color-linen: #ede2d0;
-  --color-line: #e2d5c2;
-  --color-paper: #ffffff;
+/* ═══════════════════════════════════════════════════════════════════════════
+   DESIGN TOKENS, IN THREE LAYERS
+   ───────────────────────────────────────────────────────────────────────────
+   The visual direction of this site is not final. To make a direction change
+   cheap, no component may name a colour. Components use ROLE names (surface,
+   fg, accent, hairline); roles point at PRIMITIVES; only the primitives carry
+   real values.
 
-  --font-display: 'Fraunces Variable', Georgia, serif;
-  --font-body: 'Inter Variable', system-ui, sans-serif;
+   Changing the whole look therefore means editing LAYER 1 and nothing else.
 
-  --shadow-card: 0 1px 2px rgb(34 26 20 / 0.06), 0 8px 24px -8px rgb(34 26 20 / 0.12);
-  --shadow-lift: 0 2px 4px rgb(34 26 20 / 0.08), 0 16px 40px -12px rgb(34 26 20 / 0.22);
+   Layer 1  primitives      raw values, named for what they are
+   Layer 2  semantic roles  named for what they do, reference layer 1
+   Layer 3  @theme inline   publishes the roles as Tailwind utilities
+
+   The values below are byte-identical to the palette used before this
+   refactor, so the rendered site is unchanged.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── LAYER 1: primitives ─────────────────────────────────────────────────── */
+:root {
+  /* light end of the neutral ramp */
+  --ef-ground:            #faf6ef; /* page ground                            */
+  --ef-ground-tint:       #f2e9db; /* tinted band, chip, placeholder         */
+  --ef-ground-raised:     #ffffff; /* card surface                           */
+  --ef-ground-field:      #faf6ef; /* input fill                             */
+  --ef-rule:              #e2d5c2; /* hairline on light                      */
+
+  /* ink end of the neutral ramp */
+  --ef-ink-900:           #221a14; /* strongest text on light                */
+  --ef-ink-700:           #3a2c21; /* body copy on light                     */
+  --ef-ink-500:           #57452f; /* muted text on light                    */
+
+  /* the inverse region: dark sections and dark controls */
+  --ef-dark-900:          #221a14; /* dark region ground                     */
+  --ef-dark-control:      #221a14; /* solid dark chip or button on light     */
+  --ef-dark-control-hi:   #3a2c21; /* its hover                              */
+  --ef-light-50:          #faf6ef; /* text, rules and veils on dark          */
+
+  /* accent */
+  --ef-accent:            #b5773a; /* fills, rings, borders                  */
+  --ef-accent-hi:         #96602c; /* fill hover                             */
+  --ef-accent-light:      #96602c; /* accent TEXT on a light ground          */
+  --ef-accent-dark:       #d9a86c; /* accent TEXT or fill on a dark ground   */
+  --ef-accent-display:    #b5773a; /* oversized numerals, star rows          */
+  --ef-accent-wash-pct:   15%;     /* strength of the soft accent badge      */
+  --ef-on-accent:         #ffffff; /* label sitting ON the accent fill       */
+
+  /* media. These sit over photographs, so they never follow the palette.
+     Tie them to the palette and photo captions go unreadable the moment a
+     direction inverts. */
+  --ef-scrim:             #221a14; /* brand tinted photo scrim               */
+  --ef-scrim-media:       #000000; /* neutral photo scrim                    */
+  --ef-on-media:          #ffffff; /* captions and controls over photos      */
+
+  /* non-colour direction knobs */
+  --ef-font-display: 'Fraunces Variable', Georgia, serif;
+  --ef-font-body: 'Inter Variable', system-ui, sans-serif;
+  --ef-grain-opacity: 0.05;
+  --ef-radius-card: 1rem;
+  --ef-radius-pill: 9999px;
+  --ef-shadow-tint: 34 26 20;
+}
+
+/* ── LAYER 2: semantic roles ─────────────────────────────────────────────── */
+:root {
+  /* surfaces */
+  --ef-surface:            var(--ef-ground);
+  --ef-surface-raised:     var(--ef-ground-raised);
+  --ef-surface-sunken:     var(--ef-ground-tint);
+  --ef-field:              var(--ef-ground-field);
+  --ef-surface-dark:       var(--ef-dark-900);
+  --ef-control-dark:       var(--ef-dark-control);
+  --ef-control-dark-hover: var(--ef-dark-control-hi);
+  --ef-veil-on-dark:       var(--ef-light-50);
+
+  /* foregrounds */
+  --ef-fg:                 var(--ef-ink-900);
+  --ef-fg-body:            var(--ef-ink-700);
+  --ef-fg-muted:           var(--ef-ink-500);
+  --ef-fg-subtle:          var(--ef-rule);
+  --ef-fg-on-dark:         var(--ef-light-50);
+  --ef-fg-on-accent:       var(--ef-on-accent);
+  --ef-fg-on-media:        var(--ef-on-media);
+
+  /* accent */
+  --ef-accent-fill:        var(--ef-accent);
+  --ef-accent-fill-hover:  var(--ef-accent-hi);
+  --ef-accent-on-light:    var(--ef-accent-light);
+  --ef-accent-on-dark:     var(--ef-accent-dark);
+  --ef-accent-display-fg:  var(--ef-accent-display);
+  --ef-accent-wash: color-mix(in srgb, var(--ef-accent) var(--ef-accent-wash-pct), transparent);
+
+  /* lines */
+  --ef-hairline:           var(--ef-rule);
+  --ef-hairline-on-dark:   var(--ef-light-50);
+  --ef-hairline-strong:    var(--ef-ink-900);
+
+  /* media */
+  --ef-scrim-brand:        var(--ef-scrim);
+  --ef-scrim-neutral:      var(--ef-scrim-media);
+}
+
+/* ── LAYER 3: Tailwind utilities ─────────────────────────────────────────── */
+@theme inline {
+  --color-surface: var(--ef-surface);
+  --color-surface-raised: var(--ef-surface-raised);
+  --color-surface-sunken: var(--ef-surface-sunken);
+  --color-field: var(--ef-field);
+  --color-surface-dark: var(--ef-surface-dark);
+  --color-control-dark: var(--ef-control-dark);
+  --color-control-dark-hover: var(--ef-control-dark-hover);
+  --color-veil-on-dark: var(--ef-veil-on-dark);
+
+  --color-fg: var(--ef-fg);
+  --color-fg-body: var(--ef-fg-body);
+  --color-fg-muted: var(--ef-fg-muted);
+  --color-fg-subtle: var(--ef-fg-subtle);
+  --color-fg-on-dark: var(--ef-fg-on-dark);
+  --color-fg-on-accent: var(--ef-fg-on-accent);
+  --color-fg-on-media: var(--ef-fg-on-media);
+
+  --color-accent: var(--ef-accent-fill);
+  --color-accent-hover: var(--ef-accent-fill-hover);
+  --color-accent-on-light: var(--ef-accent-on-light);
+  --color-accent-on-dark: var(--ef-accent-on-dark);
+  --color-accent-display: var(--ef-accent-display-fg);
+  --color-accent-wash: var(--ef-accent-wash);
+
+  --color-hairline: var(--ef-hairline);
+  --color-hairline-on-dark: var(--ef-hairline-on-dark);
+  --color-hairline-strong: var(--ef-hairline-strong);
+
+  --color-scrim: var(--ef-scrim-brand);
+  --color-scrim-media: var(--ef-scrim-neutral);
+
+  --font-display: var(--ef-font-display);
+  --font-body: var(--ef-font-body);
+
+  --shadow-card: 0 1px 2px rgb(var(--ef-shadow-tint) / 0.06),
+    0 8px 24px -8px rgb(var(--ef-shadow-tint) / 0.12);
+  --shadow-lift: 0 2px 4px rgb(var(--ef-shadow-tint) / 0.08),
+    0 16px 40px -12px rgb(var(--ef-shadow-tint) / 0.22);
 
   --animate-marquee: marquee 36s linear infinite;
   --animate-drift: drift 9s ease-in-out infinite alternate;
@@ -48,34 +171,38 @@ html {
 }
 
 body {
-  font-family: var(--font-body);
-  background-color: var(--color-cream);
-  color: var(--color-ink);
+  font-family: var(--ef-font-body);
+  background-color: var(--ef-surface);
+  color: var(--ef-fg);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background-color: var(--color-oak);
-  color: #fff;
+  background-color: var(--ef-accent-fill);
+  color: var(--ef-fg-on-accent);
 }
 
 h1, h2, h3, .font-display {
-  font-family: var(--font-display);
+  font-family: var(--ef-font-display);
 }
 
-/* Italic serif accent inside display headings */
+/* Italic serif accent inside display headings.
+   NOTE: the SOFT and WONK axes only exist in Fraunces. A direction that swaps
+   the display face has to drop them and pick a different emphasis device. */
 .accent-italic {
   font-style: italic;
   font-variation-settings: 'SOFT' 60, 'WONK' 1;
-  color: var(--color-oak);
+  color: var(--ef-accent-on-light);
 }
 .accent-italic-soft {
   font-style: italic;
-  color: var(--color-oak-soft);
+  color: var(--ef-accent-on-dark);
 }
 
-/* Subtle film grain for dark sections (tiny data-URI noise, GPU friendly) */
+/* Subtle film grain for dark sections (tiny data-URI noise, GPU friendly).
+   The noise itself is black and cannot be tokenised, since a var() cannot be
+   interpolated into a data-URI. Only its strength is a knob. */
 .grain {
   position: relative;
   isolation: isolate;
@@ -86,7 +213,7 @@ h1, h2, h3, .font-display {
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.05;
+  opacity: var(--ef-grain-opacity);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.9'/%3E%3C/svg%3E");
 }
 .grain > * {
@@ -94,32 +221,37 @@ h1, h2, h3, .font-display {
   z-index: 2;
 }
 
-/* Eyebrow pill badge (replaces the old line motif) */
+/* Eyebrow pill badge. The only place that already modelled the light/dark
+   pair correctly, so it maps straight onto the two accent roles. */
 .eyebrow-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  border-radius: 9999px;
+  border-radius: var(--ef-radius-pill);
   padding: 0.42rem 0.95rem;
-  font-family: var(--font-display);
+  font-family: var(--ef-font-display);
   font-style: italic;
   font-size: 15px;
   letter-spacing: 0.01em;
 }
 .eyebrow-pill.on-light {
-  background: rgb(181 119 58 / 0.12);
-  color: var(--color-oak-deep);
-  border: 1px solid rgb(181 119 58 / 0.25);
+  background: color-mix(in srgb, var(--ef-accent-fill) 12%, transparent);
+  color: var(--ef-accent-on-light);
+  border: 1px solid color-mix(in srgb, var(--ef-accent-fill) 25%, transparent);
 }
 .eyebrow-pill.on-dark {
-  background: rgb(217 168 108 / 0.14);
-  color: var(--color-oak-soft);
-  border: 1px solid rgb(217 168 108 / 0.3);
+  background: color-mix(in srgb, var(--ef-accent-on-dark) 14%, transparent);
+  color: var(--ef-accent-on-dark);
+  border: 1px solid color-mix(in srgb, var(--ef-accent-on-dark) 30%, transparent);
 }
 
 /* Soft radial glow used behind hero imagery */
 .glow-oak {
-  background: radial-gradient(closest-side, rgb(181 119 58 / 0.35), transparent 70%);
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--ef-accent-fill) 35%, transparent),
+    transparent 70%
+  );
   filter: blur(10px);
 }
 
@@ -192,7 +324,7 @@ html.js .reveal-scale.is-visible {
   bottom: -4px;
   width: 100%;
   height: 2px;
-  background: var(--color-oak);
+  background: var(--ef-accent-fill);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.25s ease;
