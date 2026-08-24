@@ -114,7 +114,7 @@ export default function ContactForm() {
             name="name"
             autoComplete="name"
             placeholder="John Smith"
-            className="rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
+            className="w-full min-w-0 rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
         <label className="grid gap-1.5">
@@ -125,7 +125,7 @@ export default function ContactForm() {
             type="tel"
             autoComplete="tel"
             placeholder="(916) 555-0123"
-            className="rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
+            className="w-full min-w-0 rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
       </div>
@@ -138,7 +138,7 @@ export default function ContactForm() {
             type="email"
             autoComplete="email"
             placeholder="you@email.com"
-            className="rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
+            className="w-full min-w-0 rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
         <label className="grid gap-1.5">
@@ -147,7 +147,7 @@ export default function ContactForm() {
             name="city"
             autoComplete="address-level2"
             placeholder="Sacramento"
-            className="rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
+            className="w-full min-w-0 rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
       </div>
@@ -156,7 +156,7 @@ export default function ContactForm() {
         <span className="text-[14px] font-semibold text-fg-body">What do you need?</span>
         <select
           name="service"
-          className="rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
+          className="w-full min-w-0 rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           defaultValue=""
         >
           <option value="" disabled>
@@ -176,7 +176,7 @@ export default function ContactForm() {
           name="message"
           rows={4}
           placeholder="Rooms, approximate square footage, current floor, timeline..."
-          className="rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition resize-y"
+          className="w-full min-w-0 rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition resize-y"
         />
       </label>
 

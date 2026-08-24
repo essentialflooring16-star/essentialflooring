@@ -1,6 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#221a14"/>
-  <path d="M14 28 32 15l18 13" fill="none" stroke="#b5773a" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M19 31v17h26V31" fill="none" stroke="#faf6ef" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M27 48v-9h10v9" fill="none" stroke="#b5773a" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Direction A mark: the two parallel planks from the client's own logo,
+       cream over brick, on the ink ground. Squared corners per direction A. -->
+  <rect width="64" height="64" rx="6" fill="#16150f"/>
+  <g transform="rotate(-25 32 32)">
+    <rect x="10" y="22.5" width="36" height="8" fill="#efece4"/>
+    <rect x="18" y="34" width="36" height="8" fill="#c8442a"/>
+  </g>
 </svg>

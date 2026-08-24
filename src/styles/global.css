@@ -250,16 +250,6 @@ h1, h2, h3, .font-display {
   border: 1px solid color-mix(in srgb, var(--ef-accent-on-dark) 30%, transparent);
 }
 
-/* Soft radial glow used behind hero imagery */
-.glow-oak {
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--ef-accent-fill) 35%, transparent),
-    transparent 70%
-  );
-  filter: blur(10px);
-}
-
 /* Marquee ribbon */
 .marquee-track {
   display: flex;

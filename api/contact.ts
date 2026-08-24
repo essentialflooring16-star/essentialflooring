@@ -180,15 +180,15 @@ export default async function handler(req: Request): Promise<Response> {
   ]
     .map(
       ([k, v]) =>
-        `<tr><td style="padding:6px 14px 6px 0;color:#57452f;white-space:nowrap"><strong>${k}</strong></td><td style="padding:6px 0">${esc(v)}</td></tr>`,
+        `<tr><td style="padding:6px 14px 6px 0;color:#5d594d;white-space:nowrap"><strong>${k}</strong></td><td style="padding:6px 0">${esc(v)}</td></tr>`,
     )
     .join('');
 
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:560px">
-      <h2 style="color:#221a14">New estimate request from the website</h2>
+      <h2 style="color:#16150f">New estimate request from the website</h2>
       <table style="font-size:15px;border-collapse:collapse">${rows}</table>
-      ${message ? `<p style="font-size:15px;background:#f2e9db;padding:12px 16px;border-radius:8px;color:#221a14">${esc(message)}</p>` : ''}
+      ${message ? `<p style="font-size:15px;background:#e6e2d6;padding:12px 16px;border-radius:8px;color:#16150f">${esc(message)}</p>` : ''}
       <p style="font-size:12px;color:#999">Sent automatically by essentialflooringinc.com</p>
     </div>`;
 
