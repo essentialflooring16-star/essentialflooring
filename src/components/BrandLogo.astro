@@ -1,0 +1,47 @@
+---
+// The client's own logo, rebuilt as a live-text lockup so it stays crisp at
+// every size and on every ground. The original (WhatsApp, 17 Aug) is a JPG on
+// baked-in anthracite: two planks above the E, ESSENTIAL fading cream to
+// copper, FLOORING letterspaced in copper beneath. This mirrors it 1:1 and is
+// meant for DARK grounds, exactly like the original.
+interface Props {
+  /** overall scale: header (compact) or footer (full, with the service line) */
+  variant?: 'header' | 'footer';
+}
+const { variant = 'header' } = Astro.props;
+const compact = variant === 'header';
+---
+
+<span class={`inline-block leading-none select-none ${compact ? '' : 'pb-0.5'}`}>
+  <svg
+    width={compact ? 46 : 58}
+    height={compact ? 13 : 16}
+    viewBox="0 0 58 16"
+    fill="none"
+    aria-hidden="true"
+    class="block mb-[3px]"
+  >
+    <g transform="rotate(-14 29 8)">
+      <rect x="1" y="2.2" width="34" height="3.4" fill="var(--ef-fg-on-dark)" />
+      <rect x="13" y="8.6" width="34" height="3.4" fill="var(--ef-accent-on-dark)" />
+    </g>
+  </svg>
+  <span
+    class={`block font-display font-extrabold uppercase tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-r from-fg-on-dark from-55% to-accent-on-dark ${compact ? 'text-[21px]' : 'text-[26px]'}`}
+  >
+    Essential
+  </span>
+  <span
+    class={`mt-[3px] flex items-center gap-2 text-accent-on-dark font-semibold uppercase ${compact ? 'text-[9.5px] tracking-[0.34em]' : 'text-[11px] tracking-[0.4em]'}`}
+  >
+    <span class="h-px flex-1 bg-accent-on-dark/60" aria-hidden="true"></span>
+    Flooring
+    <span class="h-px flex-1 bg-accent-on-dark/60" aria-hidden="true"></span>
+  </span>
+  {!compact && (
+    <span class="mt-2 block text-[8.5px] leading-[1.7] tracking-[0.18em] uppercase text-fg-on-dark/60 font-medium">
+      <span class="block whitespace-nowrap">LVP, Laminate &amp; Vinyl</span>
+      <span class="block whitespace-nowrap">Hardwood Refinishing</span>
+    </span>
+  )}
+</span>

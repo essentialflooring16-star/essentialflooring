@@ -1,12 +1,13 @@
 ---
 import { SITE, SERVICES, CORE_CITIES } from '../data/site';
+import BrandLogo from './BrandLogo.astro';
 const year = new Date().getFullYear();
 ---
 
 <footer class="bg-surface-dark text-fg-on-dark/80">
   <div class="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
     <div>
-      <p class="font-display font-semibold text-xl text-fg-on-dark">Essential Flooring</p>
+      <a href="/" aria-label="Essential Flooring, home" class="inline-block"><BrandLogo variant="footer" /></a>
       <p class="mt-3 text-[15px] leading-relaxed">
         Licensed flooring contractor serving the greater Sacramento area.
         Hardwood refinishing, LVP, laminate and carpet, done right and on time.

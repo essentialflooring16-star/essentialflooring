@@ -1,5 +1,6 @@
 ---
 import { SITE } from '../data/site';
+import BrandLogo from './BrandLogo.astro';
 
 const nav = [
   { href: '/services/', label: 'Services' },
@@ -21,7 +22,7 @@ const isActive = (href: string) => {
 };
 ---
 
-<div class="bg-surface-dark text-fg-on-dark/90 text-[13px]" role="region" aria-label="Contact details">
+<div class="bg-surface-dark text-fg-on-dark/85 text-[13px] border-b border-hairline-on-dark/10" role="region" aria-label="Contact details">
   <div class="mx-auto max-w-6xl px-4 sm:px-6 flex items-center justify-between gap-4 h-9">
     <p class="hidden sm:block tracking-wide">
       Licensed &amp; Insured <span class="text-accent-on-dark font-medium">{SITE.license}</span>
@@ -38,33 +39,18 @@ const isActive = (href: string) => {
 
 <header
   id="site-header"
-  class="sticky top-0 z-50 bg-surface/95 backdrop-blur-sm border-b border-hairline transition-shadow"
+  class="sticky top-0 z-50 bg-surface-dark/95 backdrop-blur-sm border-b border-hairline-on-dark/12 transition-shadow"
 >
   <div class="mx-auto max-w-6xl px-4 sm:px-6 flex items-center justify-between h-[72px]">
-    <a href="/" class="flex items-center gap-3 group" aria-label="Essential Flooring, home">
-      <span
-        class="grid place-items-center size-10 rounded-[10px] bg-control-dark text-fg-on-dark group-hover:bg-control-dark-hover transition-colors"
-        aria-hidden="true"
-      >
-        {/* The two-plank mark from the client's own logo, same as the favicon. */}
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <g transform="rotate(-25 12 12)">
-            <rect x="2.5" y="7.5" width="14" height="3.4" fill="var(--ef-fg-on-dark)" />
-            <rect x="7.5" y="13.1" width="14" height="3.4" fill="var(--ef-accent-fill)" />
-          </g>
-        </svg>
-      </span>
-      <span class="leading-none">
-        <span class="block font-display font-semibold text-[19px] tracking-tight text-fg">Essential Flooring</span>
-        <span class="block text-[11px] uppercase tracking-[0.18em] text-fg-muted mt-1">Sacramento, California</span>
-      </span>
+    <a href="/" class="block group" aria-label="Essential Flooring, home">
+      <BrandLogo variant="header" />
     </a>
 
     <nav class="hidden lg:flex items-center gap-7" aria-label="Main">
       {nav.map((item) => (
         <a
           href={item.href}
-          class="nav-link text-[15px] font-medium text-fg-body hover:text-fg transition-colors"
+          class="nav-link text-[15px] font-medium text-fg-on-dark/75 hover:text-fg-on-dark transition-colors"
           aria-current={isActive(item.href) ? 'page' : undefined}
         >
           {item.label}
@@ -86,7 +72,7 @@ const isActive = (href: string) => {
       <button
         id="menu-toggle"
         type="button"
-        class="lg:hidden grid place-items-center size-11 rounded-lg border border-hairline text-fg"
+        class="lg:hidden grid place-items-center size-11 rounded-lg border border-hairline-on-dark/30 text-fg-on-dark"
         aria-expanded="false"
         aria-controls="mobile-menu"
         aria-label="Open menu"
@@ -101,12 +87,12 @@ const isActive = (href: string) => {
     </div>
   </div>
 
-  <div id="mobile-menu" class="hidden lg:hidden border-t border-hairline bg-surface">
+  <div id="mobile-menu" class="hidden lg:hidden border-t border-hairline-on-dark/15 bg-surface-dark">
     <nav class="mx-auto max-w-6xl px-4 sm:px-6 py-4 flex flex-col" aria-label="Mobile">
       {nav.map((item) => (
         <a
           href={item.href}
-          class="py-3 text-[17px] font-medium text-fg-body border-b border-hairline/60 last:border-0"
+          class="py-3 text-[17px] font-medium text-fg-on-dark/85 border-b border-hairline-on-dark/15 last:border-0"
           aria-current={isActive(item.href) ? 'page' : undefined}
         >
           {item.label}
@@ -118,7 +104,7 @@ const isActive = (href: string) => {
       >
         Get a Free Estimate
       </a>
-      <a href={SITE.phoneHref} class="mt-3 text-center text-fg-body font-medium py-2">
+      <a href={SITE.phoneHref} class="mt-3 text-center text-fg-on-dark/85 font-medium py-2">
         Call {SITE.phone}
       </a>
     </nav>

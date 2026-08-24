@@ -44,12 +44,12 @@
 
   /* accent. White on #c8442a measures 4.87:1, so the primary button clears
      WCAG AA. The old copper was 3.71:1 and did not. */
-  --ef-accent:            #c8442a;
-  --ef-accent-hi:         #a3341f;
-  --ef-accent-light:      #a3341f; /* accent TEXT on a light ground          */
-  --ef-accent-dark:       #e8775e; /* accent TEXT or fill on a dark ground   */
-  --ef-accent-display:    #c8442a;
-  --ef-accent-wash-pct:   12%;
+  --ef-accent:            #96602c;
+  --ef-accent-hi:         #7d4f22;
+  --ef-accent-light:      #8a5724; /* accent TEXT on a light ground          */
+  --ef-accent-dark:       #d9a86c; /* accent TEXT or fill on a dark ground   */
+  --ef-accent-display:    #b5773a;
+  --ef-accent-wash-pct:   14%;
   --ef-on-accent:         #ffffff;
 
   /* media. These sit over photographs, so they never follow the palette. */
@@ -319,7 +319,7 @@ html.js .reveal-scale.is-visible {
   bottom: -4px;
   width: 100%;
   height: 2px;
-  background: var(--ef-accent-fill);
+  background: var(--ef-accent-on-dark);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.25s ease;
