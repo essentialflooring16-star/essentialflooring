@@ -139,7 +139,10 @@ const schemas = [localBusiness, ...schema];
     <script>
       // Lightweight first-party analytics -> Supabase (no cookies, no PII).
       import { trackPageView } from '../lib/analytics';
+      import { trackVitals } from '../lib/vitals';
       trackPageView();
+      // Real-user Core Web Vitals, sent once per page when the visit ends.
+      trackVitals();
     </script>
 
     <script>

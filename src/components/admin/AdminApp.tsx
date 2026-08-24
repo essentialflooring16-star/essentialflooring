@@ -5,8 +5,12 @@ import Dashboard from './Dashboard';
 import PortfolioManager from './PortfolioManager';
 import LeadsInbox from './LeadsInbox';
 import BlogManager from './BlogManager';
+import ReviewsManager from './ReviewsManager';
+import VitalsPanel from './VitalsPanel';
+import SettingsPanel from './SettingsPanel';
+import SeoHealth from './SeoHealth';
 
-type Tab = 'dashboard' | 'portfolio' | 'leads' | 'blog';
+type Tab = 'dashboard' | 'leads' | 'portfolio' | 'reviews' | 'blog' | 'vitals' | 'seo' | 'settings';
 
 export default function AdminApp() {
   const [session, setSession] = useState<Session | null>(null);
@@ -74,13 +78,17 @@ export default function AdminApp() {
         </div>
       </header>
 
-      <nav className="flex gap-2 mt-6 mb-8" aria-label="Admin sections">
+      <nav className="flex flex-wrap gap-2 mt-6 mb-8" aria-label="Admin sections">
         {(
           [
             ['dashboard', 'Traffic'],
-            ['portfolio', 'Portfolio'],
             ['leads', 'Leads'],
+            ['portfolio', 'Portfolio'],
+            ['reviews', 'Reviews'],
             ['blog', 'Blog'],
+            ['vitals', 'Speed'],
+            ['seo', 'SEO'],
+            ['settings', 'Settings'],
           ] as [Tab, string][]
         ).map(([key, label]) => (
           <button
@@ -98,9 +106,13 @@ export default function AdminApp() {
       </nav>
 
       {tab === 'dashboard' && <Dashboard />}
-      {tab === 'portfolio' && <PortfolioManager />}
       {tab === 'leads' && <LeadsInbox />}
+      {tab === 'portfolio' && <PortfolioManager />}
+      {tab === 'reviews' && <ReviewsManager />}
       {tab === 'blog' && <BlogManager />}
+      {tab === 'vitals' && <VitalsPanel />}
+      {tab === 'seo' && <SeoHealth />}
+      {tab === 'settings' && <SettingsPanel />}
     </Shell>
   );
 }
