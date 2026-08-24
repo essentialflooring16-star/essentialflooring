@@ -3,17 +3,44 @@ import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import CtaBand from '../components/CtaBand.astro';
 import { SITE } from '../data/site';
-import reviewsData from '../data/reviews.json';
+import { getReviews, ratingSummary, reviewDate } from '../lib/reviews';
 
-// Real Google reviews go into src/data/reviews.json:
-// { "author": "...", "rating": 5, "text": "...", "date": "2026-08-01", "city": "Roseville" }
-type Review = { author: string; rating: number; text: string; date?: string; city?: string };
-const reviews = reviewsData as Review[];
+// Reviews are pasted into the admin cabinet and fetched at build time. The
+// deploy hook rebuilds the site when the client saves, so they ship as static
+// HTML. src/data/reviews.json remains the fallback before Supabase is wired.
+const reviews = await getReviews();
+const summary = ratingSummary(reviews);
+
+// AggregateRating is only emitted when real reviews exist. Publishing a rating
+// with nothing behind it would be a fabricated claim.
+const schema = summary
+  ? [{
+      '@context': 'https://schema.org',
+      '@type': 'LocalBusiness',
+      '@id': `${SITE.domain}/#business`,
+      name: SITE.legalName,
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: summary.average,
+        reviewCount: summary.count,
+        bestRating: 5,
+        worstRating: 1,
+      },
+      review: reviews.slice(0, 10).map((r) => ({
+        '@type': 'Review',
+        author: { '@type': 'Person', name: r.author },
+        reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+        reviewBody: r.text,
+        ...(r.date ? { datePublished: r.date } : {}),
+      })),
+    }]
+  : [];
 ---
 
 <Base
   title="Reviews | Essential Flooring, Sacramento CA"
   description="Essential Flooring reviews and ratings on Google. Licensed Sacramento flooring contractor for hardwood refinishing, LVP, laminate and carpet installation."
+  schema={schema}
 >
   <section class="pt-10 pb-20">
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
@@ -26,6 +53,21 @@ const reviews = reviewsData as Review[];
           We would rather let the work and the people we worked for speak for us.
           These reviews come from our Google Business profile.
         </p>
+        {summary && (
+          <p class="mt-6 inline-flex items-center gap-3 rounded-btn border border-hairline bg-surface-raised px-4 py-2.5">
+            <span class="flex items-center gap-1 text-accent-display" aria-hidden="true">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill={i < Math.round(summary.average) ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.6">
+                  <path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6L2.5 9.5l6.6-.8z" />
+                </svg>
+              ))}
+            </span>
+            <span class="text-[15px] font-semibold text-fg">{summary.average.toFixed(1)}</span>
+            <span class="text-[14px] text-fg-muted">
+              from {summary.count} {summary.count === 1 ? 'review' : 'reviews'}
+            </span>
+          </p>
+        )}
       </div>
 
       {reviews.length > 0 ? (
@@ -45,6 +87,9 @@ const reviews = reviewsData as Review[];
                 {r.author}
                 {r.city && <span class="font-normal text-fg-muted"> &middot; {r.city}</span>}
               </p>
+              {reviewDate(r) && (
+                <p class="mt-1 text-[13px] text-fg-muted">{reviewDate(r)}</p>
+              )}
             </li>
           ))}
         </ul>

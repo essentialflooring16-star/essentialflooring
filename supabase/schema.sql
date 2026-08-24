@@ -266,7 +266,79 @@ as $$
   delete from public.contact_hits where created_at < now() - interval '1 day';
 $$;
 
--- 9) Verificare rapida dupa rulare ---------------------------------------------
+-- 9) Recenzii afisate pe site --------------------------------------------------
+-- Clientul le copiaza din profilul lui Google. Site-ul e static, deci apar dupa
+-- rebuild (hook-ul de deploy il declanseaza cabinetul).
+create table if not exists public.reviews (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  author text not null,
+  rating int not null check (rating between 1 and 5),
+  text text not null,
+  city text,
+  review_date date,
+  source text not null default 'google',
+  published boolean not null default true,
+  sort_order int not null default 0
+);
+
+alter table public.reviews enable row level security;
+
+drop policy if exists "anon read published reviews" on public.reviews;
+create policy "anon read published reviews"
+  on public.reviews for select to anon
+  using (published = true);
+
+drop policy if exists "admin manage reviews" on public.reviews;
+create policy "admin manage reviews"
+  on public.reviews for all to authenticated
+  using (public.is_admin()) with check (public.is_admin());
+
+create index if not exists reviews_published_idx
+  on public.reviews (published, sort_order, created_at desc);
+
+-- 10) Core Web Vitals de la vizitatori reali ----------------------------------
+-- Masuratori first-party, fara cookies si fara date personale. Cheia anon e
+-- publica in bundle, deci limitam strict ce se poate insera.
+create table if not exists public.web_vitals (
+  id bigint generated always as identity primary key,
+  created_at timestamptz not null default now(),
+  path text not null,
+  metric text not null check (metric in ('LCP', 'CLS', 'INP', 'FCP', 'TTFB')),
+  value double precision not null,
+  rating text check (rating in ('good', 'needs-improvement', 'poor')),
+  device text
+);
+
+alter table public.web_vitals enable row level security;
+
+drop policy if exists "anon insert web_vitals" on public.web_vitals;
+create policy "anon insert web_vitals"
+  on public.web_vitals for insert to anon
+  with check (
+    char_length(path) <= 200
+    and value >= 0 and value < 600000
+    and (device is null or device in ('mobile', 'tablet', 'desktop'))
+  );
+
+drop policy if exists "admin read web_vitals" on public.web_vitals;
+create policy "admin read web_vitals"
+  on public.web_vitals for select to authenticated
+  using (public.is_admin());
+
+create index if not exists web_vitals_lookup_idx
+  on public.web_vitals (created_at desc, metric);
+
+create or replace function public.prune_web_vitals()
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  delete from public.web_vitals where created_at < now() - interval '90 days';
+$$;
+
+-- 11) Verificare rapida dupa rulare ---------------------------------------------
 -- Ar trebui sa returneze true doar pentru adresele din admin_emails:
 --   select public.is_admin();
 -- Lista politicilor active:
