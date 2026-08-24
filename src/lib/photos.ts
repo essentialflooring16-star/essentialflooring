@@ -42,10 +42,15 @@ export const galleryPhotos = photos
   .filter((p) => p.quality >= 4 || p.state === 'before')
   .sort((a, b) => b.quality - a.quality);
 
+// Gallery builds its filter chips by intersecting the categories actually
+// present with this record, so a key with no photos is harmless, but a photo
+// whose category is missing here can never be filtered to. The admin upload
+// form offers 'other', so it has to be listed.
 export const CATEGORY_LABELS: Record<string, string> = {
   'hardwood-refinishing': 'Hardwood Refinishing',
   'lvp-vinyl': 'LVP & Vinyl Plank',
   stairs: 'Stairs',
   laminate: 'Laminate',
   carpet: 'Carpet',
+  other: 'Other',
 };

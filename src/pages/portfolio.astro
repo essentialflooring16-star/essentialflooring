@@ -1,10 +1,12 @@
 ---
 import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Gallery from '../components/Gallery.tsx';
 import { galleryPhotos, photoImage, CATEGORY_LABELS } from '../lib/photos';
+import pairsData from '../data/before-after.json';
 
 const items = await Promise.all(
   galleryPhotos.map(async (p) => {
@@ -18,6 +20,32 @@ const items = await Promise.all(
       category: p.category,
     };
   }),
+);
+
+// All 12 before/after pairs, rendered as static side-by-side images. The home
+// page keeps the interactive slider for the best six; here the point is
+// completeness, and 12 hydrated islands would cost far more than they are worth.
+const baModules = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/before-after/*.jpg',
+  { eager: true },
+);
+const baImage = (file: string) => {
+  const mod = Object.entries(baModules).find(([p]) => p.endsWith(`/${file}`));
+  if (!mod) throw new Error(`Before/after image missing: ${file}`);
+  return mod[1].default;
+};
+
+type Pair = {
+  id: string; before: string; after: string; label: string;
+  city: string; caption: string; sameSpot: boolean;
+};
+
+const pairs = await Promise.all(
+  (pairsData as Pair[]).map(async (p) => ({
+    ...p,
+    beforeSrc: (await getImage({ src: baImage(p.before), width: 760, format: 'webp', quality: 72 })).src,
+    afterSrc: (await getImage({ src: baImage(p.after), width: 760, format: 'webp', quality: 72 })).src,
+  })),
 );
 ---
 
@@ -40,6 +68,69 @@ const items = await Promise.all(
       </div>
 
       <Gallery client:load items={items} categories={CATEGORY_LABELS} />
+    </div>
+  </section>
+
+  <section class="py-16 sm:py-20 bg-surface-sunken/60">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="max-w-2xl mb-10">
+        <p class="text-[13px] font-semibold uppercase tracking-[0.18em] text-accent-on-light mb-3">
+          Before and after
+        </p>
+        <h2 class="font-display font-semibold text-3xl sm:text-4xl text-fg tracking-tight">
+          The part that actually shows
+        </h2>
+        <p class="mt-4 text-[16px] leading-relaxed text-fg-muted">
+          Every pair below is one job, photographed before we started and after we
+          finished. Nothing here is a stock photo or a showroom.
+        </p>
+      </div>
+
+      <div class="grid gap-8 sm:gap-10 md:grid-cols-2">
+        {pairs.map((p) => (
+          <figure class="reveal-scale rounded-2xl overflow-hidden bg-surface-raised border border-hairline shadow-card">
+            <div class="grid grid-cols-2 gap-px bg-hairline">
+              <div class="relative bg-surface-sunken">
+                <img
+                  src={p.beforeSrc}
+                  alt={`Before: ${p.caption}`}
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full aspect-[3/4] object-cover"
+                />
+                <span class="absolute top-3 left-3 rounded-full bg-scrim-media/60 text-fg-on-media text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1">
+                  Before
+                </span>
+              </div>
+              <div class="relative bg-surface-sunken">
+                <img
+                  src={p.afterSrc}
+                  alt={`After: ${p.caption}`}
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full aspect-[3/4] object-cover"
+                />
+                <span class="absolute top-3 left-3 rounded-full bg-accent text-fg-on-accent text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1">
+                  After
+                </span>
+              </div>
+            </div>
+            <figcaption class="p-5">
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px]">
+                <span class="font-semibold text-fg">{p.label}</span>
+                <span aria-hidden="true" class="text-fg-subtle">/</span>
+                <span class="text-fg-muted">{p.city}, CA</span>
+                {p.sameSpot && (
+                  <span class="ml-auto text-[11px] uppercase tracking-wider text-accent-on-light font-semibold">
+                    Same spot
+                  </span>
+                )}
+              </div>
+              <p class="mt-2 text-[14.5px] leading-relaxed text-fg-muted">{p.caption}</p>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
     </div>
   </section>
 
