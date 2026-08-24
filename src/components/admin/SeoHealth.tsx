@@ -613,11 +613,13 @@ export default function SeoHealth() {
   const warningCount = results ? countBySeverity(results, 'warning') : 0;
   const cleanPages = results ? results.filter((r) => r.findings.length === 0) : [];
   const errorPages = results ? results.filter((r) => r.findings.some((f) => f.severity === 'error')) : [];
+  // A page can appear in both groups: its errors show above, its warnings further down.
   const warningPages = results
-    ? results.filter(
-        (r) => !r.findings.some((f) => f.severity === 'error') && r.findings.length > 0,
-      )
+    ? results.filter((r) => r.findings.some((f) => f.severity === 'warning'))
     : [];
+  const warningOnlyPages = warningPages.filter(
+    (r) => !r.findings.some((f) => f.severity === 'error'),
+  );
 
   let verdict = '';
   if (results) {
@@ -626,7 +628,7 @@ export default function SeoHealth() {
     } else if (errorCount === 0) {
       verdict = `Nothing is broken. ${warningPages.length} ${plural(warningPages.length, 'page has', 'pages have')} smaller issues that are worth tidying up when there is time.`;
     } else {
-      verdict = `${errorPages.length} ${plural(errorPages.length, 'page needs', 'pages need')} a fix before ${plural(errorPages.length, 'it', 'they')} can rank properly, and ${warningPages.length} more ${plural(warningPages.length, 'page could be', 'pages could be')} stronger.`;
+      verdict = `${errorPages.length} ${plural(errorPages.length, 'page needs', 'pages need')} a fix before ${plural(errorPages.length, 'it', 'they')} can rank properly, and ${warningOnlyPages.length} more ${plural(warningOnlyPages.length, 'page could be', 'pages could be')} stronger.`;
     }
   }
 
@@ -749,17 +751,8 @@ export default function SeoHealth() {
           {warningPages.length > 0 && (
             <Section
               title="Worth improving"
-              blurb="Nothing here is broken, but each one leaves easy ranking on the table."
+              blurb="None of these break anything, but each one leaves easy ranking on the table."
               pages={warningPages}
-              severity="warning"
-            />
-          )}
-
-          {errorPages.length > 0 && (
-            <Section
-              title="Smaller issues on the same pages"
-              blurb="Warnings found on pages that also have an error above."
-              pages={errorPages.filter((p) => p.findings.some((f) => f.severity === 'warning'))}
               severity="warning"
             />
           )}

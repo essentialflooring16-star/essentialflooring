@@ -124,6 +124,29 @@ Pagina /reviews le afiseaza automat (acum arata fallback-ul cu link spre Google)
   servicii/orase, FAQPage, BreadcrumbList), sitemap automat, robots.txt,
   alt-text pe toate pozele, copy unic per oras (nu template).
 
+## 7b. Cabinetul de admin: ce contine
+
+Sapte sectiuni la `/admin`:
+
+| Tab | Ce face |
+| --- | --- |
+| Traffic | vizite pe zile, pagini top, surse, dispozitive |
+| Leads | cererile din formular, cu status new / contacted / closed |
+| Portfolio | incarca poze noi, le ascunde sau le sterge |
+| Reviews | **nou.** Clientul lipeste recenziile reale de pe Google. Media calculata aici alimenteaza insigna de rating de pe site si markup-ul AggregateRating |
+| Blog | scrie si publica articole |
+| Speed | **nou.** Core Web Vitals de la vizitatori reali (p75, separat mobil/desktop, paginile cele mai lente) |
+| SEO | **nou.** Scaneaza tot site-ul prin sitemap si raporteaza title, meta, h1, alt, canonical, JSON-LD, continut subtire si titluri duplicate |
+| Settings | **nou.** Deploy hook (mascat si validat), starea conexiunilor, datele firmei |
+
+Doua lucruri de stiut:
+
+- **Recenziile si articolele apar pe site doar dupa rebuild.** Site-ul e static.
+  Cabinetul apeleaza singur deploy hook-ul, deci apar in 1-2 minute, dar hook-ul
+  trebuie configurat intai (vezi 4b si tabul Settings).
+- **Datele de viteza apar abia dupa lansare**, fiindca se colecteaza de la
+  vizitatori reali. Local si inainte de deploy tabul e gol, si asa trebuie.
+
 ## 8. Directia de design
 
 Stratul vizual e izolat in tokeni. Schimbarea directiei inseamna editarea unui
