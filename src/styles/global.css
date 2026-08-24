@@ -19,48 +19,51 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── LAYER 1: primitives ─────────────────────────────────────────────────── */
+/* DIRECTION A, "Proof": bone ground, heavy grotesque, brick red.
+   The before/after pairs are the design. Chosen over the dark direction
+   because the nearest competitor already owns dark + serif + copper, and
+   because brick red on bone clears the contrast bar that copper did not. */
 :root {
   /* light end of the neutral ramp */
-  --ef-ground:            #faf6ef; /* page ground                            */
-  --ef-ground-tint:       #f2e9db; /* tinted band, chip, placeholder         */
-  --ef-ground-raised:     #ffffff; /* card surface                           */
-  --ef-ground-field:      #faf6ef; /* input fill                             */
-  --ef-rule:              #e2d5c2; /* hairline on light                      */
+  --ef-ground:            #efece4; /* page ground                            */
+  --ef-ground-tint:       #e6e2d6; /* tinted band, chip, placeholder         */
+  --ef-ground-raised:     #f8f7f3; /* card surface                           */
+  --ef-ground-field:      #e6e2d6; /* input fill                             */
+  --ef-rule:              #d5d0c1; /* hairline on light                      */
 
   /* ink end of the neutral ramp */
-  --ef-ink-900:           #221a14; /* strongest text on light                */
-  --ef-ink-700:           #3a2c21; /* body copy on light                     */
-  --ef-ink-500:           #57452f; /* muted text on light                    */
+  --ef-ink-900:           #16150f; /* strongest text on light                */
+  --ef-ink-700:           #33312a; /* body copy on light                     */
+  --ef-ink-500:           #5d594d; /* muted text on light                    */
 
   /* the inverse region: dark sections and dark controls */
-  --ef-dark-900:          #221a14; /* dark region ground                     */
-  --ef-dark-control:      #221a14; /* solid dark chip or button on light     */
-  --ef-dark-control-hi:   #3a2c21; /* its hover                              */
-  --ef-light-50:          #faf6ef; /* text, rules and veils on dark          */
+  --ef-dark-900:          #16150f; /* dark region ground                     */
+  --ef-dark-control:      #16150f; /* solid dark chip or button on light     */
+  --ef-dark-control-hi:   #2c2a22; /* its hover                              */
+  --ef-light-50:          #efece4; /* text, rules and veils on dark          */
 
-  /* accent */
-  --ef-accent:            #b5773a; /* fills, rings, borders                  */
-  --ef-accent-hi:         #96602c; /* fill hover                             */
-  --ef-accent-light:      #96602c; /* accent TEXT on a light ground          */
-  --ef-accent-dark:       #d9a86c; /* accent TEXT or fill on a dark ground   */
-  --ef-accent-display:    #b5773a; /* oversized numerals, star rows          */
-  --ef-accent-wash-pct:   15%;     /* strength of the soft accent badge      */
-  --ef-on-accent:         #ffffff; /* label sitting ON the accent fill       */
+  /* accent. White on #c8442a measures 4.87:1, so the primary button clears
+     WCAG AA. The old copper was 3.71:1 and did not. */
+  --ef-accent:            #c8442a;
+  --ef-accent-hi:         #a3341f;
+  --ef-accent-light:      #a3341f; /* accent TEXT on a light ground          */
+  --ef-accent-dark:       #e8775e; /* accent TEXT or fill on a dark ground   */
+  --ef-accent-display:    #c8442a;
+  --ef-accent-wash-pct:   12%;
+  --ef-on-accent:         #ffffff;
 
-  /* media. These sit over photographs, so they never follow the palette.
-     Tie them to the palette and photo captions go unreadable the moment a
-     direction inverts. */
-  --ef-scrim:             #221a14; /* brand tinted photo scrim               */
-  --ef-scrim-media:       #000000; /* neutral photo scrim                    */
-  --ef-on-media:          #ffffff; /* captions and controls over photos      */
+  /* media. These sit over photographs, so they never follow the palette. */
+  --ef-scrim:             #16150f;
+  --ef-scrim-media:       #000000;
+  --ef-on-media:          #ffffff;
 
   /* non-colour direction knobs */
-  --ef-font-display: 'Fraunces Variable', Georgia, serif;
+  --ef-font-display: 'Archivo Variable', 'Archivo', Helvetica, Arial, sans-serif;
   --ef-font-body: 'Inter Variable', system-ui, sans-serif;
-  --ef-grain-opacity: 0.05;
-  --ef-radius-card: 1rem;
-  --ef-radius-pill: 9999px;
-  --ef-shadow-tint: 34 26 20;
+  --ef-grain-opacity: 0.07;
+  --ef-radius-card: 0.25rem;
+  --ef-radius-pill: 0.25rem;
+  --ef-shadow-tint: 22 21 15;
 }
 
 /* ── LAYER 2: semantic roles ─────────────────────────────────────────────── */
@@ -185,19 +188,20 @@ body {
 
 h1, h2, h3, .font-display {
   font-family: var(--ef-font-display);
+  font-weight: 800;
+  letter-spacing: -0.028em;
 }
 
-/* Italic serif accent inside display headings.
-   NOTE: the SOFT and WONK axes only exist in Fraunces. A direction that swaps
-   the display face has to drop them and pick a different emphasis device. */
+/* Emphasis inside a display heading. Direction A carries it with weight and
+   colour: Archivo has no expressive italic, so a slanted grotesque would read
+   as a mistake rather than a flourish. */
 .accent-italic {
-  font-style: italic;
-  font-variation-settings: 'SOFT' 60, 'WONK' 1;
   color: var(--ef-accent-on-light);
+  font-weight: 800;
 }
 .accent-italic-soft {
-  font-style: italic;
   color: var(--ef-accent-on-dark);
+  font-weight: 800;
 }
 
 /* Subtle film grain for dark sections (tiny data-URI noise, GPU friendly).
@@ -229,10 +233,11 @@ h1, h2, h3, .font-display {
   gap: 0.5rem;
   border-radius: var(--ef-radius-pill);
   padding: 0.42rem 0.95rem;
-  font-family: var(--ef-font-display);
-  font-style: italic;
-  font-size: 15px;
-  letter-spacing: 0.01em;
+  font-family: var(--ef-font-body);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
 }
 .eyebrow-pill.on-light {
   background: color-mix(in srgb, var(--ef-accent-fill) 12%, transparent);
