@@ -175,6 +175,12 @@ export default function Gallery({ items, categories }: Props) {
             </figcaption>
           </figure>
 
+          {/* Arrow navigation swaps the image in place, which a screen reader
+              would otherwise not notice. This announces the new position. */}
+          <p aria-live="polite" className="sr-only">
+            {`Photo ${openIdx + 1} of ${visible.length}. ${visible[openIdx].alt}`}
+          </p>
+
           <button
             ref={closeBtnRef}
             type="button"

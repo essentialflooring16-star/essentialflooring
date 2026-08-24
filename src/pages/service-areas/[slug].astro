@@ -129,8 +129,9 @@ const serviceSchema = {
           Free estimate in {page.city}
         </h2>
         <p class="mt-3 text-[14.5px] leading-relaxed text-fg-muted">
-          Tell us about your rooms and floors. We measure on site and send a clear written
-          quote, free of charge.
+          {isExtended
+            ? 'Tell us about your rooms and floors. For projects outside the Sacramento area we scope the job from your measurements and photos first, then confirm on site before any work starts.'
+            : 'Tell us about your rooms and floors. We measure on site and send a clear written quote, free of charge.'}
         </p>
         <a
           href="/contact/"
@@ -194,6 +195,8 @@ const serviceSchema = {
 
   <CtaBand
     title={`Ready to upgrade your floors in ${page.city}?`}
-    text="Free estimate, clear timeline, licensed contractor. It starts with one call."
+    text={isExtended
+      ? 'Free estimate, dates agreed in writing, licensed contractor. It starts with one call.'
+      : 'Free estimate, clear timeline, licensed contractor. It starts with one call.'}
   />
 </Base>

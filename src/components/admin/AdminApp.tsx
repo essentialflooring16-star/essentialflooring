@@ -87,6 +87,7 @@ export default function AdminApp() {
             key={key}
             type="button"
             onClick={() => setTab(key)}
+            aria-current={tab === key ? 'page' : undefined}
             className={`rounded-full px-5 py-2.5 text-[14.5px] font-semibold transition-colors ${
               tab === key ? 'bg-accent text-fg-on-accent' : 'bg-surface-raised border border-hairline text-fg-body hover:border-accent'
             }`}

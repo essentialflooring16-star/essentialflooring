@@ -82,6 +82,7 @@ export default function LeadsInbox() {
                     <button
                       key={s}
                       type="button"
+                      aria-pressed={lead.status === s}
                       onClick={() => setStatus(lead, s)}
                       className={`rounded-full px-3 py-1 text-[12px] font-semibold transition-colors ${
                         lead.status === s

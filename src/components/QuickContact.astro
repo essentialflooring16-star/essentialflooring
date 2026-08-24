@@ -74,14 +74,21 @@ const wa = 'https://wa.me/19164251361';
     toggle.querySelector('.qc-open')?.classList.toggle('hidden', open);
     toggle.querySelector('.qc-close')?.classList.toggle('hidden', !open);
   });
-  document.addEventListener('click', (e) => {
+  const close = () => {
     if (!menu || menu.classList.contains('hidden')) return;
-    if (!(e.target as HTMLElement).closest('#quick-contact')) {
-      menu.classList.add('hidden');
-      menu.classList.remove('flex');
-      toggle?.setAttribute('aria-expanded', 'false');
-      toggle?.querySelector('.qc-open')?.classList.remove('hidden');
-      toggle?.querySelector('.qc-close')?.classList.add('hidden');
-    }
+    menu.classList.add('hidden');
+    menu.classList.remove('flex');
+    toggle?.setAttribute('aria-expanded', 'false');
+    toggle?.querySelector('.qc-open')?.classList.remove('hidden');
+    toggle?.querySelector('.qc-close')?.classList.add('hidden');
+  };
+  document.addEventListener('click', (e) => {
+    if (!(e.target as HTMLElement).closest('#quick-contact')) close();
+  });
+  // Escape closes it and hands focus back to the button that opened it.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || !menu || menu.classList.contains('hidden')) return;
+    close();
+    toggle?.focus();
   });
 </script>

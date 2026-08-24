@@ -18,14 +18,16 @@ const stats = [
 
 <dl class={`grid grid-cols-2 lg:grid-cols-4 gap-px rounded-2xl overflow-hidden border ${dark ? 'border-hairline-on-dark/10 bg-veil-on-dark/10' : 'border-hairline bg-hairline'}`}>
   {stats.map((s) => (
-    <div class={`p-6 sm:p-8 ${dark ? 'bg-surface-dark' : 'bg-surface-raised'}`}>
+    <div class={`flex flex-col p-6 sm:p-8 ${dark ? 'bg-surface-dark' : 'bg-surface-raised'}`}>
+      {/* dt then dd: the label is the term, the number defines it. Visually the
+          number still comes first via flex order. */}
+      <dt class={`order-2 mt-2 text-[13.5px] ${dark ? 'text-fg-on-dark/60' : 'text-fg-muted'}`}>{s.label}</dt>
       <dd
-        class={`font-display font-semibold text-4xl sm:text-5xl tabular-nums tracking-tight ${dark ? 'text-fg-on-dark' : 'text-fg'}`}
+        class={`order-1 font-display font-semibold text-4xl sm:text-5xl tabular-nums tracking-tight ${dark ? 'text-fg-on-dark' : 'text-fg'}`}
         data-countup={s.value}
       >
-        {s.value}<span class="text-accent-on-dark">{s.suffix}</span>
+        {s.value}<span class={dark ? 'text-accent-on-dark' : 'text-accent-on-light'}>{s.suffix}</span>
       </dd>
-      <dt class={`mt-2 text-[13.5px] ${dark ? 'text-fg-on-dark/60' : 'text-fg-muted'}`}>{s.label}</dt>
     </div>
   ))}
 </dl>
