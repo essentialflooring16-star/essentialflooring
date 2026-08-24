@@ -51,6 +51,14 @@ export default function BlogManager() {
       setMsg('Saved. Ask your developer to set the deploy hook so changes go live automatically.');
       return;
     }
+    // The stored value is a credential and this browser POSTs to it. The database
+    // constrains it too, but never fetch a URL from a table without checking the
+    // host first: a bad row here would turn the admin's browser into a client for
+    // whatever host it named.
+    if (!hook.startsWith('https://api.vercel.com/v1/integrations/deploy/')) {
+      setMsg('Saved, but the stored deploy hook does not look like a Vercel hook, so it was not called.');
+      return;
+    }
     try {
       await fetch(hook, { method: 'POST', mode: 'no-cors' });
       setMsg('Saved. The website is rebuilding now, changes go live in 1-2 minutes.');
@@ -103,7 +111,8 @@ export default function BlogManager() {
       await load();
       await triggerRebuild();
     } catch (err) {
-      setMsg(`Could not save: ${err instanceof Error ? err.message : 'unknown error'}`);
+      console.error(err);
+      setMsg("Could not save the post. Check your connection and try again.");
     } finally {
       setBusy(false);
     }

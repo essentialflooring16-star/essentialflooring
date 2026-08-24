@@ -8,10 +8,9 @@ export const SITE = {
   phoneSchema: '+1-916-425-1361',
   email: 'essentialflooring16@gmail.com',
   license: 'CSLB #1117565',
-  licenseNumber: '1117565',
   founded: 2023,
   founder: 'Alexandru Szep',
-  experienceYears: '5+',
+  experienceYears: 5, // rendered with a '+' suffix; keep numeric for the count-up
   hours: 'Monday to Saturday, 7 AM to 7 PM',
   hoursSchema: 'Mo-Sa 07:00-19:00',
   address: {
@@ -22,9 +21,6 @@ export const SITE = {
   instagram: 'https://www.instagram.com/essentialflooring16',
   facebook: 'https://www.facebook.com/profile.php?id=61580305899098',
   googleProfile: 'https://share.google/uPqoGQQ9rCQJQw4Gr',
-  tagline: 'Floors built to be lived on',
-  description:
-    'Licensed flooring contractor in Sacramento, CA. Hardwood floor refinishing, LVP and vinyl plank, laminate, carpet and stairs. Free estimates.',
 } as const;
 
 export const SERVICES = [

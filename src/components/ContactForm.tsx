@@ -1,16 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
+import { SERVICES as SITE_SERVICES } from '../data/site';
 
 const supaUrl = import.meta.env.PUBLIC_SUPABASE_URL as string | undefined;
 const supaKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string | undefined;
 
-const SERVICES = [
-  'Hardwood Floor Refinishing',
-  'LVP / Vinyl Plank Flooring',
-  'Laminate Flooring',
-  'Carpet Installation',
-  'Stairs',
-  'Not sure yet',
-];
+// Derived from the same source the nav and the service pages use, so a lead
+// never arrives naming a service that does not exist on the site.
+const SERVICE_OPTIONS = [...SITE_SERVICES.map((s) => s.name), 'Not sure yet'];
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
@@ -166,7 +162,7 @@ export default function ContactForm() {
           <option value="" disabled>
             Choose a service
           </option>
-          {SERVICES.map((s) => (
+          {SERVICE_OPTIONS.map((s) => (
             <option key={s} value={s}>
               {s}
             </option>

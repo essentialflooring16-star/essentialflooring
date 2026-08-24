@@ -74,7 +74,8 @@ export default function PortfolioManager() {
       setMsg('Photo published. It is already visible on the website portfolio.');
       await load();
     } catch (err) {
-      setMsg(`Upload failed: ${err instanceof Error ? err.message : 'unknown error'}`);
+      console.error(err);
+      setMsg("Upload failed. Check the file is a JPG, PNG or WebP under 8MB, then try again.");
     } finally {
       setBusy(false);
     }

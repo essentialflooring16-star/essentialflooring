@@ -29,7 +29,10 @@ export default function Dashboard() {
       .order('created_at', { ascending: true })
       .limit(20000)
       .then(({ data, error }) => {
-        if (error) setError(error.message);
+        if (error) {
+          console.error(error);
+          setError("Could not load the traffic data. Refresh the page, and if it keeps failing contact your developer.");
+        }
         else setRows(data as PageView[]);
       });
   }, [days]);
