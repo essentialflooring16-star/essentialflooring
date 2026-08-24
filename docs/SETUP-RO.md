@@ -18,13 +18,28 @@ galeria foloseste pozele built-in, formularul afiseaza eroare eleganta cu telefo
 
 1. Creeaza proiect nou pe supabase.com (regiunea us-west, e client din Sacramento).
 2. SQL Editor > New query > lipeste TOT continutul din `supabase/schema.sql` > Run.
+   Fisierul e idempotent, se poate rula de cate ori vrei.
 3. Authentication > Users > Add user > email + parola pentru client
    (ex: essentialflooring16@gmail.com + parola generata). Confirm user: da.
    NU activa sign-up public: Authentication > Sign In / Up > dezactiveaza "Allow new users to sign up".
-4. Settings > API: copiaza `Project URL` si `anon public key` in `.env`
-   (local) si in Vercel > Environment Variables:
-   - `PUBLIC_SUPABASE_URL`
-   - `PUBLIC_SUPABASE_ANON_KEY`
+4. Settings > API: copiaza in `.env` (local) si in Vercel > Environment Variables:
+   - `PUBLIC_SUPABASE_URL` (Project URL)
+   - `PUBLIC_SUPABASE_ANON_KEY` (anon public key)
+   - `SUPABASE_SERVICE_ROLE_KEY` (service_role) NUMAI in Vercel, niciodata in `.env`
+     comis in git si niciodata in browser
+
+**IMPORTANT, schimbat 22.08.2026.** Accesul de admin nu mai inseamna "orice cont
+logat". Se verifica emailul in tabelul `admin_emails`. Motivul: site-ul e static,
+deci `/admin` si bundle-ul lui sunt publice, iar RLS e singura bariera reala.
+Schema seedeaza automat `essentialflooring16@gmail.com`. Ca sa iti dai si tie
+acces, ruleaza in SQL Editor:
+
+```sql
+insert into public.admin_emails (email, note) values ('ark4su@gmail.com', 'artiom')
+  on conflict (email) do nothing;
+```
+
+Verificare rapida, logat ca admin: `select public.is_admin();` trebuie sa dea `true`.
 
 Cabinetul e la `/admin`. Clientul poate: vedea traficul (vizite pe zile, pagini top,
 surse, dispozitive), incarca poze noi in portofoliu (apar instant pe site),
@@ -40,8 +55,14 @@ ascunde/sterge poze, vedea si gestiona cererile de oferta (statusuri new/contact
 4. IMPORTANT (regula ta): nu trimite test-uri spre inbox-ul clientului fara sa-l anunti;
    testeaza cu adresa ta si subiect marcat TEST.
 
-Formularul salveaza cererea si in Supabase (tabelul `leads`) chiar daca emailul pica,
-deci nu se pierde nimic.
+Ordinea e: functia `api/contact` salveaza intai cererea in Supabase (cu service
+role), abia apoi incearca emailul. Daca Resend pica, raspunsul e tot 200 si
+cererea exista in cabinet, deci nu se pierde niciun lead. Browserul mai are un
+fallback de scriere, dar porneste doar daca functia chiar a esuat, ca sa nu
+apara cereri duplicate.
+
+Formularul are si rate limiting: 4 trimiteri la 10 minute de pe acelasi IP
+(stocat doar ca hash), plus honeypot si o verificare de timp minim de completare.
 
 ## 4. Domeniu + Vercel
 
@@ -102,3 +123,9 @@ Pagina /reviews le afiseaza automat (acum arata fallback-ul cu link spre Google)
 - SEO: meta unice pe fiecare pagina, JSON-LD (LocalBusiness pe toate, Service pe
   servicii/orase, FAQPage, BreadcrumbList), sitemap automat, robots.txt,
   alt-text pe toate pozele, copy unic per oras (nu template).
+
+## 8. Directia de design
+
+Stratul vizual e izolat in tokeni. Schimbarea directiei inseamna editarea unui
+singur bloc din `src/styles/global.css`. Toate detaliile, plus cele trei
+directii gata de copiat, sunt in [DESIGN.md](DESIGN.md).
