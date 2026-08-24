@@ -29,7 +29,7 @@ export default function AdminApp() {
   if (!isConfigured) {
     return (
       <Shell>
-        <div className="mx-auto max-w-lg mt-24 rounded-2xl border border-hairline bg-surface-raised p-8 shadow-card text-center">
+        <div className="mx-auto max-w-lg mt-24 rounded-card border border-hairline bg-surface-raised p-8 shadow-card text-center">
           <h1 className="font-display font-semibold text-2xl text-fg">Admin is not connected yet</h1>
           <p className="mt-3 text-[15px] text-fg-muted leading-relaxed">
             Supabase environment variables are missing. Add PUBLIC_SUPABASE_URL and
@@ -60,14 +60,14 @@ export default function AdminApp() {
         <div className="flex items-center gap-3">
           <a
             href="/"
-            className="rounded-full border border-hairline px-4 py-2 text-[14px] font-medium text-fg-body hover:border-accent transition-colors"
+            className="rounded-btn border border-hairline px-4 py-2 text-[14px] font-medium text-fg-body hover:border-accent transition-colors"
           >
             View website
           </a>
           <button
             type="button"
             onClick={() => supabase!.auth.signOut()}
-            className="rounded-full bg-control-dark text-fg-on-dark px-4 py-2 text-[14px] font-medium hover:bg-control-dark-hover transition-colors"
+            className="rounded-btn bg-control-dark text-fg-on-dark px-4 py-2 text-[14px] font-medium hover:bg-control-dark-hover transition-colors"
           >
             Sign out
           </button>
@@ -88,7 +88,7 @@ export default function AdminApp() {
             type="button"
             onClick={() => setTab(key)}
             aria-current={tab === key ? 'page' : undefined}
-            className={`rounded-full px-5 py-2.5 text-[14.5px] font-semibold transition-colors ${
+            className={`rounded-btn px-5 py-2.5 text-[14.5px] font-semibold transition-colors ${
               tab === key ? 'bg-accent text-fg-on-accent' : 'bg-surface-raised border border-hairline text-fg-body hover:border-accent'
             }`}
           >
@@ -130,7 +130,7 @@ function Login() {
     <div className="min-h-screen grid place-items-center px-4">
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-sm rounded-3xl border border-hairline bg-surface-raised p-8 shadow-lift"
+        className="w-full max-w-sm rounded-card border border-hairline bg-surface-raised p-8 shadow-lift"
       >
         <p className="font-display font-semibold text-2xl text-fg text-center">Essential Flooring</p>
         <p className="text-[13px] uppercase tracking-[0.16em] text-fg-muted text-center mt-1 mb-7">
@@ -143,7 +143,7 @@ function Login() {
             type="email"
             required
             autoComplete="username"
-            className="rounded-xl border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
+            className="rounded-card border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
         <label className="grid gap-1.5 mb-6">
@@ -153,18 +153,18 @@ function Login() {
             type="password"
             required
             autoComplete="current-password"
-            className="rounded-xl border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
+            className="rounded-card border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
         {error && (
-          <p className="mb-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-[14px] px-4 py-2.5">
+          <p className="mb-4 rounded-card bg-red-50 border border-red-200 text-red-700 text-[14px] px-4 py-2.5">
             {error}
           </p>
         )}
         <button
           type="submit"
           disabled={busy}
-          className="w-full rounded-full bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold py-3 transition-colors"
+          className="w-full rounded-btn bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold py-3 transition-colors"
         >
           {busy ? 'Signing in...' : 'Sign in'}
         </button>

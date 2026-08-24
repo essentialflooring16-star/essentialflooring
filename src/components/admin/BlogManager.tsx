@@ -133,7 +133,7 @@ export default function BlogManager() {
 
   if (creating || editing) {
     return (
-      <form onSubmit={onSave} className="rounded-2xl border border-hairline bg-surface-raised p-6 sm:p-8 shadow-card grid gap-4 max-w-2xl">
+      <form onSubmit={onSave} className="rounded-card border border-hairline bg-surface-raised p-6 sm:p-8 shadow-card grid gap-4 max-w-2xl">
         <div className="flex items-center justify-between">
           <h1 className="font-display font-semibold text-2xl text-fg">
             {editing ? 'Edit article' : 'New article'}
@@ -158,7 +158,7 @@ export default function BlogManager() {
             required
             defaultValue={editing?.title}
             maxLength={140}
-            className="rounded-xl border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
+            className="rounded-card border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
 
@@ -171,20 +171,20 @@ export default function BlogManager() {
             rows={2}
             maxLength={200}
             defaultValue={editing?.excerpt}
-            className="rounded-xl border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition resize-y"
+            className="rounded-card border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition resize-y"
           />
         </label>
 
         <label className="grid gap-1.5">
           <span className="text-[14px] font-semibold text-fg-body">Cover photo</span>
           {editing?.cover_url && (
-            <img src={editing.cover_url} alt="" className="w-48 aspect-[16/10] object-cover rounded-lg mb-1" />
+            <img src={editing.cover_url} alt="" className="w-48 aspect-[16/10] object-cover rounded-media mb-1" />
           )}
           <input
             type="file"
             name="cover"
             accept="image/jpeg,image/png,image/webp"
-            className="rounded-xl border border-hairline bg-field px-4 py-2.5 text-[14px] file:mr-3 file:rounded-full file:border-0 file:bg-control-dark file:text-fg-on-dark file:px-4 file:py-1.5 file:text-[13px] file:font-semibold"
+            className="rounded-card border border-hairline bg-field px-4 py-2.5 text-[14px] file:mr-3 file:rounded-btn file:border-0 file:bg-control-dark file:text-fg-on-dark file:px-4 file:py-1.5 file:text-[13px] file:font-semibold"
           />
         </label>
 
@@ -198,7 +198,7 @@ export default function BlogManager() {
             rows={14}
             required
             defaultValue={editing?.content}
-            className="rounded-xl border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition resize-y font-mono"
+            className="rounded-card border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition resize-y font-mono"
           />
         </label>
 
@@ -207,12 +207,12 @@ export default function BlogManager() {
           <span className="text-[14.5px] font-semibold text-fg-body">Published (visible on the website)</span>
         </label>
 
-        {msg && <p className="rounded-xl bg-surface-sunken border border-hairline text-fg-body text-[14px] px-4 py-3">{msg}</p>}
+        {msg && <p className="rounded-card bg-surface-sunken border border-hairline text-fg-body text-[14px] px-4 py-3">{msg}</p>}
 
         <button
           type="submit"
           disabled={busy}
-          className="justify-self-start rounded-full bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-6 py-3 transition-colors"
+          className="justify-self-start rounded-btn bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-6 py-3 transition-colors"
         >
           {busy ? 'Saving...' : editing ? 'Save changes' : 'Publish article'}
         </button>
@@ -230,7 +230,7 @@ export default function BlogManager() {
             setCreating(true);
             setMsg(null);
           }}
-          className="rounded-full bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-5 py-2.5 transition-colors"
+          className="rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-5 py-2.5 transition-colors"
         >
           New article
         </button>
@@ -240,20 +240,20 @@ export default function BlogManager() {
         recent project work great.
       </p>
 
-      {msg && <p className="mb-4 rounded-xl bg-surface-sunken border border-hairline text-fg-body text-[14px] px-4 py-3">{msg}</p>}
+      {msg && <p className="mb-4 rounded-card bg-surface-sunken border border-hairline text-fg-body text-[14px] px-4 py-3">{msg}</p>}
 
       {posts.length === 0 ? (
-        <div className="rounded-2xl border border-hairline bg-surface-raised p-8 shadow-card text-center text-fg-muted">
+        <div className="rounded-card border border-hairline bg-surface-raised p-8 shadow-card text-center text-fg-muted">
           No articles yet. Write the first one, a before and after story is a great start.
         </div>
       ) : (
         <ul className="grid gap-3">
           {posts.map((post) => (
-            <li key={post.id} className="flex flex-wrap items-center gap-4 rounded-2xl border border-hairline bg-surface-raised p-4 shadow-card">
+            <li key={post.id} className="flex flex-wrap items-center gap-4 rounded-card border border-hairline bg-surface-raised p-4 shadow-card">
               {post.cover_url ? (
-                <img src={post.cover_url} alt="" className="w-20 aspect-[4/3] object-cover rounded-lg" />
+                <img src={post.cover_url} alt="" className="w-20 aspect-[4/3] object-cover rounded-media" />
               ) : (
-                <span className="w-20 aspect-[4/3] rounded-lg bg-surface-sunken" aria-hidden="true"></span>
+                <span className="w-20 aspect-[4/3] rounded-media bg-surface-sunken" aria-hidden="true"></span>
               )}
               <div className="flex-1 min-w-[200px]">
                 <p className="font-semibold text-[16px] text-fg">{post.title}</p>
@@ -266,7 +266,7 @@ export default function BlogManager() {
                 <button
                   type="button"
                   onClick={() => togglePublished(post)}
-                  className={`rounded-full px-3 py-1.5 text-[12.5px] font-semibold transition-colors ${
+                  className={`rounded-btn px-3 py-1.5 text-[12.5px] font-semibold transition-colors ${
                     post.published ? 'bg-accent-wash text-accent-on-light' : 'bg-surface-sunken text-fg-muted'
                   }`}
                 >
@@ -275,7 +275,7 @@ export default function BlogManager() {
                 <button
                   type="button"
                   onClick={() => setEditing(post)}
-                  className="rounded-full border border-hairline px-3 py-1.5 text-[12.5px] font-semibold text-fg-body hover:border-accent"
+                  className="rounded-btn border border-hairline px-3 py-1.5 text-[12.5px] font-semibold text-fg-body hover:border-accent"
                 >
                   Edit
                 </button>

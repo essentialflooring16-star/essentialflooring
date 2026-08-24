@@ -99,7 +99,7 @@ export default function Gallery({ items, categories }: Props) {
           type="button"
           aria-pressed={filter === 'all'}
           onClick={() => setFilter('all')}
-          className={`rounded-full px-4.5 py-2 text-[14px] font-semibold transition-colors px-5 ${
+          className={`rounded-btn px-4.5 py-2 text-[14px] font-semibold transition-colors px-5 ${
             filter === 'all'
               ? 'bg-control-dark text-fg-on-dark'
               : 'bg-surface-raised border border-hairline text-fg-body hover:border-accent'
@@ -113,7 +113,7 @@ export default function Gallery({ items, categories }: Props) {
             type="button"
             aria-pressed={filter === key}
             onClick={() => setFilter(key)}
-            className={`rounded-full px-5 py-2 text-[14px] font-semibold transition-colors ${
+            className={`rounded-btn px-5 py-2 text-[14px] font-semibold transition-colors ${
               filter === key
                 ? 'bg-control-dark text-fg-on-dark'
                 : 'bg-surface-raised border border-hairline text-fg-body hover:border-accent'
@@ -133,7 +133,7 @@ export default function Gallery({ items, categories }: Props) {
                 triggerRef.current = e.currentTarget;
                 setOpenIdx(i);
               }}
-              className="group relative block w-full overflow-hidden rounded-xl aspect-[4/3] shadow-card focus-visible:outline-2 focus-visible:outline-accent"
+              className="group relative block w-full overflow-hidden rounded-media aspect-[4/3] shadow-card focus-visible:outline-2 focus-visible:outline-accent"
               aria-label={`Open photo: ${item.caption || item.alt}`}
             >
               <img
@@ -168,7 +168,7 @@ export default function Gallery({ items, categories }: Props) {
             <img
               src={visible[openIdx].src}
               alt={visible[openIdx].alt}
-              className="w-full max-h-[78vh] object-contain rounded-lg"
+              className="w-full max-h-[78vh] object-contain rounded-card"
             />
             <figcaption className="mt-3 text-center text-fg-on-media/85 text-[15px]">
               {visible[openIdx].caption}
@@ -185,7 +185,7 @@ export default function Gallery({ items, categories }: Props) {
             ref={closeBtnRef}
             type="button"
             onClick={() => setOpenIdx(null)}
-            className="absolute top-4 right-4 grid place-items-center size-11 rounded-full bg-fg-on-media/10 hover:bg-fg-on-media/25 text-fg-on-media transition-colors"
+            className="absolute top-4 right-4 grid place-items-center size-11 rounded-btn bg-fg-on-media/10 hover:bg-fg-on-media/25 text-fg-on-media transition-colors"
             aria-label="Close viewer"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -198,7 +198,7 @@ export default function Gallery({ items, categories }: Props) {
               e.stopPropagation();
               setOpenIdx((openIdx - 1 + visible.length) % visible.length);
             }}
-            className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 grid place-items-center size-11 rounded-full bg-fg-on-media/10 hover:bg-fg-on-media/25 text-fg-on-media transition-colors"
+            className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 grid place-items-center size-11 rounded-btn bg-fg-on-media/10 hover:bg-fg-on-media/25 text-fg-on-media transition-colors"
             aria-label="Previous photo"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
@@ -211,7 +211,7 @@ export default function Gallery({ items, categories }: Props) {
               e.stopPropagation();
               setOpenIdx((openIdx + 1) % visible.length);
             }}
-            className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 grid place-items-center size-11 rounded-full bg-fg-on-media/10 hover:bg-fg-on-media/25 text-fg-on-media transition-colors"
+            className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 grid place-items-center size-11 rounded-btn bg-fg-on-media/10 hover:bg-fg-on-media/25 text-fg-on-media transition-colors"
             aria-label="Next photo"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">

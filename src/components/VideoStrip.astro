@@ -23,7 +23,7 @@ const videos = [
         type="button"
         data-video-toggle
         hidden
-        class="inline-flex items-center gap-2 rounded-full border border-hairline hover:border-accent bg-surface-raised text-fg text-[14px] font-medium px-4 py-2 transition-colors"
+        class="inline-flex items-center gap-2 rounded-btn border border-hairline hover:border-accent bg-surface-raised text-fg text-[14px] font-medium px-4 py-2 transition-colors"
         aria-pressed="false"
       >
         <svg data-icon-pause width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -37,7 +37,7 @@ const videos = [
     </div>
     <div class="grid sm:grid-cols-3 gap-4 sm:gap-5">
       {videos.map((v, i) => (
-        <figure class={`reveal-scale relative rounded-2xl overflow-hidden shadow-card aspect-[3/4] sm:aspect-[4/5] ${i === 1 ? 'sm:translate-y-6' : ''}`} style={`transition-delay:${i * 70}ms`}>
+        <figure class={`reveal-scale relative rounded-media overflow-hidden shadow-card aspect-[3/4] sm:aspect-[4/5] ${i === 1 ? 'sm:translate-y-6' : ''}`} style={`transition-delay:${i * 70}ms`}>
           <video
             class="h-full w-full object-cover"
             muted

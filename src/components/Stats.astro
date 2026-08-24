@@ -16,7 +16,7 @@ const stats = [
 ];
 ---
 
-<dl class={`grid grid-cols-2 lg:grid-cols-4 gap-px rounded-2xl overflow-hidden border ${dark ? 'border-hairline-on-dark/10 bg-veil-on-dark/10' : 'border-hairline bg-hairline'}`}>
+<dl class={`grid grid-cols-2 lg:grid-cols-4 gap-px rounded-media overflow-hidden border ${dark ? 'border-hairline-on-dark/10 bg-veil-on-dark/10' : 'border-hairline bg-hairline'}`}>
   {stats.map((s) => (
     <div class={`flex flex-col p-6 sm:p-8 ${dark ? 'bg-surface-dark' : 'bg-surface-raised'}`}>
       {/* dt then dd: the label is the term, the number defines it. Visually the

@@ -80,12 +80,12 @@ const values = [
             alt={aboutPhoto.alt}
             widths={[640, 960]}
             sizes="(min-width:1024px) 50vw, 100vw"
-            class="rounded-3xl shadow-lift w-full object-cover aspect-[4/3]"
+            class="rounded-media shadow-lift w-full object-cover aspect-[4/3]"
             format="webp"
             quality={74}
           />
           <div class="grid grid-cols-[1fr_auto] items-center gap-5">
-            <div class="rounded-2xl bg-surface-dark text-fg-on-dark p-6">
+            <div class="rounded-card bg-surface-dark text-fg-on-dark p-6">
               <p class="font-display text-xl leading-snug">
                 "Fast, efficient and stress-free. That is the whole philosophy."
               </p>
@@ -96,7 +96,7 @@ const values = [
               alt={detailPhoto.alt}
               widths={[300]}
               sizes="160px"
-              class="rounded-2xl shadow-card size-36 object-cover hidden sm:block"
+              class="rounded-card shadow-card size-36 object-cover hidden sm:block"
               format="webp"
               quality={70}
             />
@@ -110,7 +110,7 @@ const values = [
         </h2>
         <ul class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {values.map((v, i) => (
-            <li class="reveal rounded-2xl bg-surface-raised border border-hairline p-6 shadow-card" style={`transition-delay:${i * 50}ms`}>
+            <li class="reveal rounded-card bg-surface-raised border border-hairline p-6 shadow-card" style={`transition-delay:${i * 50}ms`}>
               <h3 class="font-display font-semibold text-[18px] text-fg">{v.t}</h3>
               <p class="mt-2 text-[14.5px] leading-relaxed text-fg-muted">{v.d}</p>
             </li>

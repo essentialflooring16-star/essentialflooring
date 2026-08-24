@@ -16,13 +16,13 @@ const schema = {
 };
 ---
 
-<div class="divide-y divide-hairline rounded-2xl border border-hairline bg-surface-raised shadow-card overflow-hidden">
+<div class="divide-y divide-hairline rounded-media border border-hairline bg-surface-raised shadow-card overflow-hidden">
   {items.map((f) => (
     <details class="group">
       <summary class="flex items-center justify-between gap-4 cursor-pointer list-none px-5 sm:px-7 py-5 text-[16px] sm:text-[17px] font-semibold text-fg hover:bg-surface-sunken/40 transition-colors [&::-webkit-details-marker]:hidden">
         {f.q}
         <span
-          class="shrink-0 grid place-items-center size-7 rounded-full border border-hairline text-fg-muted transition-transform group-open:rotate-45"
+          class="shrink-0 grid place-items-center size-7 rounded-btn border border-hairline text-fg-muted transition-transform group-open:rotate-45"
           aria-hidden="true"
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">

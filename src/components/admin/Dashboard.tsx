@@ -72,7 +72,7 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <p className="rounded-xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-[14.5px]">
+      <p className="rounded-card bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-[14.5px]">
         Could not load analytics: {error}
       </p>
     );
@@ -91,7 +91,7 @@ export default function Dashboard() {
               key={r.days}
               type="button"
               onClick={() => setDays(r.days)}
-              className={`rounded-full px-4 py-1.5 text-[13.5px] font-semibold transition-colors ${
+              className={`rounded-btn px-4 py-1.5 text-[13.5px] font-semibold transition-colors ${
                 days === r.days ? 'bg-control-dark text-fg-on-dark' : 'bg-surface-raised border border-hairline text-fg-body'
               }`}
             >
@@ -111,7 +111,7 @@ export default function Dashboard() {
       </div>
 
       {/* Daily bar chart */}
-      <div className="rounded-2xl border border-hairline bg-surface-raised p-6 shadow-card">
+      <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
         <h2 className="font-semibold text-[15px] text-fg-body mb-4">Daily page views</h2>
         <svg viewBox={`0 0 ${stats.daily.length * 12} 120`} className="w-full h-36" role="img" aria-label="Daily page views chart">
           {stats.daily.map(([day, v], i) => {
@@ -166,7 +166,7 @@ export default function Dashboard() {
 
 function StatCard({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-2xl border border-hairline bg-surface-raised p-6 shadow-card">
+    <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
       <p className="text-[13px] uppercase tracking-[0.14em] text-fg-muted">{label}</p>
       <p className="mt-2 font-display font-semibold text-4xl text-fg">{value}</p>
     </div>
@@ -185,7 +185,7 @@ function ListCard({
   empty: string;
 }) {
   return (
-    <div className="rounded-2xl border border-hairline bg-surface-raised p-6 shadow-card">
+    <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
       <h2 className="font-semibold text-[15px] text-fg-body mb-4">{title}</h2>
       {rows.length === 0 ? (
         <p className="text-[14px] text-fg-muted">{empty}</p>
@@ -197,9 +197,9 @@ function ListCard({
                 <span className="truncate text-fg-body">{label}</span>
                 <span className="shrink-0 font-semibold text-fg">{count}</span>
               </div>
-              <div className="h-1.5 rounded-full bg-surface-sunken overflow-hidden">
+              <div className="h-1.5 rounded-btn bg-surface-sunken overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-accent"
+                  className="h-full rounded-btn bg-accent"
                   style={{ width: `${Math.min(100, (count / Math.max(1, total)) * 100 * 2)}%` }}
                 />
               </div>

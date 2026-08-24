@@ -88,7 +88,7 @@ const pairs = await Promise.all(
 
       <div class="grid gap-8 sm:gap-10 md:grid-cols-2">
         {pairs.map((p) => (
-          <figure class="reveal-scale rounded-2xl overflow-hidden bg-surface-raised border border-hairline shadow-card">
+          <figure class="reveal-scale rounded-media overflow-hidden bg-surface-raised border border-hairline shadow-card">
             <div class="grid grid-cols-2 gap-px bg-hairline">
               <div class="relative bg-surface-sunken">
                 <img
@@ -98,7 +98,7 @@ const pairs = await Promise.all(
                   decoding="async"
                   class="w-full aspect-[3/4] object-cover"
                 />
-                <span class="absolute top-3 left-3 rounded-full bg-scrim-media/60 text-fg-on-media text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1">
+                <span class="absolute top-3 left-3 rounded-btn bg-scrim-media/60 text-fg-on-media text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1">
                   Before
                 </span>
               </div>
@@ -110,7 +110,7 @@ const pairs = await Promise.all(
                   decoding="async"
                   class="w-full aspect-[3/4] object-cover"
                 />
-                <span class="absolute top-3 left-3 rounded-full bg-accent text-fg-on-accent text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1">
+                <span class="absolute top-3 left-3 rounded-btn bg-accent text-fg-on-accent text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1">
                   After
                 </span>
               </div>

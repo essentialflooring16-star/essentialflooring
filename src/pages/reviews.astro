@@ -31,7 +31,7 @@ const reviews = reviewsData as Review[];
       {reviews.length > 0 ? (
         <ul class="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {reviews.map((r) => (
-            <li class="reveal rounded-2xl bg-surface-raised border border-hairline p-7 shadow-card flex flex-col">
+            <li class="reveal rounded-card bg-surface-raised border border-hairline p-7 shadow-card flex flex-col">
               <div class="flex items-center gap-1 text-accent-display">
                 <span class="sr-only">Rated {r.rating} out of 5 stars</span>
                 {Array.from({ length: r.rating }).map(() => (
@@ -49,8 +49,8 @@ const reviews = reviewsData as Review[];
           ))}
         </ul>
       ) : (
-        <div class="reveal mt-12 rounded-3xl border border-hairline bg-surface-raised shadow-card p-10 sm:p-14 text-center max-w-2xl mx-auto">
-          <div class="inline-flex items-center justify-center size-14 rounded-full bg-accent-wash text-accent-on-light" aria-hidden="true">
+        <div class="reveal mt-12 rounded-card border border-hairline bg-surface-raised shadow-card p-10 sm:p-14 text-center max-w-2xl mx-auto">
+          <div class="inline-flex items-center justify-center size-14 rounded-btn bg-accent-wash text-accent-on-light" aria-hidden="true">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
               <path d="M21 11.5a8.5 8.5 0 1 1-4.6-7.6" stroke-linecap="round" />
               <path d="M21 4.5v4h-4" stroke-linecap="round" stroke-linejoin="round" />
@@ -68,14 +68,14 @@ const reviews = reviewsData as Review[];
             href={SITE.googleProfile}
             target="_blank"
             rel="noopener"
-            class="mt-6 inline-flex items-center gap-2 rounded-full bg-control-dark hover:bg-control-dark-hover text-fg-on-dark font-semibold px-6 py-3 transition-colors"
+            class="mt-6 inline-flex items-center gap-2 rounded-btn bg-control-dark hover:bg-control-dark-hover text-fg-on-dark font-semibold px-6 py-3 transition-colors"
           >
             See our Google profile
           </a>
         </div>
       )}
 
-      <div class="reveal mt-14 rounded-2xl bg-surface-sunken/70 border border-hairline p-7 sm:p-9 text-center max-w-2xl mx-auto">
+      <div class="reveal mt-14 rounded-card bg-surface-sunken/70 border border-hairline p-7 sm:p-9 text-center max-w-2xl mx-auto">
         <h2 class="font-display font-semibold text-xl text-fg">Worked with us recently?</h2>
         <p class="mt-2 text-[15px] text-fg-muted leading-relaxed">
           A short Google review helps a small local business more than any ad ever could. Thank you.

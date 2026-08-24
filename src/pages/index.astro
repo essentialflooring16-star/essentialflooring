@@ -113,7 +113,7 @@ const marqueeItems = [
           <div class="reveal mt-9 flex flex-col sm:flex-row gap-4" style="transition-delay:160ms">
             <a
               href="/contact/"
-              class="inline-flex justify-center items-center gap-2 rounded-full bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-8 py-4 text-[16px] transition-colors shadow-lift"
+              class="inline-flex justify-center items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-8 py-4 text-[16px] transition-colors shadow-lift"
             >
               Get a Free Estimate
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
@@ -122,7 +122,7 @@ const marqueeItems = [
             </a>
             <a
               href="/portfolio/"
-              class="inline-flex justify-center items-center rounded-full border border-hairline-strong/25 hover:border-hairline-strong/60 text-fg font-semibold px-8 py-4 text-[16px] transition-colors"
+              class="inline-flex justify-center items-center rounded-btn border border-hairline-strong/25 hover:border-hairline-strong/60 text-fg font-semibold px-8 py-4 text-[16px] transition-colors"
             >
               See all 12 projects
             </a>
@@ -140,7 +140,7 @@ const marqueeItems = [
         </div>
 
         <figure class="reveal-scale relative">
-          <div class="grid grid-cols-2 gap-1 bg-fg rounded-sm overflow-hidden shadow-lift">
+          <div class="grid grid-cols-2 gap-1 bg-fg rounded-media overflow-hidden shadow-lift">
             <div class="relative">
               <img
                 src={heroPair.beforeSrc}
@@ -211,7 +211,7 @@ const marqueeItems = [
 
       <ul class="reveal mt-8 flex flex-wrap gap-2">
         {ALL_SERVICES.map((s) => (
-          <li class="rounded-full bg-surface-sunken border border-hairline px-3.5 py-1.5 text-[13px] font-medium text-fg-body">
+          <li class="rounded-btn bg-surface-sunken border border-hairline px-3.5 py-1.5 text-[13px] font-medium text-fg-body">
             {s}
           </li>
         ))}
@@ -233,7 +233,7 @@ const marqueeItems = [
           <div class="reveal mt-8">
             <a
               href="/contact/"
-              class="inline-flex items-center gap-2 rounded-full bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-6 py-3 transition-colors"
+              class="inline-flex items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-6 py-3 transition-colors"
             >
               Start your transformation
             </a>
@@ -262,7 +262,7 @@ const marqueeItems = [
         <span class="hidden lg:block absolute top-7 left-[12%] right-[12%] h-px bg-hairline" aria-hidden="true"></span>
         {steps.map((step, i) => (
           <li class="reveal relative text-center sm:text-left lg:text-center px-2" style={`transition-delay:${i * 80}ms`}>
-            <span class="relative inline-grid place-items-center size-14 rounded-full bg-control-dark text-fg-on-dark font-display font-semibold text-xl mb-5 z-10">
+            <span class="relative inline-grid place-items-center size-14 rounded-btn bg-control-dark text-fg-on-dark font-display font-semibold text-xl mb-5 z-10">
               {i + 1}
             </span>
             <h3 class="font-display font-semibold text-[19px] text-fg">{step.title}</h3>
@@ -308,7 +308,7 @@ const marqueeItems = [
           ];
           return (
             <li class={`reveal-scale ${spans[i] ?? ''}`} style={`transition-delay:${i * 45}ms`}>
-              <a href="/portfolio/" class="group relative block overflow-hidden rounded-xl h-full">
+              <a href="/portfolio/" class="group relative block overflow-hidden rounded-media h-full">
                 <Image
                   src={photoImage(p.id)}
                   alt={p.alt}
@@ -360,7 +360,7 @@ const marqueeItems = [
             },
           ].map((item) => (
             <li class="reveal flex gap-4">
-              <span class="shrink-0 grid place-items-center size-9 rounded-full bg-accent-wash text-accent-on-light mt-0.5" aria-hidden="true">
+              <span class="shrink-0 grid place-items-center size-9 rounded-btn bg-accent-wash text-accent-on-light mt-0.5" aria-hidden="true">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
                   <path d="m5 13 4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
@@ -374,7 +374,7 @@ const marqueeItems = [
         </ul>
       </div>
 
-      <div class="reveal rounded-2xl bg-surface-raised border border-hairline shadow-card p-7 sm:p-9 h-fit">
+      <div class="reveal rounded-card bg-surface-raised border border-hairline shadow-card p-7 sm:p-9 h-fit">
         <h3 class="font-display font-semibold text-2xl text-fg">Where we work</h3>
         <p class="mt-2 text-[15px] text-fg-muted leading-relaxed">
           Based in Sacramento, serving homes across the region.
@@ -431,7 +431,7 @@ const marqueeItems = [
         href={hasReviews ? '/reviews' : SITE.googleProfile}
         target={hasReviews ? undefined : '_blank'}
         rel={hasReviews ? undefined : 'noopener'}
-        class="reveal mt-6 inline-flex items-center gap-2 rounded-full bg-control-dark hover:bg-control-dark-hover text-fg-on-dark font-semibold px-6 py-3 transition-colors"
+        class="reveal mt-6 inline-flex items-center gap-2 rounded-btn bg-control-dark hover:bg-control-dark-hover text-fg-on-dark font-semibold px-6 py-3 transition-colors"
       >
         {hasReviews ? 'Read our reviews' : 'See us on Google'}
       </a>

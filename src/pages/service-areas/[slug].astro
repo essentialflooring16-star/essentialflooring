@@ -73,13 +73,13 @@ const serviceSchema = {
       <div class="mt-8 flex flex-col sm:flex-row gap-4">
         <a
           href="/contact/"
-          class="inline-flex justify-center items-center gap-2 rounded-full bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-7 py-3.5 transition-colors shadow-lift"
+          class="inline-flex justify-center items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-7 py-3.5 transition-colors shadow-lift"
         >
           Get a Free Estimate
         </a>
         <a
           href={SITE.phoneHref}
-          class="inline-flex justify-center items-center rounded-full border border-hairline-on-dark/30 hover:border-hairline-on-dark/60 text-fg-on-dark font-semibold px-7 py-3.5 transition-colors"
+          class="inline-flex justify-center items-center rounded-btn border border-hairline-on-dark/30 hover:border-hairline-on-dark/60 text-fg-on-dark font-semibold px-7 py-3.5 transition-colors"
         >
           Call {SITE.phone}
         </a>
@@ -109,7 +109,7 @@ const serviceSchema = {
           {SERVICES.map((s) => (
             <a
               href={`/services/${s.slug}/`}
-              class="group rounded-xl border border-hairline bg-surface-raised px-5 py-4 shadow-card hover:shadow-lift transition-shadow"
+              class="group rounded-card border border-hairline bg-surface-raised px-5 py-4 shadow-card hover:shadow-lift transition-shadow"
             >
               <span class="font-semibold text-[15px] text-fg group-hover:text-accent-on-light transition-colors">
                 {s.name}
@@ -124,7 +124,7 @@ const serviceSchema = {
         <p class="mt-4 text-[16px] leading-relaxed text-fg-muted">{page.whyUs}</p>
       </article>
 
-      <aside class="reveal rounded-2xl bg-surface-raised border border-hairline shadow-card p-7 h-fit lg:sticky lg:top-24">
+      <aside class="reveal rounded-card bg-surface-raised border border-hairline shadow-card p-7 h-fit lg:sticky lg:top-24">
         <h2 class="font-display font-semibold text-xl text-fg">
           Free estimate in {page.city}
         </h2>
@@ -135,13 +135,13 @@ const serviceSchema = {
         </p>
         <a
           href="/contact/"
-          class="mt-5 w-full inline-flex justify-center items-center rounded-full bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-6 py-3 transition-colors"
+          class="mt-5 w-full inline-flex justify-center items-center rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-6 py-3 transition-colors"
         >
           Request an estimate
         </a>
         <a
           href={SITE.phoneHref}
-          class="mt-3 w-full inline-flex justify-center items-center rounded-full border border-hairline hover:border-accent text-fg font-semibold px-6 py-3 transition-colors"
+          class="mt-3 w-full inline-flex justify-center items-center rounded-btn border border-hairline hover:border-accent text-fg font-semibold px-6 py-3 transition-colors"
         >
           {SITE.phone}
         </a>
@@ -175,7 +175,7 @@ const serviceSchema = {
           <li>
             <a
               href={`/service-areas/${c.slug}/`}
-              class="inline-flex rounded-full border border-hairline bg-surface-raised px-4 py-2 text-[14px] font-medium text-fg-body hover:border-accent hover:text-accent-on-light transition-colors"
+              class="inline-flex rounded-btn border border-hairline bg-surface-raised px-4 py-2 text-[14px] font-medium text-fg-body hover:border-accent hover:text-accent-on-light transition-colors"
             >
               {c.city}
             </a>
@@ -184,7 +184,7 @@ const serviceSchema = {
         <li>
           <a
             href="/service-areas/"
-            class="inline-flex rounded-full bg-surface-dark text-fg-on-dark px-4 py-2 text-[14px] font-medium hover:bg-control-dark-hover transition-colors"
+            class="inline-flex rounded-btn bg-surface-dark text-fg-on-dark px-4 py-2 text-[14px] font-medium hover:bg-control-dark-hover transition-colors"
           >
             All areas
           </a>

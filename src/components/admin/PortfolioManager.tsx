@@ -102,7 +102,7 @@ export default function PortfolioManager() {
     <div className="grid gap-8">
       <form
         onSubmit={onUpload}
-        className="rounded-2xl border border-hairline bg-surface-raised p-6 sm:p-8 shadow-card grid gap-4"
+        className="rounded-card border border-hairline bg-surface-raised p-6 sm:p-8 shadow-card grid gap-4"
       >
         <h1 className="font-display font-semibold text-2xl text-fg">Add a project photo</h1>
         <p className="text-[14.5px] text-fg-muted -mt-2">
@@ -117,14 +117,14 @@ export default function PortfolioManager() {
               name="photo"
               accept="image/jpeg,image/png,image/webp"
               required
-              className="rounded-xl border border-hairline bg-field px-4 py-2.5 text-[14px] file:mr-3 file:rounded-full file:border-0 file:bg-control-dark file:text-fg-on-dark file:px-4 file:py-1.5 file:text-[13px] file:font-semibold"
+              className="rounded-card border border-hairline bg-field px-4 py-2.5 text-[14px] file:mr-3 file:rounded-btn file:border-0 file:bg-control-dark file:text-fg-on-dark file:px-4 file:py-1.5 file:text-[13px] file:font-semibold"
             />
           </label>
           <label className="grid gap-1.5">
             <span className="text-[14px] font-semibold text-fg-body">Category</span>
             <select
               name="category"
-              className="rounded-xl border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent"
+              className="rounded-card border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent"
               defaultValue="lvp-vinyl"
             >
               {CATEGORIES.map(([value, label]) => (
@@ -144,18 +144,18 @@ export default function PortfolioManager() {
             name="caption"
             required
             maxLength={120}
-            className="rounded-xl border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
+            className="rounded-card border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
 
         {msg && (
-          <p className="rounded-xl bg-surface-sunken border border-hairline text-fg-body text-[14px] px-4 py-3">{msg}</p>
+          <p className="rounded-card bg-surface-sunken border border-hairline text-fg-body text-[14px] px-4 py-3">{msg}</p>
         )}
 
         <button
           type="submit"
           disabled={busy}
-          className="justify-self-start rounded-full bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-6 py-3 transition-colors"
+          className="justify-self-start rounded-btn bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-6 py-3 transition-colors"
         >
           {busy ? 'Uploading...' : 'Publish photo'}
         </button>
@@ -172,7 +172,7 @@ export default function PortfolioManager() {
         ) : (
           <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {items.map((item) => (
-              <li key={item.id} className="rounded-xl border border-hairline bg-surface-raised shadow-card overflow-hidden">
+              <li key={item.id} className="rounded-media border border-hairline bg-surface-raised shadow-card overflow-hidden">
                 <img
                   src={item.image_url}
                   alt={item.alt}
@@ -185,7 +185,7 @@ export default function PortfolioManager() {
                     <button
                       type="button"
                       onClick={() => togglePublished(item)}
-                      className={`rounded-full px-3 py-1 text-[12px] font-semibold transition-colors ${
+                      className={`rounded-btn px-3 py-1 text-[12px] font-semibold transition-colors ${
                         item.published
                           ? 'bg-accent-wash text-accent-on-light'
                           : 'bg-surface-sunken text-fg-muted'

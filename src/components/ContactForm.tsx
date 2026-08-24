@@ -83,8 +83,8 @@ export default function ContactForm() {
 
   if (status === 'sent') {
     return (
-      <div className="rounded-2xl border border-hairline bg-surface-raised p-8 text-center shadow-card" role="status">
-        <span className="mx-auto grid place-items-center size-14 rounded-full bg-accent-wash text-accent-on-light mb-4">
+      <div className="rounded-card border border-hairline bg-surface-raised p-8 text-center shadow-card" role="status">
+        <span className="mx-auto grid place-items-center size-14 rounded-btn bg-accent-wash text-accent-on-light mb-4">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
             <path d="m5 13 4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -114,7 +114,7 @@ export default function ContactForm() {
             name="name"
             autoComplete="name"
             placeholder="John Smith"
-            className="w-full min-w-0 rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
+            className="w-full min-w-0 rounded-card border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
         <label className="grid gap-1.5">
@@ -125,7 +125,7 @@ export default function ContactForm() {
             type="tel"
             autoComplete="tel"
             placeholder="(916) 555-0123"
-            className="w-full min-w-0 rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
+            className="w-full min-w-0 rounded-card border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
       </div>
@@ -138,7 +138,7 @@ export default function ContactForm() {
             type="email"
             autoComplete="email"
             placeholder="you@email.com"
-            className="w-full min-w-0 rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
+            className="w-full min-w-0 rounded-card border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
         <label className="grid gap-1.5">
@@ -147,7 +147,7 @@ export default function ContactForm() {
             name="city"
             autoComplete="address-level2"
             placeholder="Sacramento"
-            className="w-full min-w-0 rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
+            className="w-full min-w-0 rounded-card border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           />
         </label>
       </div>
@@ -156,7 +156,7 @@ export default function ContactForm() {
         <span className="text-[14px] font-semibold text-fg-body">What do you need?</span>
         <select
           name="service"
-          className="w-full min-w-0 rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
+          className="w-full min-w-0 rounded-card border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
           defaultValue=""
         >
           <option value="" disabled>
@@ -176,7 +176,7 @@ export default function ContactForm() {
           name="message"
           rows={4}
           placeholder="Rooms, approximate square footage, current floor, timeline..."
-          className="w-full min-w-0 rounded-xl border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition resize-y"
+          className="w-full min-w-0 rounded-card border border-hairline bg-surface-raised px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition resize-y"
         />
       </label>
 
@@ -191,7 +191,7 @@ export default function ContactForm() {
       />
 
       {status === 'error' && (
-        <p role="alert" className="rounded-xl bg-red-50 border border-red-200 text-red-700 text-[14.5px] px-4 py-3">
+        <p role="alert" className="rounded-card bg-red-50 border border-red-200 text-red-700 text-[14.5px] px-4 py-3">
           Something went wrong sending your request. Please call us directly at (916) 425-1361 or
           email essentialflooring16@gmail.com.
         </p>
@@ -200,7 +200,7 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={status === 'sending'}
-        className="mt-1 inline-flex justify-center items-center gap-2 rounded-full bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-7 py-3.5 transition-colors shadow-card"
+        className="mt-1 inline-flex justify-center items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-7 py-3.5 transition-colors shadow-card"
       >
         {status === 'sending' ? 'Sending...' : 'Request Free Estimate'}
       </button>

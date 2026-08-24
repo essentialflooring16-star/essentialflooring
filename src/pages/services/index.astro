@@ -37,7 +37,7 @@ const extras = [
         {SERVICES.map((s, i) => (
           <a
             href={`/services/${s.slug}/`}
-            class={`reveal group grid md:grid-cols-2 rounded-3xl overflow-hidden bg-surface-raised border border-hairline shadow-card hover:shadow-lift transition-shadow`}
+            class={`reveal group grid md:grid-cols-2 rounded-media overflow-hidden bg-surface-raised border border-hairline shadow-card hover:shadow-lift transition-shadow`}
           >
             <div class={`aspect-[16/10] md:aspect-auto md:min-h-[300px] overflow-hidden ${i % 2 ? 'md:order-2' : ''}`}>
               <Image
@@ -77,7 +77,7 @@ const extras = [
       />
       <ul class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {extras.map((e) => (
-          <li class="reveal rounded-2xl bg-surface-raised border border-hairline p-6 shadow-card">
+          <li class="reveal rounded-card bg-surface-raised border border-hairline p-6 shadow-card">
             <h3 class="font-display font-semibold text-[18px] text-fg">{e.t}</h3>
             <p class="mt-2 text-[14.5px] leading-relaxed text-fg-muted">{e.d}</p>
           </li>
@@ -90,7 +90,7 @@ const extras = [
         </h3>
         <ul class="flex flex-wrap gap-2">
           {ALL_SERVICES.map((s) => (
-            <li class="rounded-full bg-surface-raised border border-hairline px-3.5 py-1.5 text-[13.5px] font-medium text-fg-body">
+            <li class="rounded-btn bg-surface-raised border border-hairline px-3.5 py-1.5 text-[13.5px] font-medium text-fg-body">
               {s}
             </li>
           ))}

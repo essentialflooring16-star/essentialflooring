@@ -51,7 +51,7 @@ export default function LeadsInbox() {
       </p>
 
       {leads.length === 0 ? (
-        <div className="rounded-2xl border border-hairline bg-surface-raised p-8 shadow-card text-center text-fg-muted">
+        <div className="rounded-card border border-hairline bg-surface-raised p-8 shadow-card text-center text-fg-muted">
           No requests yet. When a visitor fills the form, it appears here instantly.
         </div>
       ) : (
@@ -59,7 +59,7 @@ export default function LeadsInbox() {
           {leads.map((lead) => (
             <li
               key={lead.id}
-              className={`rounded-2xl border bg-surface-raised p-6 shadow-card ${
+              className={`rounded-card border bg-surface-raised p-6 shadow-card ${
                 lead.status === 'new' ? 'border-accent' : 'border-hairline'
               }`}
             >
@@ -84,7 +84,7 @@ export default function LeadsInbox() {
                       type="button"
                       aria-pressed={lead.status === s}
                       onClick={() => setStatus(lead, s)}
-                      className={`rounded-full px-3 py-1 text-[12px] font-semibold transition-colors ${
+                      className={`rounded-btn px-3 py-1 text-[12px] font-semibold transition-colors ${
                         lead.status === s
                           ? s === 'new'
                             ? 'bg-accent text-fg-on-accent'
@@ -101,7 +101,7 @@ export default function LeadsInbox() {
               </div>
 
               {lead.message && (
-                <p className="mt-3 text-[14.5px] leading-relaxed text-fg-body bg-surface-sunken/50 rounded-xl px-4 py-3">
+                <p className="mt-3 text-[14.5px] leading-relaxed text-fg-body bg-surface-sunken/50 rounded-card px-4 py-3">
                   {lead.message}
                 </p>
               )}
@@ -109,14 +109,14 @@ export default function LeadsInbox() {
               <div className="mt-4 flex flex-wrap gap-3">
                 <a
                   href={`tel:${lead.phone.replace(/[^+\d]/g, '')}`}
-                  className="inline-flex items-center gap-2 rounded-full bg-control-dark text-fg-on-dark px-4 py-2 text-[13.5px] font-semibold hover:bg-control-dark-hover transition-colors"
+                  className="inline-flex items-center gap-2 rounded-btn bg-control-dark text-fg-on-dark px-4 py-2 text-[13.5px] font-semibold hover:bg-control-dark-hover transition-colors"
                 >
                   Call {lead.phone}
                 </a>
                 {lead.email && (
                   <a
                     href={`mailto:${lead.email}`}
-                    className="inline-flex items-center gap-2 rounded-full border border-hairline px-4 py-2 text-[13.5px] font-semibold text-fg-body hover:border-accent transition-colors"
+                    className="inline-flex items-center gap-2 rounded-btn border border-hairline px-4 py-2 text-[13.5px] font-semibold text-fg-body hover:border-accent transition-colors"
                   >
                     Email {lead.email}
                   </a>

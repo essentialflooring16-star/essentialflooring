@@ -18,7 +18,7 @@ import { photoImage, photoById } from '../lib/photos';
     return (
       <a
         href={`/services/${s.slug}/`}
-        class={`reveal-scale group relative overflow-hidden rounded-2xl shadow-card hover:shadow-lift transition-shadow ${spans[i]}`}
+        class={`reveal-scale group relative overflow-hidden rounded-media shadow-card hover:shadow-lift transition-shadow ${spans[i]}`}
         style={`transition-delay:${i * 60}ms`}
       >
         <Image
@@ -32,11 +32,11 @@ import { photoImage, photoById } from '../lib/photos';
         />
         <span class="absolute inset-0 bg-gradient-to-t from-scrim/85 via-scrim/25 to-scrim/5 transition-opacity" aria-hidden="true"></span>
 
-        <span class="absolute top-4 left-4 grid place-items-center rounded-full bg-veil-on-dark/15 backdrop-blur-sm text-fg-on-dark font-display text-[13px] font-medium size-9 border border-hairline-on-dark/25" aria-hidden="true">
+        <span class="absolute top-4 left-4 grid place-items-center rounded-btn bg-veil-on-dark/15 backdrop-blur-sm text-fg-on-dark font-display text-[13px] font-medium size-9 border border-hairline-on-dark/25" aria-hidden="true">
           0{i + 1}
         </span>
 
-        <span class="absolute top-4 right-4 grid place-items-center size-10 rounded-full bg-veil-on-dark/15 backdrop-blur-sm border border-hairline-on-dark/25 text-fg-on-dark transition-all duration-300 group-hover:bg-accent group-hover:border-accent group-hover:rotate-45" aria-hidden="true">
+        <span class="absolute top-4 right-4 grid place-items-center size-10 rounded-btn bg-veil-on-dark/15 backdrop-blur-sm border border-hairline-on-dark/25 text-fg-on-dark transition-all duration-300 group-hover:bg-accent group-hover:border-accent group-hover:rotate-45" aria-hidden="true">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
