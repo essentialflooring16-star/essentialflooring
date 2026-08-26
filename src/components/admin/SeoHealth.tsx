@@ -3,8 +3,10 @@ import { supabase } from '../../lib/supabase';
 
 /**
  * The site is static and this panel runs in the browser, so there is no filesystem to
- * read. Instead the panel crawls the live site over HTTP from the same origin, which is
- * also the most honest check: it sees exactly what Google would download.
+ * read. Instead the panel crawls the live site over HTTP from the same origin. What it
+ * parses is the HTML as it is served, before any JavaScript runs, which is what a crawler
+ * downloads on its first pass. Anything a React island injects later is not counted, and
+ * that is deliberate: the checks here are about what ships in the HTML.
  */
 
 const SETTINGS_KEY = 'seo_last_scan';
@@ -107,10 +109,13 @@ function countWords(el: HTMLElement): number {
  */
 async function collectPaths(
   signal: AbortSignal,
-): Promise<{ paths: string[]; siteOrigin: string | null }> {
+): Promise<{ paths: string[]; siteOrigin: string | null; truncated: boolean }> {
   const seen = new Set<string>();
   const paths: string[] = [];
   let siteOrigin: string | null = null;
+  // Set when the sitemap holds more URLs than MAX_PAGES, so the summary can say the
+  // counts cover part of the site instead of quietly claiming the whole of it.
+  let truncated = false;
 
   async function readSitemap(url: string, depth: number): Promise<boolean> {
     if (depth > 2) return true;
@@ -140,7 +145,11 @@ async function collectPaths(
       }
       if (!siteOrigin) siteOrigin = parsed.origin;
       const path = normalizePath(parsed.pathname);
-      if (seen.has(path) || paths.length >= MAX_PAGES) continue;
+      if (seen.has(path)) continue;
+      if (paths.length >= MAX_PAGES) {
+        truncated = true;
+        continue;
+      }
       seen.add(path);
       paths.push(path);
     }
@@ -153,7 +162,7 @@ async function collectPaths(
   }
 
   paths.sort();
-  return { paths, siteOrigin };
+  return { paths, siteOrigin, truncated };
 }
 
 /* -------------------------------------------------------- the page checks */
@@ -191,7 +200,7 @@ function auditDocument(doc: Document, path: string, siteOrigin: string | null): 
     add(
       'Meta description',
       'error',
-      'There is no meta description, so Google picks a random sentence from the page to show. Write one of 70 to 160 characters saying what you do and where.',
+      'There is no meta description, so Google picks a sentence off the page itself to show under the link. Write one of 70 to 160 characters saying what you do and where.',
     );
   } else if (description.length > DESC_MAX) {
     add(
@@ -297,7 +306,7 @@ function auditDocument(doc: Document, path: string, siteOrigin: string | null): 
       add(
         'Canonical',
         'error',
-        `The canonical tag points at ${canonicalPath}, not at this page. Search engines will index that other page instead. Point it at ${path}.`,
+        `The canonical tag points at ${canonicalPath}, not at this page. Search engines usually follow that and index the other page instead. Point it at ${path}.`,
       );
     }
   }
@@ -308,7 +317,7 @@ function auditDocument(doc: Document, path: string, siteOrigin: string | null): 
     add(
       'Structured data',
       'warning',
-      'No structured data on this page. Add a JSON-LD block (LocalBusiness, Service or FAQPage) so Google can show stars, hours and answers next to the listing.',
+      'No structured data on this page. Add a JSON-LD block (LocalBusiness, Service or FAQPage) so Google has the option of showing extra detail such as hours or answers next to the listing. Google decides whether to use it, but without the block it never can.',
     );
   } else {
     const broken = ldBlocks.filter((block) => {
@@ -352,7 +361,7 @@ function auditDocument(doc: Document, path: string, siteOrigin: string | null): 
     add(
       'Thin content',
       'warning',
-      `Only ${words} words of real content. Thin pages rarely rank for anything. Aim for at least ${MIN_WORDS} words that answer the questions customers actually ask.`,
+      `Only ${words} words of real content. Thin pages rarely rank well. Aim for at least ${MIN_WORDS} words that answer the questions customers actually ask.`,
     );
   }
 
@@ -482,7 +491,13 @@ export default function SeoHealth() {
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const [lastScan, setLastScan] = useState<LastScan | null>(null);
+  // A crawl updates progress dozens of times. Feeding that straight into a live region
+  // would talk over a screen reader user for the whole scan, so only the start, the end
+  // and a failure are announced, from one region that is always in the DOM.
+  const [announcement, setAnnouncement] = useState('');
   const abortRef = useRef<AbortController | null>(null);
+  const runButtonRef = useRef<HTMLButtonElement>(null);
+  const wasScanning = useRef(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -509,6 +524,15 @@ export default function SeoHealth() {
   // Stop an in-flight crawl if the admin switches tabs or signs out.
   useEffect(() => () => abortRef.current?.abort(), []);
 
+  useEffect(() => {
+    // Cancel unmounts when the scan ends, which drops keyboard focus onto the body.
+    // Hand it back to the button that is still there rather than losing the user's place.
+    if (wasScanning.current && !scanning && document.activeElement === document.body) {
+      runButtonRef.current?.focus();
+    }
+    wasScanning.current = scanning;
+  }, [scanning]);
+
   const runScan = useCallback(async () => {
     const controller = new AbortController();
     abortRef.current = controller;
@@ -517,14 +541,21 @@ export default function SeoHealth() {
     setNote(null);
     setResults(null);
     setProgress({ done: 0, total: 0 });
+    setAnnouncement('Scan started. Reading the sitemap.');
 
     try {
-      const { paths, siteOrigin } = await collectPaths(controller.signal);
+      const { paths, siteOrigin, truncated } = await collectPaths(controller.signal);
       if (paths.length === 0) {
         setError(
           'The sitemap could not be read, so there was nothing to scan. Check that /sitemap-index.xml opens in a browser tab, then try again.',
         );
+        setAnnouncement('The scan could not start because the sitemap could not be read.');
         return;
+      }
+      if (truncated) {
+        setNote(
+          `The sitemap lists more than ${MAX_PAGES} pages, so only the first ${MAX_PAGES} were checked. Everything below covers that part of the site, not all of it.`,
+        );
       }
       setProgress({ done: 0, total: paths.length });
 
@@ -575,8 +606,11 @@ export default function SeoHealth() {
 
       if (controller.signal.aborted) {
         setNote(
-          `Scan stopped early. These are the ${finished.length} of ${paths.length} pages that were checked before you cancelled.`,
+          finished.length === 0
+            ? 'Scan stopped before any page was checked. Run it again when you are ready.'
+            : `Scan stopped early. These are the ${finished.length} of ${paths.length} pages that were checked before you cancelled.`,
         );
+        setAnnouncement(`Scan stopped. ${finished.length} of ${paths.length} pages were checked.`);
         return;
       }
 
@@ -587,6 +621,9 @@ export default function SeoHealth() {
         warnings: countBySeverity(finished, 'warning'),
       };
       setLastScan(summary);
+      setAnnouncement(
+        `Scan finished. ${summary.pages} ${plural(summary.pages, 'page', 'pages')} checked, ${summary.errors} ${plural(summary.errors, 'error', 'errors')}, ${summary.warnings} ${plural(summary.warnings, 'warning', 'warnings')}.`,
+      );
 
       if (supabase) {
         const { error: saveErr } = await supabase
@@ -594,15 +631,26 @@ export default function SeoHealth() {
           .upsert({ key: SETTINGS_KEY, value: JSON.stringify(summary) });
         if (saveErr) {
           console.error(saveErr);
-          setNote('The results are on screen, but the scan date could not be saved for next time.');
+          // Append: a truncation notice may already be sitting here and still matters.
+          setNote((prev) =>
+            [prev, 'The results are on screen, but the scan date could not be saved for next time.']
+              .filter(Boolean)
+              .join(' '),
+          );
         }
       }
     } catch (err) {
-      if (controller.signal.aborted) return;
+      // Cancelling makes the in-flight fetch throw, which is not something to report.
+      if (controller.signal.aborted) {
+        setNote('Scan cancelled. Nothing was checked, so run it again when you are ready.');
+        setAnnouncement('Scan cancelled.');
+        return;
+      }
       console.error(err);
       setError(
         'The scan could not finish. Check that the website is online, then run it again.',
       );
+      setAnnouncement('The scan could not finish.');
     } finally {
       setScanning(false);
       abortRef.current = null;
@@ -624,27 +672,42 @@ export default function SeoHealth() {
   let verdict = '';
   if (results) {
     if (errorCount === 0 && warningCount === 0) {
-      verdict = `All ${results.length} pages pass every check. Nothing to fix on the page level right now.`;
+      verdict =
+        results.length === 1
+          ? 'The page scanned passes every check on this list. Nothing to fix at the page level right now.'
+          : `All ${results.length} pages pass every check on this list. Nothing to fix at the page level right now.`;
     } else if (errorCount === 0) {
       verdict = `Nothing is broken. ${warningPages.length} ${plural(warningPages.length, 'page has', 'pages have')} smaller issues that are worth tidying up when there is time.`;
     } else {
-      verdict = `${errorPages.length} ${plural(errorPages.length, 'page needs', 'pages need')} a fix before ${plural(errorPages.length, 'it', 'they')} can rank properly, and ${warningOnlyPages.length} more ${plural(warningOnlyPages.length, 'page could be', 'pages could be')} stronger.`;
+      const needFixing = `${errorPages.length} ${plural(errorPages.length, 'page needs', 'pages need')} a fix before ${plural(errorPages.length, 'it', 'they')} can rank properly`;
+      // "and 0 more pages could be stronger" is not a sentence anyone should have to read.
+      verdict =
+        warningOnlyPages.length === 0
+          ? `${needFixing}.`
+          : `${needFixing}, and ${warningOnlyPages.length} more ${plural(warningOnlyPages.length, 'page could be', 'pages could be')} stronger.`;
     }
   }
 
   return (
     <div className="grid gap-6">
+      {/* Always mounted: a live region inserted together with its text is unreliable. */}
+      <p role="status" aria-live="polite" className="sr-only">
+        {announcement}
+      </p>
+
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="font-display font-semibold text-2xl text-fg">SEO health</h1>
           <p className="text-[14.5px] text-fg-muted mt-1 max-w-2xl">
-            This reads every page listed in the sitemap, exactly as Google does, and reports what is
-            missing or weak. It checks the pages themselves, not your position in search results.
+            This downloads every page listed in the sitemap and checks the HTML a search engine
+            reads first: titles, descriptions, headings, alt text, canonical tags and structured
+            data. It looks at the pages themselves, not at your position in search results.
           </p>
         </div>
         <div className="flex gap-2">
           <button
             type="button"
+            ref={runButtonRef}
             onClick={runScan}
             disabled={scanning}
             className="rounded-btn bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-5 py-2.5 text-[14.5px] transition-colors"
@@ -690,7 +753,8 @@ export default function SeoHealth() {
 
       {scanning && (
         <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
-          <p role="status" aria-live="polite" className="text-[14.5px] text-fg-body">
+          {/* Deliberately not a live region: the sr-only one above carries the milestones. */}
+          <p className="text-[14.5px] text-fg-body">
             {progress.total === 0
               ? 'Reading the sitemap...'
               : `Checking page ${Math.min(progress.done + 1, progress.total)} of ${progress.total}...`}
@@ -717,12 +781,14 @@ export default function SeoHealth() {
             No scan has run in this session yet.
           </p>
           <p className="text-[14px] text-fg-muted mt-1">
-            Press Run the scan. It takes under a minute for the whole site.
+            Press Run the scan. It loads every page in the sitemap, so give it a moment.
           </p>
         </div>
       )}
 
-      {results && (
+      {/* A scan cancelled before the first page finishes leaves an empty array. Showing the
+          summary then would print "All 0 pages pass every check", which is not true. */}
+      {results && results.length > 0 && (
         <>
           <div className="grid sm:grid-cols-4 gap-4">
             <SummaryTile label="Pages scanned" value={results.length} />
@@ -732,7 +798,11 @@ export default function SeoHealth() {
               value={warningCount}
               tone={warningCount > 0 ? 'warning' : 'ok'}
             />
-            <SummaryTile label="Clean pages" value={cleanPages.length} tone="ok" />
+            <SummaryTile
+              label="Clean pages"
+              value={cleanPages.length}
+              tone={cleanPages.length > 0 ? 'ok' : 'neutral'}
+            />
           </div>
 
           <p className="rounded-card border border-hairline bg-surface-raised px-5 py-4 text-[15px] leading-relaxed text-fg-body shadow-card">
@@ -751,7 +821,7 @@ export default function SeoHealth() {
           {warningPages.length > 0 && (
             <Section
               title="Worth improving"
-              blurb="None of these break anything, but each one leaves easy ranking on the table."
+              blurb="None of these stop a page from ranking, but each one is a small gain that is sitting there unused."
               pages={warningPages}
               severity="warning"
             />
@@ -759,11 +829,11 @@ export default function SeoHealth() {
 
           <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
             <h2 className="font-semibold text-[15px] text-fg-body">
-              Pages with no problems ({cleanPages.length})
+              Pages that passed every check ({cleanPages.length})
             </h2>
             {cleanPages.length === 0 ? (
               <p className="text-[14px] text-fg-muted mt-2">
-                Every page has at least one thing to fix.
+                Every page has at least one thing to look at.
               </p>
             ) : (
               <ul className="mt-3 flex flex-wrap gap-2">
@@ -835,6 +905,9 @@ function Section({
                 href={page.path}
                 target="_blank"
                 rel="noreferrer"
+                // Every card carries this link, so the bare text is useless out of context
+                // in a screen reader's link list. The label names the page and the new tab.
+                aria-label={`Open ${page.path} in a new tab`}
                 className="text-[13px] font-semibold text-accent-on-light hover:underline"
               >
                 Open this page

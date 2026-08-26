@@ -294,7 +294,7 @@ export default function ReviewsManager() {
             <p className="mt-2 font-display font-semibold text-4xl text-fg">
               {summary.published ? summary.average.toFixed(1) : 'None'}
             </p>
-            <p className="mt-1 text-[13px] text-fg-muted">Star rating shown on the website</p>
+            <p className="mt-1 text-[13px] text-fg-muted">Shown on the home page and reviews page</p>
           </div>
           <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
             <p className="text-[13px] uppercase tracking-[0.14em] text-fg-muted">Hidden</p>
