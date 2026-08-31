@@ -19,55 +19,59 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── LAYER 1: primitives ─────────────────────────────────────────────────── */
-/* DIRECTION D, "Gallery": white ground, ink type, the copper of the client's
-   own logo as the only colour. The register is taken from recent.design
-   itself, measured in the browser: pure white page, near-black text, quiet
-   13px UI labels, cards with an 8px radius and no heavy shadows. Directions
-   A-C live in docs/DESIGN.md. Anthracite (#16150f, the ground the client's
-   logo was designed on) survives only as the footer and the closing band. */
+/* DIRECTION E, "Atelier verde": deep forest green, warm paper, the copper of
+   the client's own logo, and a designer serif for display. The palette anchor
+   is measured, not invented: rgb(40,78,54) = #284e36 is the brand green of
+   tedtodd.co.uk, the reference class for premium wood flooring. Green + cream
+   + oak is the heritage register of that industry, no Sacramento competitor
+   uses it, and every photograph in the library is warm oak, which sits
+   naturally inside it. Directions A-D live in docs/DESIGN.md and git. */
 :root {
-  /* light end of the neutral ramp */
-  --ef-ground:            #ffffff; /* page ground                            */
-  --ef-ground-tint:       #f5f4f0; /* tinted band, chip, placeholder         */
-  --ef-ground-raised:     #ffffff; /* card surface (hairline does the work)  */
-  --ef-ground-field:      #f5f4f0; /* input fill                             */
-  --ef-rule:              #e9e7e2; /* hairline on light                      */
+  /* light end of the neutral ramp: warm paper, not white */
+  --ef-ground:            #f5f2e9; /* page ground                            */
+  --ef-ground-tint:       #eae5d6; /* tinted band, chip, placeholder         */
+  --ef-ground-raised:     #fdfcf7; /* card surface                           */
+  --ef-ground-field:      #eae5d6; /* input fill                             */
+  --ef-rule:              #dcd5c2; /* hairline on light                      */
 
-  /* ink end of the neutral ramp */
-  --ef-ink-900:           #131211; /* strongest text on light                */
-  --ef-ink-700:           #37342f; /* body copy on light                     */
-  --ef-ink-500:           #6f6a61; /* muted text on light                    */
+  /* ink end of the neutral ramp: green-cast near-black, not neutral gray */
+  --ef-ink-900:           #1a231e; /* strongest text on light                */
+  --ef-ink-700:           #36423b; /* body copy on light                     */
+  --ef-ink-500:           #646f67; /* muted text on light                    */
 
-  /* the inverse region: the anthracite the logo lives on */
-  --ef-dark-900:          #16150f; /* dark region ground                     */
-  --ef-dark-control:      #131211; /* solid dark chip or button on light     */
-  --ef-dark-control-hi:   #2b2925; /* its hover                              */
-  --ef-light-50:          #f5f4f0; /* text, rules and veils on dark          */
+  /* the inverse region: the forest green */
+  --ef-dark-900:          #21402d; /* dark region ground (Ted Todd's #284e36,
+                                      deepened one step so cream text and the
+                                      copper accent both clear AA on it)      */
+  --ef-dark-control:      #21402d; /* solid dark chip or button on light     */
+  --ef-dark-control-hi:   #2c5039; /* its hover                              */
+  --ef-light-50:          #f2efe2; /* text, rules and veils on dark          */
 
-  /* accent: the logo's copper family, one role per ground so AA holds.
-     White on #96602c measures 5.24:1. */
+  /* accent: the client's logo copper. White on #96602c is 5.24:1. */
   --ef-accent:            #96602c;
   --ef-accent-hi:         #7d4f22;
   --ef-accent-light:      #8a5724; /* accent TEXT on a light ground          */
-  --ef-accent-dark:       #d9a86c; /* accent TEXT or fill on a dark ground   */
+  --ef-accent-dark:       #d9a86c; /* accent TEXT or fill on the green       */
   --ef-accent-display:    #b5773a;
-  --ef-accent-wash-pct:   10%;
+  --ef-accent-wash-pct:   12%;
   --ef-on-accent:         #ffffff;
 
   /* media. These sit over photographs, so they never follow the palette. */
-  --ef-scrim:             #16150f;
+  --ef-scrim:             #16201a;
   --ef-scrim-media:       #000000;
   --ef-on-media:          #ffffff;
 
   /* non-colour direction knobs */
-  --ef-font-display: 'Archivo Variable', 'Archivo', Helvetica, Arial, sans-serif;
+  --ef-font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
   --ef-font-body: 'Inter Variable', system-ui, sans-serif;
-  --ef-grain-opacity: 0.05;
-  /* Soft gallery corners: 8px on media is recent.design's own card radius. */
-  --ef-radius-btn: 0.5rem;    /* buttons, pills, chips                       */
-  --ef-radius-card: 0.75rem;  /* cards, panels, inputs                       */
-  --ef-radius-media: 0.5rem;  /* photos, video frames                        */
-  --ef-shadow-tint: 25 22 18;
+  /* The client's logo lockup is a grotesque wordmark and must NOT follow the
+     serif: it keeps Archivo through its own role. */
+  --ef-font-brand: 'Archivo Variable', 'Archivo', Helvetica, Arial, sans-serif;
+  --ef-grain-opacity: 0.06;
+  --ef-radius-btn: 0.25rem;   /* buttons, pills, chips                       */
+  --ef-radius-card: 0.5rem;   /* cards, panels, inputs                       */
+  --ef-radius-media: 0.375rem;/* photos, video frames                        */
+  --ef-shadow-tint: 26 35 29;
 }
 
 /* ── LAYER 2: semantic roles ─────────────────────────────────────────────── */
@@ -144,6 +148,7 @@
 
   --font-display: var(--ef-font-display);
   --font-body: var(--ef-font-body);
+  --font-brand: var(--ef-font-brand);
 
   --radius-btn: var(--ef-radius-btn);
   --radius-card: var(--ef-radius-card);
@@ -196,20 +201,22 @@ body {
 
 h1, h2, h3, .font-display {
   font-family: var(--ef-font-display);
+  font-variation-settings: 'SOFT' 40, 'WONK' 0;
   font-weight: 800;
   letter-spacing: -0.028em;
 }
 
-/* Emphasis inside a display heading. Direction A carries it with weight and
-   colour: Archivo has no expressive italic, so a slanted grotesque would read
-   as a mistake rather than a flourish. */
+/* Emphasis inside a display heading. Fraunces is back, so the flourish is a
+   true italic again, softened and wonked the way the axes intend. */
 .accent-italic {
   color: var(--ef-accent-on-light);
-  font-weight: 800;
+  font-style: italic;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
 }
 .accent-italic-soft {
   color: var(--ef-accent-on-dark);
-  font-weight: 800;
+  font-style: italic;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
 }
 
 /* Subtle film grain for dark sections (tiny data-URI noise, GPU friendly).

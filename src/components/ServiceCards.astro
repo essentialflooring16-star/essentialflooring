@@ -1,12 +1,26 @@
 ---
-// Photo-first services grid: every card leads with real project imagery.
+// Services as framed pictures on the green: each card is a paper mat around a
+// real project photograph, with the caption set beneath the picture the way a
+// gallery labels a frame — icon from the site's own set, serif title, one
+// line of text. The mat is what makes the phone photographs read as curated
+// work instead of screenshots.
 import { Image } from 'astro:assets';
 import { SERVICES } from '../data/site';
 import { photoImage, photoById } from '../lib/photos';
+import Icon from './Icon.astro';
+
+const icons: Record<string, 'refinish' | 'plank' | 'stairs' | 'layers' | 'carpet'> = {
+  'hardwood-floor-refinishing': 'refinish',
+  'lvp-vinyl-plank-flooring': 'plank',
+  'stairs-installation-refinishing': 'stairs',
+  'laminate-flooring': 'layers',
+  'carpet-installation': 'carpet',
+};
 ---
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 sm:gap-5 auto-rows-[210px] sm:auto-rows-[230px]">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-5 sm:gap-6">
   {SERVICES.map((s, i) => {
+    const big = i === 0;
     const spans = [
       'lg:col-span-3 lg:row-span-2 sm:col-span-2',
       'lg:col-span-3',
@@ -14,40 +28,41 @@ import { photoImage, photoById } from '../lib/photos';
       'lg:col-span-3',
       'lg:col-span-3',
     ];
-    const big = i === 0;
     return (
       <a
         href={`/services/${s.slug}/`}
-        class={`m-rise card-lift group relative overflow-hidden rounded-media shadow-card ${spans[i]}`}
-        style={`transition-delay:${i * 60}ms`}
+        class={`m-rise card-lift group flex flex-col rounded-card bg-surface-raised p-2.5 pb-0 shadow-card ${spans[i]}`}
+        style={`--i:${i}`}
       >
-        <Image
-          src={photoImage(s.image)}
-          alt={'imageAlt' in s ? s.imageAlt : photoById(s.image).alt}
-          widths={[480, 760, 1100]}
-          sizes={big ? '(min-width:1024px) 50vw, 100vw' : '(min-width:1024px) 50vw, (min-width:640px) 50vw, 100vw'}
-          class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
-          format="webp"
-          quality={68}
-        />
-        <span class="absolute inset-0 bg-gradient-to-t from-scrim/85 via-scrim/25 to-scrim/5 transition-opacity" aria-hidden="true"></span>
-
-        <span class="absolute top-4 left-4 grid place-items-center rounded-btn bg-veil-on-dark/15 backdrop-blur-sm text-fg-on-dark font-display text-[13px] font-medium size-9 border border-hairline-on-dark/25" aria-hidden="true">
-          0{i + 1}
-        </span>
-
-        <span class="absolute top-4 right-4 grid place-items-center size-10 rounded-btn bg-veil-on-dark/15 backdrop-blur-sm border border-hairline-on-dark/25 text-fg-on-dark transition-all duration-300 group-hover:bg-accent group-hover:border-accent group-hover:rotate-45" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-
-        <span class="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
-          <span class={`block font-display font-semibold text-fg-on-dark leading-tight ${big ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
-            {s.name}
+        <span class={`relative block overflow-hidden rounded-media ${big ? 'aspect-[4/4.4] sm:aspect-[16/12] lg:aspect-auto lg:flex-1 lg:min-h-0' : 'aspect-[16/9]'}`}>
+          <Image
+            src={photoImage(s.image)}
+            alt={'imageAlt' in s ? s.imageAlt : photoById(s.image).alt}
+            widths={[480, 760, 1100]}
+            sizes={big ? '(min-width:1024px) 50vw, 100vw' : '(min-width:1024px) 50vw, (min-width:640px) 50vw, 100vw'}
+            class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
+            format="webp"
+            quality={68}
+          />
+          <span
+            class="absolute top-3 right-3 grid place-items-center size-9 rounded-btn bg-scrim-media/40 backdrop-blur-[2px] text-fg-on-media opacity-0 -translate-y-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0"
+            aria-hidden="true"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M7 17 17 7M9 7h8v8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
           </span>
-          <span class={`mt-2 block text-fg-on-dark/80 text-[14px] leading-relaxed max-w-md ${big ? '' : 'hidden sm:block'}`}>
-            {s.short}
+        </span>
+
+        <span class="flex items-start gap-3.5 px-2.5 sm:px-3 py-4">
+          <Icon name={icons[s.slug] ?? 'plank'} size={30} class="shrink-0 mt-0.5 text-fg" />
+          <span class="min-w-0">
+            <span class={`block font-display font-medium text-fg leading-snug ${big ? 'text-[22px] sm:text-[25px]' : 'text-[19px] sm:text-[21px]'}`}>
+              {s.name}
+            </span>
+            <span class={`mt-1.5 block text-fg-muted text-[13.5px] leading-relaxed ${big ? 'max-w-md' : 'hidden xl:block'}`}>
+              {s.short}
+            </span>
           </span>
         </span>
       </a>

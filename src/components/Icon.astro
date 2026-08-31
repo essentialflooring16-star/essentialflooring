@@ -1,0 +1,100 @@
+---
+// The site's own icon set, drawn for this client rather than pulled from a
+// library. The signature is the copper chip behind every glyph: a small plank
+// rotated -14 degrees, which is the exact angle of the two planks in the
+// client's logo. Glyphs are 1.8px strokes in the current text colour, so the
+// same icon works on paper and on the green.
+interface Props {
+  name:
+    | 'refinish'
+    | 'plank'
+    | 'stairs'
+    | 'layers'
+    | 'carpet'
+    | 'ruler'
+    | 'shield'
+    | 'clock'
+    | 'pin'
+    | 'check'
+    | 'hammer'
+    | 'sparkle';
+  /** px, default 28 */
+  size?: number;
+  class?: string;
+}
+const { name, size = 28, class: cls = '' } = Astro.props;
+
+// Every path lives on a 28x28 grid. The chip sits behind, offset up-left.
+const glyphs: Record<string, string> = {
+  // sanding disc with motion ticks: refinishing
+  refinish: `
+    <circle cx="14.5" cy="15.5" r="6.2" />
+    <circle cx="14.5" cy="15.5" r="1.4" fill="currentColor" stroke="none" />
+    <path d="M23 7l-3.2 3.2M24.5 12.5h-2.6M12.5 24.5v-2.4" />`,
+  // three boards, staggered joints
+  plank: `
+    <path d="M4.5 9.5h19M4.5 15h19M4.5 20.5h19" />
+    <path d="M11 9.5V15M17.5 15v5.5M8.5 4.5h11" />
+    <path d="M4.5 4.5v20.5M23.5 4.5v20.5M4.5 4.5h19M4.5 25h19" opacity="0" />`,
+  stairs: `
+    <path d="M4.5 23.5h5v-5h5v-5h5v-5h5" />
+    <path d="M4.5 23.5V21M24.5 8.5V6" />`,
+  // laminate: boards in perspective
+  layers: `
+    <path d="M4.5 18.5l10 5 9-4.5" />
+    <path d="M4.5 14l10 5 9-4.5" />
+    <path d="M4.5 9.5l10 5 9-4.5-10-4.5z" />`,
+  // carpet roll seen from the side
+  carpet: `
+    <path d="M8.5 10.5a4 4 0 1 1 0 8" />
+    <circle cx="8.5" cy="14.5" r="1.2" fill="currentColor" stroke="none" />
+    <path d="M8.5 18.5h11a4 4 0 0 0 4-4v-0.5" />
+    <path d="M12.5 10.5h7a4 4 0 0 1 4 3.5" />`,
+  ruler: `
+    <rect x="4.5" y="11" width="19" height="7" rx="1" />
+    <path d="M9 11v3M13.5 11v4.5M18 11v3M22.5 11v4.5" transform="translate(-1.5 0)" />`,
+  shield: `
+    <path d="M14 4.5l7.5 3v6c0 5-3.1 8.4-7.5 10-4.4-1.6-7.5-5-7.5-10v-6z" />
+    <path d="M10.8 14l2.3 2.4 4.4-4.8" />`,
+  clock: `
+    <circle cx="14" cy="14.5" r="8" />
+    <path d="M14 9.8v4.7l3.4 2" />`,
+  pin: `
+    <path d="M14 25s-7.5-6.6-7.5-12a7.5 7.5 0 0 1 15 0c0 5.4-7.5 12-7.5 12z" />
+    <circle cx="14" cy="12.8" r="2.6" />`,
+  check: `
+    <path d="M5.5 15l6 6L23 8.5" />`,
+  hammer: `
+    <path d="M7 8.5l4-4 8 8-4 4z" />
+    <path d="M13.5 15L6 22.5a1.8 1.8 0 0 1-2.5-2.5L11 12.5" />
+    <path d="M17 6.5l4.5 4.5" />`,
+  sparkle: `
+    <path d="M14 4.5c.8 4.6 2.4 6.6 9.5 9.5-7.1 2.9-8.7 4.9-9.5 9.5-.8-4.6-2.4-6.6-9.5-9.5 7.1-2.9 8.7-4.9 9.5-9.5z" />`,
+};
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 28 28"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.8"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class={cls}
+  aria-hidden="true"
+>
+  <rect
+    x="2"
+    y="4"
+    width="13"
+    height="5"
+    rx="1"
+    transform="rotate(-14 8.5 6.5)"
+    fill="var(--ef-accent-display)"
+    opacity="0.32"
+    stroke="none"
+  />
+  <g set:html={glyphs[name]} />
+</svg>

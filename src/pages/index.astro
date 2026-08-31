@@ -9,6 +9,7 @@ import Stats from '../components/Stats.astro';
 import ServiceCards from '../components/ServiceCards.astro';
 import VideoStrip from '../components/VideoStrip.astro';
 import ShowcaseSlider from '../components/ShowcaseSlider.tsx';
+import Icon from '../components/Icon.astro';
 import { SITE, ALL_SERVICES, CORE_CITIES, EXTENDED_CITIES } from '../data/site';
 import { photos, photoImage, photoById } from '../lib/photos';
 import faqData from '../data/faq.json';
@@ -95,100 +96,101 @@ const marqueeItems = [
   description="Licensed Sacramento flooring contractor. Hardwood floor refinishing, waterproof LVP, stairs, laminate and carpet. Free estimates, call (916) 425-1361."
 >
   <!-- HERO
-       Rebuilt after studying walkerwarner.com, marasrl.it and icebug.com. In
-       all three the photograph is the hero and the type is small, quiet and
-       pushed to an edge; none of them opens with a headline block and two
-       buttons. That register suits this client for a practical reason: the
-       one asset we have in quantity is photographs of finished floors, and
-       the floor is the only part of a phone photo of an empty house that is
-       beautiful. Cropping wide and low fills the frame with grain and leaves
-       the room out of it.
-
-       The h1 changed from a slogan to a sentence that names the work and the
-       area. "See the difference, not the promise" carried no search term at
-       all, and it is the single most valuable string on the site. -->
-  <section class="relative bg-surface">
-    <div class="mx-auto max-w-[1400px] px-3 sm:px-5 pt-3 sm:pt-5">
-      <div class="relative h-[62svh] min-h-[400px] sm:h-[70svh] lg:h-[78svh] overflow-hidden rounded-card">
-      <Image
-        src={photoImage(heroPhoto.file)}
-        alt={heroPhoto.alt}
-        widths={[900, 1400, 2000, 2600]}
-        sizes="100vw"
-        loading="eager"
-        fetchpriority="high"
-        class="absolute inset-0 h-full w-full object-cover [object-position:50%_74%]"
-      />
-      <!-- Two scrims, not one: a wide soft one for the type and a short hard
-           one at the very bottom so the meta row stays legible on the light
-           reflections in the finish. -->
-      <div
-        class="absolute inset-x-0 bottom-0 h-[78%] bg-gradient-to-t from-scrim-media/88 via-scrim-media/40 to-transparent"
-        aria-hidden="true"
-      ></div>
-
-      <div class="absolute inset-x-0 bottom-0">
-        <div class="px-5 sm:px-10 pb-8 sm:pb-11">
-          <p class="m-intro text-fg-on-media/70 text-[11px] font-bold uppercase tracking-[0.22em]">
-            {heroPhoto.city}, California
-          </p>
-          <h1
-            style="--i:1"
-            class="m-intro mt-4 font-display font-semibold text-fg-on-media text-[28px] sm:text-[40px] lg:text-[50px] leading-[1.04] max-w-[19ch] sm:max-w-[24ch] [text-wrap:balance]"
-          >
-            Hardwood refinishing, vinyl plank and stairs in greater Sacramento
-          </h1>
-          <div class="m-intro mt-7 sm:mt-9 flex flex-wrap items-center gap-x-7 gap-y-4" style="--i:2">
-            <a
-              href="/contact/"
-              class="inline-flex items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-7 py-3.5 text-[15px] transition-colors"
-            >
-              Get a free estimate
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
-                <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </a>
-            <a
-              href={SITE.phoneHref}
-              class="text-fg-on-media font-display font-semibold text-[19px] sm:text-[21px] underline-offset-[6px] hover:underline"
-            >
-              {SITE.phone}
-            </a>
-          </div>
-        </div>
-      </div>
-      </div>
-    </div>
-
-    <!-- The line that used to be a row of bullet points under the headline.
-         As a rule under the photograph it carries the same four facts without
-         asking for a third of the first screen. -->
-    <div class="bg-surface">
-      <div
-        class="mx-auto max-w-6xl px-4 sm:px-6 py-4 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3 text-[13px] text-fg-muted"
+       Direction E: the editorial opening of the premium wood-flooring class
+       (tedtodd.co.uk is the palette anchor). The statement comes first, set
+       in the serif with one italic copper flourish; the photograph follows,
+       framed in the paper ground, with the place label pinned to its corner.
+       The h1 keeps the search terms: the work and the region, by name. -->
+  <section class="relative bg-surface overflow-hidden">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 pt-12 sm:pt-16 lg:pt-20">
+      <p class="m-intro eyebrow on-light">Sacramento flooring contractor</p>
+      <h1
+        style="--i:1"
+        class="m-intro mt-5 font-display font-medium text-fg text-[38px] sm:text-[56px] lg:text-[68px] leading-[1.02] tracking-[-0.01em] max-w-[17ch] [text-wrap:balance]"
       >
-        <p><span class="text-fg font-semibold">Licensed &amp; insured</span> {SITE.license}</p>
-        <p><span class="text-fg font-semibold">Mon to Sat</span> 7 AM to 7 PM</p>
-        <p><span class="text-fg font-semibold">{CORE_CITIES.length + EXTENDED_CITIES.length} areas</span> around Sacramento</p>
-        <p><span class="text-fg font-semibold">Free estimates</span> no call-out fee</p>
+        Hardwood refinishing, vinyl plank <span class="accent-italic">and stairs</span> in greater Sacramento
+      </h1>
+
+      <div class="m-intro mt-8 sm:mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" style="--i:2">
+        <a
+          href="/contact/"
+          class="inline-flex items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-7 py-3.5 text-[15px] transition-colors shadow-card"
+        >
+          Get a free estimate
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+            <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a
+          href={SITE.phoneHref}
+          class="font-display font-medium text-fg text-[20px] sm:text-[22px] underline-offset-[6px] decoration-accent/60 hover:underline"
+        >
+          {SITE.phone}
+        </a>
+        <p class="basis-full sm:basis-auto text-[13.5px] text-fg-muted">
+          Free estimates, no call-out fee
+        </p>
       </div>
     </div>
 
-    <Marquee items={marqueeItems} />
+    <div class="mx-auto max-w-[1400px] px-3 sm:px-5 mt-10 sm:mt-14">
+      <figure class="m-media relative overflow-hidden rounded-card shadow-lift">
+        <Image
+          src={photoImage(heroPhoto.file)}
+          alt={heroPhoto.alt}
+          widths={[900, 1400, 2000, 2600]}
+          sizes="100vw"
+          loading="eager"
+          fetchpriority="high"
+          class="h-[46svh] min-h-[320px] sm:h-[56svh] lg:h-[64svh] w-full object-cover [object-position:50%_74%]"
+        />
+        <figcaption
+          class="absolute left-4 bottom-4 sm:left-6 sm:bottom-6 inline-flex items-center gap-2.5 rounded-btn bg-scrim-media/55 backdrop-blur-[2px] text-fg-on-media text-[12px] font-semibold uppercase tracking-[0.14em] px-3.5 py-2"
+        >
+          <span class="size-1.5 bg-accent-display" aria-hidden="true"></span>
+          {heroPhoto.city}, California — our work
+        </figcaption>
+      </figure>
+    </div>
+
+    <!-- Facts, each stamped with the site's own icon set. -->
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 mt-8 sm:mt-10 mb-2">
+      <ul class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5 text-[13.5px] text-fg-muted border-t border-hairline pt-6">
+        <li class="flex items-center gap-3">
+          <Icon name="shield" size={26} class="shrink-0 text-fg" />
+          <span><span class="block text-fg font-semibold">Licensed &amp; insured</span>{SITE.license}</span>
+        </li>
+        <li class="flex items-center gap-3">
+          <Icon name="clock" size={26} class="shrink-0 text-fg" />
+          <span><span class="block text-fg font-semibold">Mon to Sat</span>7 AM to 7 PM</span>
+        </li>
+        <li class="flex items-center gap-3">
+          <Icon name="pin" size={26} class="shrink-0 text-fg" />
+          <span><span class="block text-fg font-semibold">{CORE_CITIES.length + EXTENDED_CITIES.length} cities</span>around Sacramento</span>
+        </li>
+        <li class="flex items-center gap-3">
+          <Icon name="ruler" size={26} class="shrink-0 text-fg" />
+          <span><span class="block text-fg font-semibold">Free estimates</span>written, no hidden fees</span>
+        </li>
+      </ul>
+    </div>
+
+    <Marquee items={marqueeItems} dark />
   </section>
 
-  <!-- SERVICES: editorial numbered index -->
-  <section class="py-16 sm:py-24">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+  <!-- SERVICES: framed pictures on the green wall -->
+  <section class="grain py-16 sm:py-24 bg-surface-dark relative overflow-hidden">
+    <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
         <SectionHeading
           eyebrow="Services"
           title="What we install and refinish"
           text="From tear-out to the last baseboard, one licensed contractor owns the whole job. No handoffs, no finger-pointing."
+          light
         />
         <a
           href="/services/"
-          class="reveal shrink-0 inline-flex items-center gap-2 font-semibold text-accent-on-light hover:text-fg transition-colors"
+          class="reveal shrink-0 inline-flex items-center gap-2 font-semibold text-accent-on-dark hover:text-fg-on-dark transition-colors"
         >
           All 16 services
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
@@ -199,9 +201,9 @@ const marqueeItems = [
 
       <ServiceCards />
 
-      <ul class="reveal mt-8 flex flex-wrap gap-2">
+      <ul class="reveal mt-9 flex flex-wrap gap-2">
         {ALL_SERVICES.map((s) => (
-          <li class="rounded-btn bg-surface-sunken border border-hairline px-3.5 py-1.5 text-[13px] font-medium text-fg-body">
+          <li class="rounded-btn border border-hairline-on-dark/25 text-fg-on-dark/85 px-3.5 py-1.5 text-[13px] font-medium">
             {s}
           </li>
         ))}
