@@ -82,33 +82,47 @@ export const ALL_SERVICES = [
   'Transition installation',
 ] as const;
 
-// Core cities get the strongest internal linking; extended areas are select-project regions.
+// The service area is split by how far out it sits, not by how much we want
+// the work. CORE is the inner Sacramento metro, where most jobs are and where
+// the internal linking is strongest. SURROUNDING is the ring in Placer, El
+// Dorado, Yolo and Sutter counties, still fully served.
+//
+// The list used to end with San Francisco, the SF Bay Area, Orange County and
+// South Lake Tahoe. Those pages are gone. Orange County is about 400 miles
+// from Sacramento, and a location page a searcher would not believe is worse
+// for local ranking than no page at all. The eight cities added in their place
+// are all inside an hour's drive.
 export const CORE_CITIES = [
   { slug: 'sacramento', city: 'Sacramento' },
-  { slug: 'roseville', city: 'Roseville' },
-  { slug: 'folsom', city: 'Folsom' },
+  { slug: 'arden-arcade', city: 'Arden-Arcade' },
+  { slug: 'carmichael', city: 'Carmichael' },
   { slug: 'citrus-heights', city: 'Citrus Heights' },
   { slug: 'rancho-cordova', city: 'Rancho Cordova' },
-  { slug: 'carmichael', city: 'Carmichael' },
+  { slug: 'north-highlands', city: 'North Highlands' },
+  { slug: 'rio-linda', city: 'Rio Linda' },
   { slug: 'antelope', city: 'Antelope' },
   { slug: 'orangevale', city: 'Orangevale' },
   { slug: 'fair-oaks', city: 'Fair Oaks' },
-  { slug: 'granite-bay', city: 'Granite Bay' },
-  { slug: 'lincoln', city: 'Lincoln' },
-  { slug: 'loomis', city: 'Loomis' },
-  { slug: 'north-highlands', city: 'North Highlands' },
-  { slug: 'rio-linda', city: 'Rio Linda' },
-  { slug: 'arden-arcade', city: 'Arden-Arcade' },
-  { slug: 'yuba-city', city: 'Yuba City' },
+  { slug: 'elk-grove', city: 'Elk Grove' },
+  { slug: 'west-sacramento', city: 'West Sacramento' },
+  { slug: 'folsom', city: 'Folsom' },
+  { slug: 'roseville', city: 'Roseville' },
 ] as const;
 
 // `region: true` marks an area that is not a single city, so structured data
-// does not emit a malformed place name like "Orange County CA".
+// does not emit a malformed place name. Nothing in the current list needs it,
+// but the city page and the schema builder still honour the flag.
 export const EXTENDED_CITIES = [
-  { slug: 'san-francisco', city: 'San Francisco' },
-  { slug: 'san-francisco-bay-area', city: 'San Francisco Bay Area', region: true },
-  { slug: 'orange-county', city: 'Orange County', region: true },
-  { slug: 'south-lake-tahoe', city: 'South Lake Tahoe' },
+  { slug: 'rocklin', city: 'Rocklin' },
+  { slug: 'granite-bay', city: 'Granite Bay' },
+  { slug: 'lincoln', city: 'Lincoln' },
+  { slug: 'loomis', city: 'Loomis' },
+  { slug: 'el-dorado-hills', city: 'El Dorado Hills' },
+  { slug: 'auburn', city: 'Auburn' },
+  { slug: 'davis', city: 'Davis' },
+  { slug: 'woodland', city: 'Woodland' },
+  { slug: 'galt', city: 'Galt' },
+  { slug: 'yuba-city', city: 'Yuba City' },
 ] as const;
 
 export const ALL_CITIES = [...CORE_CITIES, ...EXTENDED_CITIES];
