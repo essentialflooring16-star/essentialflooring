@@ -19,16 +19,14 @@ const { items, dark = false } = Astro.props;
         {items.map((item) => (
           <li class="flex items-center shrink-0">
             <span class="font-display text-[17px] tracking-wide whitespace-nowrap px-5">{item}</span>
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill={dark ? 'var(--ef-accent-on-dark)' : 'var(--ef-accent-fill)'}
+            <!-- A square, not a star. The five pointed star between marquee
+                 items is stock decoration; a plank end is at least about the
+                 trade this ribbon is listing. -->
+            <span
+              class="shrink-0 size-1.5"
+              style={`background:${dark ? 'var(--ef-accent-on-dark)' : 'var(--ef-accent-fill)'}`}
               aria-hidden="true"
-              class="shrink-0"
-            >
-              <path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6L2.5 9.5l6.6-.8z" />
-            </svg>
+            ></span>
           </li>
         ))}
       </ul>

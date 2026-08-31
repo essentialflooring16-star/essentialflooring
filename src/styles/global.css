@@ -233,29 +233,43 @@ h1, h2, h3, .font-display {
   z-index: 2;
 }
 
-/* Eyebrow pill badge. The only place that already modelled the light/dark
-   pair correctly, so it maps straight onto the two accent roles. */
-.eyebrow-pill {
+/* The mobile contact bar is fixed to the bottom edge, so the document needs
+   to end above it or the last footer line sits underneath. */
+@media (max-width: 639px) {
+  body {
+    padding-bottom: calc(3.6rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Eyebrow label.
+   Was a bordered pill with a star glyph. Every template and every generated
+   landing page uses that badge, so it was the loudest "made by a machine"
+   signal on the page. The architecture and interiors sites studied for this
+   pass (walkerwarner.com, liljewall.se, mesura.eu, franklinazzi.fr) all do
+   the same quieter thing instead: a short rule, then a small caps label. */
+.eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  border-radius: var(--ef-radius-btn);
-  padding: 0.42rem 0.95rem;
+  gap: 0.8rem;
   font-family: var(--ef-font-body);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.2em;
 }
-.eyebrow-pill.on-light {
-  background: color-mix(in srgb, var(--ef-accent-fill) 12%, transparent);
+.eyebrow::before {
+  content: '';
+  width: 1.75rem;
+  height: 1px;
+  flex: none;
+  background: currentColor;
+  opacity: 0.5;
+}
+.eyebrow.on-light {
   color: var(--ef-accent-on-light);
-  border: 1px solid color-mix(in srgb, var(--ef-accent-fill) 25%, transparent);
 }
-.eyebrow-pill.on-dark {
-  background: color-mix(in srgb, var(--ef-accent-on-dark) 14%, transparent);
+.eyebrow.on-dark {
   color: var(--ef-accent-on-dark);
-  border: 1px solid color-mix(in srgb, var(--ef-accent-on-dark) 30%, transparent);
 }
 
 /* Marquee ribbon */
@@ -344,5 +358,94 @@ html.js .reveal-scale.is-visible {
 @media (min-width: 1024px) {
   .service-row:hover {
     padding-left: 14px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCROLL-DRIVEN MOTION
+   ───────────────────────────────────────────────────────────────────────────
+   The reveal utilities above are JS driven (IntersectionObserver). These are
+   not: they run on the browser's own view() timeline, so the position of the
+   element in the scrollport IS the animation clock. No library, no observer,
+   no main-thread work, and nothing to fail on a slow phone.
+
+   Studied on walkerwarner.com, marasrl.it and icebug.com, all of which settle
+   a photograph rather than sliding a card in. The move is deliberately small:
+   a photo that eases out of a 6% overscale reads as craft, a card that flies
+   in from the left reads as a template.
+
+   Everything is gated three ways: the browser must support the timeline, the
+   visitor must not have asked for reduced motion, and the pointer must be on
+   a screen tall enough for the range to make sense.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes m-rise-k {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes m-media-k {
+  from { opacity: 0; transform: scale(1.06); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes m-rule-k {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes m-lift-k {
+  from { transform: translateY(40px); }
+  to   { transform: translateY(0); }
+}
+
+/* Above the fold there is nothing to scroll yet, so the view() timeline is the
+   wrong clock: an element sitting in the lower half of the first screen would
+   paint part way through its own reveal and only finish once the visitor
+   scrolls, which on a primary call to action reads as a rendering fault. The
+   hero therefore runs on time, once, on load. */
+@media (prefers-reduced-motion: no-preference) {
+  .m-intro {
+    animation: m-rise-k 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--i, 0) * 90ms + 60ms);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Copy, headings, list rows. */
+    .m-rise {
+      animation: m-rise-k linear both;
+      animation-timeline: view();
+      animation-range: entry 4% cover 26%;
+    }
+
+    /* Photographs and video frames. The overscale is clipped by the frame,
+       so the image appears to settle into place instead of appearing. */
+    .m-media {
+      animation: m-media-k linear both;
+      animation-timeline: view();
+      animation-range: entry 2% cover 34%;
+    }
+
+    /* Hairline that draws itself under a section label. */
+    .m-rule {
+      transform-origin: left center;
+      animation: m-rule-k linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 20%;
+    }
+
+    /* A block that keeps drifting up through the whole pass, used sparingly
+       to give a long section some parallax without a scroll listener. */
+    .m-lift {
+      animation: m-lift-k linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+
+    /* Index-based stagger: set --i on each child. */
+    .m-stagger > * {
+      animation: m-rise-k linear both;
+      animation-timeline: view();
+      animation-range: entry calc(4% + var(--i, 0) * 3%) cover calc(26% + var(--i, 0) * 3%);
+    }
   }
 }

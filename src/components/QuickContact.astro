@@ -1,94 +1,54 @@
 ---
-// Floating quick-contact button, bottom right on every page.
+// Sticky contact bar, mobile only.
+//
+// This used to be a round accent button with a pulsing halo, bottom right on
+// every page and every breakpoint. Two things were wrong with it. The shape
+// fought the rest of the direction, which is squared off everywhere else, and
+// the pulse ring is the single most recognisable widget on generated landing
+// pages. It also duplicated, on desktop, two controls that are already in the
+// header: the phone number and the estimate button.
+//
+// What replaces it is the pattern local trade sites actually convert with: a
+// full width bar pinned to the bottom edge of a phone, with the three things
+// someone standing in a half-demolished hallway wants. On desktop it renders
+// nothing at all.
 import { SITE } from '../data/site';
 const wa = 'https://wa.me/19164251361';
 ---
 
-<div id="quick-contact" class="fixed bottom-5 right-5 z-[70] flex flex-col items-end gap-3">
-  <div
-    id="qc-menu"
-    class="hidden flex-col items-stretch gap-2 min-w-[210px]"
-  >
+<div
+  class="fixed inset-x-0 bottom-0 z-[70] sm:hidden bg-surface-dark border-t border-fg-on-dark/15"
+  style="padding-bottom: env(safe-area-inset-bottom, 0px)"
+>
+  <div class="grid grid-cols-3 divide-x divide-fg-on-dark/15">
     <a
       href={SITE.phoneHref}
-      class="flex items-center gap-3 rounded-card bg-surface-raised border border-hairline shadow-lift px-4 py-3 text-[15px] font-semibold text-fg hover:border-accent transition-colors"
+      class="flex flex-col items-center justify-center gap-1 py-2.5 text-fg-on-dark active:bg-fg-on-dark/10"
     >
-      <span class="grid place-items-center size-9 rounded-btn bg-control-dark text-fg-on-dark" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-          <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </span>
-      Call now
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+        <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <span class="text-[11px] font-semibold tracking-wide">Call</span>
     </a>
     <a
       href={wa}
       target="_blank"
       rel="noopener"
-      class="flex items-center gap-3 rounded-card bg-surface-raised border border-hairline shadow-lift px-4 py-3 text-[15px] font-semibold text-fg hover:border-accent transition-colors"
+      class="flex flex-col items-center justify-center gap-1 py-2.5 text-fg-on-dark active:bg-fg-on-dark/10"
     >
-      <span class="grid place-items-center size-9 rounded-btn bg-[#25D366] text-white" aria-hidden="true">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.6-1.3 0-.2 0-.3-.1-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.9.9-1.2 2.1-.6 3.5.9 2 2.5 3.8 4.5 4.9 2.3 1.3 3.2 1.1 3.9 1 .8-.1 1.5-.6 1.7-1.2.2-.6.2-1.2.1-1.3 0-.2-.2-.3-.6-.6Z" />
-        </svg>
-      </span>
-      WhatsApp
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.6-1.3 0-.2 0-.3-.1-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.9.9-1.2 2.1-.6 3.5.9 2 2.5 3.8 4.5 4.9 2.3 1.3 3.2 1.1 3.9 1 .8-.1 1.5-.6 1.7-1.2.2-.6.2-1.2.1-1.3 0-.2-.2-.3-.6-.6Z" />
+      </svg>
+      <span class="text-[11px] font-semibold tracking-wide">WhatsApp</span>
     </a>
     <a
       href="/contact/"
-      class="flex items-center gap-3 rounded-card bg-accent text-fg-on-accent shadow-lift px-4 py-3 text-[15px] font-semibold hover:bg-accent-hover transition-colors"
+      class="flex flex-col items-center justify-center gap-1 py-2.5 bg-accent text-fg-on-accent active:bg-accent-hover"
     >
-      <span class="grid place-items-center size-9 rounded-btn bg-fg-on-accent/20" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-          <path d="M4 5h16v12H8l-4 4V5Z" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </span>
-      Free estimate
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+        <path d="M4 5h16v12H8l-4 4V5Z" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <span class="text-[11px] font-semibold tracking-wide">Estimate</span>
     </a>
   </div>
-
-  <button
-    id="qc-toggle"
-    type="button"
-    class="relative grid place-items-center size-15 w-[60px] h-[60px] rounded-full bg-accent text-fg-on-accent shadow-lift hover:bg-accent-hover transition-colors cursor-pointer"
-    aria-expanded="false"
-    aria-controls="qc-menu"
-    aria-label="Quick contact options"
-  >
-    <span class="absolute inset-0 rounded-full bg-accent animate-pulse-ring motion-reduce:hidden" aria-hidden="true"></span>
-    <svg class="qc-open relative" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
-      <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-    <svg class="qc-close relative hidden" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true">
-      <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
-    </svg>
-  </button>
 </div>
-
-<script>
-  const toggle = document.getElementById('qc-toggle');
-  const menu = document.getElementById('qc-menu');
-  toggle?.addEventListener('click', () => {
-    const open = menu?.classList.toggle('hidden') === false;
-    menu?.classList.toggle('flex', open);
-    toggle.setAttribute('aria-expanded', String(open));
-    toggle.querySelector('.qc-open')?.classList.toggle('hidden', open);
-    toggle.querySelector('.qc-close')?.classList.toggle('hidden', !open);
-  });
-  const close = () => {
-    if (!menu || menu.classList.contains('hidden')) return;
-    menu.classList.add('hidden');
-    menu.classList.remove('flex');
-    toggle?.setAttribute('aria-expanded', 'false');
-    toggle?.querySelector('.qc-open')?.classList.remove('hidden');
-    toggle?.querySelector('.qc-close')?.classList.add('hidden');
-  };
-  document.addEventListener('click', (e) => {
-    if (!(e.target as HTMLElement).closest('#quick-contact')) close();
-  });
-  // Escape closes it and hands focus back to the button that opened it.
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape' || !menu || menu.classList.contains('hidden')) return;
-    close();
-    toggle?.focus();
-  });
-</script>
