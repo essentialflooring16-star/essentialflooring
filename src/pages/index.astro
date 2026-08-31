@@ -107,8 +107,9 @@ const marqueeItems = [
        The h1 changed from a slogan to a sentence that names the work and the
        area. "See the difference, not the promise" carried no search term at
        all, and it is the single most valuable string on the site. -->
-  <section class="relative bg-fg">
-    <div class="relative h-[64svh] min-h-[400px] sm:h-[72svh] lg:h-[80svh] overflow-hidden">
+  <section class="relative bg-surface">
+    <div class="mx-auto max-w-[1400px] px-3 sm:px-5 pt-3 sm:pt-5">
+      <div class="relative h-[62svh] min-h-[400px] sm:h-[70svh] lg:h-[78svh] overflow-hidden rounded-card">
       <Image
         src={photoImage(heroPhoto.file)}
         alt={heroPhoto.alt}
@@ -127,7 +128,7 @@ const marqueeItems = [
       ></div>
 
       <div class="absolute inset-x-0 bottom-0">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6 pb-8 sm:pb-11">
+        <div class="px-5 sm:px-10 pb-8 sm:pb-11">
           <p class="m-intro text-fg-on-media/70 text-[11px] font-bold uppercase tracking-[0.22em]">
             {heroPhoto.city}, California
           </p>
@@ -156,12 +157,13 @@ const marqueeItems = [
           </div>
         </div>
       </div>
+      </div>
     </div>
 
     <!-- The line that used to be a row of bullet points under the headline.
          As a rule under the photograph it carries the same four facts without
          asking for a third of the first screen. -->
-    <div class="bg-surface border-b border-hairline">
+    <div class="bg-surface">
       <div
         class="mx-auto max-w-6xl px-4 sm:px-6 py-4 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3 text-[13px] text-fg-muted"
       >
@@ -208,7 +210,7 @@ const marqueeItems = [
   </section>
 
   <!-- BEFORE / AFTER SHOWCASE -->
-  <section class="grain py-16 sm:py-24 bg-surface-dark relative overflow-hidden">
+  <section class="py-16 sm:py-24 bg-surface-sunken/60 border-y border-hairline relative overflow-hidden">
     <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
       <div class="grid lg:grid-cols-[380px_1fr] gap-12 items-start">
         <div class="lg:sticky lg:top-28">
@@ -216,7 +218,6 @@ const marqueeItems = [
             eyebrow="Before and after"
             title="The same room, photographed twice"
             text="Every pair below was shot on real Sacramento area projects. Pick a project, pull the slider, and see exactly what we walked into and what we left behind."
-            light
           />
           <div class="reveal mt-8">
             <a
@@ -236,7 +237,7 @@ const marqueeItems = [
       </div>
 
       <div class="reveal mt-14">
-        <Stats dark />
+        <Stats dark={false} />
       </div>
     </div>
   </section>
@@ -308,7 +309,7 @@ const marqueeItems = [
           ];
           return (
             <li class={`m-rise ${spans[i] ?? ''}`} style={`--i:${i}`}>
-              <a href="/portfolio/" class="group relative block overflow-hidden rounded-media h-full">
+              <a href="/portfolio/" class="card-lift group relative block overflow-hidden rounded-media h-full">
                 <Image
                   src={photoImage(p.id)}
                   alt={p.alt}

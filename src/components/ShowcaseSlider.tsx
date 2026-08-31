@@ -113,7 +113,7 @@ export default function ShowcaseSlider({ pairs }: Props) {
             onClick={() => setActive(i)}
             className={`relative shrink-0 snap-start overflow-hidden rounded-media w-24 aspect-[4/3] transition-all cursor-pointer ${
               i === active
-                ? 'ring-2 ring-accent ring-offset-2 ring-offset-surface-dark'
+                ? 'ring-2 ring-accent ring-offset-2 ring-offset-surface'
                 : 'opacity-65 hover:opacity-100'
             }`}
           >

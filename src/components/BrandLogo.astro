@@ -2,14 +2,21 @@
 // The client's own logo, rebuilt as a live-text lockup so it stays crisp at
 // every size and on every ground. The original (WhatsApp, 17 Aug) is a JPG on
 // baked-in anthracite: two planks above the E, ESSENTIAL fading cream to
-// copper, FLOORING letterspaced in copper beneath. This mirrors it 1:1 and is
-// meant for DARK grounds, exactly like the original.
+// copper, FLOORING letterspaced in copper beneath. tone="dark" mirrors that
+// original 1:1 for anthracite grounds (footer); tone="light" re-inks the same
+// lockup for the white header, ink instead of cream, copper unchanged in
+// spirit but darkened to the on-light role so it keeps its contrast.
 interface Props {
   /** overall scale: header (compact) or footer (full, with the service line) */
   variant?: 'header' | 'footer';
+  /** the ground it sits on */
+  tone?: 'dark' | 'light';
 }
-const { variant = 'header' } = Astro.props;
+const { variant = 'header', tone = 'dark' } = Astro.props;
 const compact = variant === 'header';
+const onDark = tone === 'dark';
+const plankA = onDark ? 'var(--ef-fg-on-dark)' : 'var(--ef-ink-900)';
+const plankB = onDark ? 'var(--ef-accent-on-dark)' : 'var(--ef-accent-fill)';
 ---
 
 <span class={`inline-block leading-none select-none ${compact ? '' : 'pb-0.5'}`}>
@@ -22,21 +29,21 @@ const compact = variant === 'header';
     class="block mb-[3px]"
   >
     <g transform="rotate(-14 29 8)">
-      <rect x="1" y="2.2" width="34" height="3.4" fill="var(--ef-fg-on-dark)" />
-      <rect x="13" y="8.6" width="34" height="3.4" fill="var(--ef-accent-on-dark)" />
+      <rect x="1" y="2.2" width="34" height="3.4" fill={plankA} />
+      <rect x="13" y="8.6" width="34" height="3.4" fill={plankB} />
     </g>
   </svg>
   <span
-    class={`block font-display font-extrabold uppercase tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-r from-fg-on-dark from-55% to-accent-on-dark ${compact ? 'text-[21px]' : 'text-[26px]'}`}
+    class={`block font-display font-extrabold uppercase tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-r from-55% ${onDark ? 'from-fg-on-dark to-accent-on-dark' : 'from-fg to-accent-on-light'} ${compact ? 'text-[21px]' : 'text-[26px]'}`}
   >
     Essential
   </span>
   <span
-    class={`mt-[3px] flex items-center gap-2 text-accent-on-dark font-semibold uppercase ${compact ? 'text-[9.5px] tracking-[0.34em]' : 'text-[11px] tracking-[0.4em]'}`}
+    class={`mt-[3px] flex items-center gap-2 font-semibold uppercase ${onDark ? 'text-accent-on-dark' : 'text-accent-on-light'} ${compact ? 'text-[9.5px] tracking-[0.34em]' : 'text-[11px] tracking-[0.4em]'}`}
   >
-    <span class="h-px flex-1 bg-accent-on-dark/60" aria-hidden="true"></span>
+    <span class={`h-px flex-1 ${onDark ? 'bg-accent-on-dark/60' : 'bg-accent-on-light/50'}`} aria-hidden="true"></span>
     Flooring
-    <span class="h-px flex-1 bg-accent-on-dark/60" aria-hidden="true"></span>
+    <span class={`h-px flex-1 ${onDark ? 'bg-accent-on-dark/60' : 'bg-accent-on-light/50'}`} aria-hidden="true"></span>
   </span>
   {!compact && (
     <span class="mt-2 block text-[8.5px] leading-[1.7] tracking-[0.18em] uppercase text-fg-on-dark/60 font-medium">

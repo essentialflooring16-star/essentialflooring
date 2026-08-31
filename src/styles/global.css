@@ -19,37 +19,39 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── LAYER 1: primitives ─────────────────────────────────────────────────── */
-/* DIRECTION A, "Proof": bone ground, heavy grotesque, brick red.
-   The before/after pairs are the design. Chosen over the dark direction
-   because the nearest competitor already owns dark + serif + copper, and
-   because brick red on bone clears the contrast bar that copper did not. */
+/* DIRECTION D, "Gallery": white ground, ink type, the copper of the client's
+   own logo as the only colour. The register is taken from recent.design
+   itself, measured in the browser: pure white page, near-black text, quiet
+   13px UI labels, cards with an 8px radius and no heavy shadows. Directions
+   A-C live in docs/DESIGN.md. Anthracite (#16150f, the ground the client's
+   logo was designed on) survives only as the footer and the closing band. */
 :root {
   /* light end of the neutral ramp */
-  --ef-ground:            #efece4; /* page ground                            */
-  --ef-ground-tint:       #e6e2d6; /* tinted band, chip, placeholder         */
-  --ef-ground-raised:     #f8f7f3; /* card surface                           */
-  --ef-ground-field:      #e6e2d6; /* input fill                             */
-  --ef-rule:              #d5d0c1; /* hairline on light                      */
+  --ef-ground:            #ffffff; /* page ground                            */
+  --ef-ground-tint:       #f5f4f0; /* tinted band, chip, placeholder         */
+  --ef-ground-raised:     #ffffff; /* card surface (hairline does the work)  */
+  --ef-ground-field:      #f5f4f0; /* input fill                             */
+  --ef-rule:              #e9e7e2; /* hairline on light                      */
 
   /* ink end of the neutral ramp */
-  --ef-ink-900:           #16150f; /* strongest text on light                */
-  --ef-ink-700:           #33312a; /* body copy on light                     */
-  --ef-ink-500:           #5d594d; /* muted text on light                    */
+  --ef-ink-900:           #131211; /* strongest text on light                */
+  --ef-ink-700:           #37342f; /* body copy on light                     */
+  --ef-ink-500:           #6f6a61; /* muted text on light                    */
 
-  /* the inverse region: dark sections and dark controls */
+  /* the inverse region: the anthracite the logo lives on */
   --ef-dark-900:          #16150f; /* dark region ground                     */
-  --ef-dark-control:      #16150f; /* solid dark chip or button on light     */
-  --ef-dark-control-hi:   #2c2a22; /* its hover                              */
-  --ef-light-50:          #efece4; /* text, rules and veils on dark          */
+  --ef-dark-control:      #131211; /* solid dark chip or button on light     */
+  --ef-dark-control-hi:   #2b2925; /* its hover                              */
+  --ef-light-50:          #f5f4f0; /* text, rules and veils on dark          */
 
-  /* accent. White on #c8442a measures 4.87:1, so the primary button clears
-     WCAG AA. The old copper was 3.71:1 and did not. */
+  /* accent: the logo's copper family, one role per ground so AA holds.
+     White on #96602c measures 5.24:1. */
   --ef-accent:            #96602c;
   --ef-accent-hi:         #7d4f22;
   --ef-accent-light:      #8a5724; /* accent TEXT on a light ground          */
   --ef-accent-dark:       #d9a86c; /* accent TEXT or fill on a dark ground   */
   --ef-accent-display:    #b5773a;
-  --ef-accent-wash-pct:   14%;
+  --ef-accent-wash-pct:   10%;
   --ef-on-accent:         #ffffff;
 
   /* media. These sit over photographs, so they never follow the palette. */
@@ -60,14 +62,12 @@
   /* non-colour direction knobs */
   --ef-font-display: 'Archivo Variable', 'Archivo', Helvetica, Arial, sans-serif;
   --ef-font-body: 'Inter Variable', system-ui, sans-serif;
-  --ef-grain-opacity: 0.07;
-  /* Corner radius is a direction knob too. Direction A is squared off: the
-     heavy grotesque and the brick-cut planks fight rounded pills. A softer
-     direction just raises these three numbers. */
-  --ef-radius-btn: 0.25rem;   /* buttons, pills, chips                       */
-  --ef-radius-card: 0.375rem; /* cards, panels, inputs                       */
-  --ef-radius-media: 0.25rem; /* photos, video frames                        */
-  --ef-shadow-tint: 22 21 15;
+  --ef-grain-opacity: 0.05;
+  /* Soft gallery corners: 8px on media is recent.design's own card radius. */
+  --ef-radius-btn: 0.5rem;    /* buttons, pills, chips                       */
+  --ef-radius-card: 0.75rem;  /* cards, panels, inputs                       */
+  --ef-radius-media: 0.5rem;  /* photos, video frames                        */
+  --ef-shadow-tint: 25 22 18;
 }
 
 /* ── LAYER 2: semantic roles ─────────────────────────────────────────────── */
@@ -330,6 +330,22 @@ html.js .reveal-scale.is-visible {
   }
 }
 
+/* Gallery-card hover: the whole card rises a touch and its shadow deepens,
+   the same move recent.design cards make. Composes with the image zoom the
+   grids already have. */
+.card-lift {
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) {
+  .card-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lift);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-lift, .card-lift:hover { transform: none; }
+}
+
 /* Underline sweep for nav links */
 .nav-link {
   position: relative;
@@ -341,7 +357,7 @@ html.js .reveal-scale.is-visible {
   bottom: -4px;
   width: 100%;
   height: 2px;
-  background: var(--ef-accent-on-dark);
+  background: var(--ef-accent-fill);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.25s ease;
