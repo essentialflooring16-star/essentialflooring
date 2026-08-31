@@ -16,7 +16,7 @@ const { variant = 'header', tone = 'dark' } = Astro.props;
 const compact = variant === 'header';
 const onDark = tone === 'dark';
 const plankA = onDark ? 'var(--ef-fg-on-dark)' : 'var(--ef-ink-900)';
-const plankB = onDark ? 'var(--ef-accent-on-dark)' : 'var(--ef-accent-fill)';
+const plankB = onDark ? 'var(--ef-accent-on-dark)' : 'var(--ef-accent-display)';
 ---
 
 <span class={`inline-block leading-none select-none ${compact ? '' : 'pb-0.5'}`}>
@@ -34,16 +34,16 @@ const plankB = onDark ? 'var(--ef-accent-on-dark)' : 'var(--ef-accent-fill)';
     </g>
   </svg>
   <span
-    class={`block font-brand font-extrabold uppercase tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-r from-55% ${onDark ? 'from-fg-on-dark to-accent-on-dark' : 'from-fg to-accent-on-light'} ${compact ? 'text-[21px]' : 'text-[26px]'}`}
+    class={`block font-brand font-extrabold uppercase tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-r from-55% ${onDark ? 'from-fg-on-dark to-accent-on-dark' : 'from-fg to-accent-display'} ${compact ? 'text-[21px]' : 'text-[26px]'}`}
   >
     Essential
   </span>
   <span
-    class={`mt-[3px] flex items-center gap-2 font-semibold uppercase ${onDark ? 'text-accent-on-dark' : 'text-accent-on-light'} ${compact ? 'text-[9.5px] tracking-[0.34em]' : 'text-[11px] tracking-[0.4em]'}`}
+    class={`mt-[3px] flex items-center gap-2 font-semibold uppercase ${onDark ? 'text-accent-on-dark' : 'text-accent-display'} ${compact ? 'text-[9.5px] tracking-[0.34em]' : 'text-[11px] tracking-[0.4em]'}`}
   >
-    <span class={`h-px flex-1 ${onDark ? 'bg-accent-on-dark/60' : 'bg-accent-on-light/50'}`} aria-hidden="true"></span>
+    <span class={`h-px flex-1 ${onDark ? 'bg-accent-on-dark/60' : 'bg-accent-display/50'}`} aria-hidden="true"></span>
     Flooring
-    <span class={`h-px flex-1 ${onDark ? 'bg-accent-on-dark/60' : 'bg-accent-on-light/50'}`} aria-hidden="true"></span>
+    <span class={`h-px flex-1 ${onDark ? 'bg-accent-on-dark/60' : 'bg-accent-display/50'}`} aria-hidden="true"></span>
   </span>
   {!compact && (
     <span class="mt-2 block text-[8.5px] leading-[1.7] tracking-[0.18em] uppercase text-fg-on-dark/60 font-medium">

@@ -19,59 +19,63 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── LAYER 1: primitives ─────────────────────────────────────────────────── */
-/* DIRECTION E, "Atelier verde": deep forest green, warm paper, the copper of
-   the client's own logo, and a designer serif for display. The palette anchor
-   is measured, not invented: rgb(40,78,54) = #284e36 is the brand green of
-   tedtodd.co.uk, the reference class for premium wood flooring. Green + cream
-   + oak is the heritage register of that industry, no Sacramento competitor
-   uses it, and every photograph in the library is warm oak, which sits
-   naturally inside it. Directions A-D live in docs/DESIGN.md and git. */
+/* DIRECTION E2, "Verde si aur": a strict three-hue system, per the client
+   brief of 31 Aug — three colours that combine, everything else a lighter or
+   darker step of the same three. The muddy coffee copper is gone entirely;
+   it fought the green. The triad:
+
+     1. FOREST GREEN  - identity. Dark bands, links, accent text, the ink
+                        itself is a green-cast near-black, so even body copy
+                        belongs to the family.
+     2. CREAM / PAPER - ground. Every surface is a step of it.
+     3. HONEY GOLD    - action. Buttons and highlights only. It is the gold
+                        of the client's logo cleaned up one step, and gold on
+                        green is the oldest luxury pairing there is.
+
+   Buttons are gold with GREEN-BLACK text (6.3:1): white on this gold fails
+   AA, dark text on gold passes and reads more expensive anyway. */
 :root {
-  /* light end of the neutral ramp: warm paper, not white */
-  --ef-ground:            #f5f2e9; /* page ground                            */
-  --ef-ground-tint:       #eae5d6; /* tinted band, chip, placeholder         */
-  --ef-ground-raised:     #fdfcf7; /* card surface                           */
-  --ef-ground-field:      #eae5d6; /* input fill                             */
-  --ef-rule:              #dcd5c2; /* hairline on light                      */
+  /* CREAM family: light end */
+  --ef-ground:            #faf8f1; /* page ground                            */
+  --ef-ground-tint:       #f0ecdd; /* tinted band, chip, placeholder         */
+  --ef-ground-raised:     #ffffff; /* card surface                           */
+  --ef-ground-field:      #f0ecdd; /* input fill                             */
+  --ef-rule:              #e3ddc9; /* hairline on light                      */
 
-  /* ink end of the neutral ramp: green-cast near-black, not neutral gray */
-  --ef-ink-900:           #1a231e; /* strongest text on light                */
-  --ef-ink-700:           #36423b; /* body copy on light                     */
-  --ef-ink-500:           #646f67; /* muted text on light                    */
+  /* GREEN family: ink end (green-cast, not neutral) */
+  --ef-ink-900:           #1b2a22; /* strongest text on light                */
+  --ef-ink-700:           #35473c; /* body copy on light                     */
+  --ef-ink-500:           #5f6f65; /* muted text on light                    */
 
-  /* the inverse region: the forest green */
-  --ef-dark-900:          #21402d; /* dark region ground (Ted Todd's #284e36,
-                                      deepened one step so cream text and the
-                                      copper accent both clear AA on it)      */
-  --ef-dark-control:      #21402d; /* solid dark chip or button on light     */
-  --ef-dark-control-hi:   #2c5039; /* its hover                              */
-  --ef-light-50:          #f2efe2; /* text, rules and veils on dark          */
+  /* GREEN family: the dark region */
+  --ef-dark-900:          #1c4632; /* dark band ground                       */
+  --ef-dark-control:      #1c4632; /* solid dark chip or button on light     */
+  --ef-dark-control-hi:   #275c42; /* its hover                              */
+  --ef-light-50:          #f4f1e6; /* cream text, rules and veils on dark    */
 
-  /* accent: the client's logo copper. White on #96602c is 5.24:1. */
-  --ef-accent:            #96602c;
-  --ef-accent-hi:         #7d4f22;
-  --ef-accent-light:      #8a5724; /* accent TEXT on a light ground          */
-  --ef-accent-dark:       #d9a86c; /* accent TEXT or fill on the green       */
-  --ef-accent-display:    #b5773a;
-  --ef-accent-wash-pct:   12%;
-  --ef-on-accent:         #ffffff;
+  /* GOLD family: action only */
+  --ef-accent:            #d9a441; /* button fill                            */
+  --ef-accent-hi:         #c5922f; /* its hover                              */
+  --ef-accent-light:      #2c5a41; /* accent TEXT on light = the GREEN role  */
+  --ef-accent-dark:       #e3b154; /* gold text or fill on the green         */
+  --ef-accent-display:    #a8781f; /* deep gold for big numerals on light    */
+  --ef-accent-wash-pct:   14%;
+  --ef-on-accent:         #1b2a22; /* dark label on the gold button, 6.3:1   */
 
   /* media. These sit over photographs, so they never follow the palette. */
-  --ef-scrim:             #16201a;
+  --ef-scrim:             #14231b;
   --ef-scrim-media:       #000000;
   --ef-on-media:          #ffffff;
 
   /* non-colour direction knobs */
   --ef-font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
   --ef-font-body: 'Inter Variable', system-ui, sans-serif;
-  /* The client's logo lockup is a grotesque wordmark and must NOT follow the
-     serif: it keeps Archivo through its own role. */
   --ef-font-brand: 'Archivo Variable', 'Archivo', Helvetica, Arial, sans-serif;
-  --ef-grain-opacity: 0.06;
-  --ef-radius-btn: 0.25rem;   /* buttons, pills, chips                       */
-  --ef-radius-card: 0.5rem;   /* cards, panels, inputs                       */
-  --ef-radius-media: 0.375rem;/* photos, video frames                        */
-  --ef-shadow-tint: 26 35 29;
+  --ef-grain-opacity: 0.05;
+  --ef-radius-btn: 0.25rem;
+  --ef-radius-card: 0.5rem;
+  --ef-radius-media: 0.375rem;
+  --ef-shadow-tint: 27 35 25;
 }
 
 /* ── LAYER 2: semantic roles ─────────────────────────────────────────────── */
@@ -351,6 +355,26 @@ html.js .reveal-scale.is-visible {
 }
 @media (prefers-reduced-motion: reduce) {
   .card-lift, .card-lift:hover { transform: none; }
+}
+
+/* The hero maker's stamp turns once every 28 seconds. */
+@keyframes stamp-spin {
+  to { transform: rotate(360deg); }
+}
+.animate-stamp-spin {
+  animation: stamp-spin 28s linear infinite;
+  transform-origin: center;
+}
+
+/* Text links and buttons that end in an arrow: the arrow leads on hover. */
+.arrow-link svg {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.arrow-link:hover svg {
+  transform: translateX(4px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .arrow-link:hover svg { transform: none; }
 }
 
 /* Underline sweep for nav links */

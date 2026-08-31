@@ -62,7 +62,7 @@ const heroPhoto = photoById('hardwood-refinishing-02');
 const previewPhotos = photos
   .filter((p) => p.state === 'after')
   .sort((a, b) => b.quality - a.quality)
-  .slice(0, 7);
+  .slice(0, 8);
 
 const faqPreview = (faqData as { q: string; a: string }[]).slice(0, 4);
 
@@ -102,7 +102,25 @@ const marqueeItems = [
        framed in the paper ground, with the place label pinned to its corner.
        The h1 keeps the search terms: the work and the region, by name. -->
   <section class="relative bg-surface overflow-hidden">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 pt-12 sm:pt-16 lg:pt-20">
+    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 pt-12 sm:pt-16 lg:pt-20">
+      <!-- Maker's stamp: fills the right of the statement on wide screens,
+           turning once every 28s. Pure SVG, three palette colours only. -->
+      <div class="hidden lg:block absolute right-6 top-24 size-[164px] select-none" aria-hidden="true">
+        <svg viewBox="0 0 164 164" class="size-full animate-stamp-spin motion-reduce:animate-none">
+          <defs>
+            <path id="stamp-arc" d="M82 12a70 70 0 1 1 0 140a70 70 0 1 1 0-140" />
+          </defs>
+          <circle cx="82" cy="82" r="80" fill="none" stroke="var(--ef-rule)" stroke-width="1" />
+          <text class="font-display" fill="var(--ef-accent-on-light)" font-size="13.5" font-weight="600" letter-spacing="3.4">
+            <textPath href="#stamp-arc" startOffset="0">EST. 2023 · SACRAMENTO CA · LICENSED &amp; INSURED ·</textPath>
+          </text>
+        </svg>
+        <svg viewBox="0 0 28 28" class="absolute inset-0 m-auto size-11" fill="none">
+          <rect x="4" y="9" width="20" height="4.5" rx="1" transform="rotate(-14 14 11)" fill="var(--ef-accent-fill)" />
+          <rect x="4" y="16.5" width="20" height="4.5" rx="1" transform="rotate(-14 14 18.5)" fill="var(--ef-dark-control)" />
+        </svg>
+      </div>
+
       <p class="m-intro eyebrow on-light">Sacramento flooring contractor</p>
       <h1
         style="--i:1"
@@ -114,7 +132,7 @@ const marqueeItems = [
       <div class="m-intro mt-8 sm:mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" style="--i:2">
         <a
           href="/contact/"
-          class="inline-flex items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-7 py-3.5 text-[15px] transition-colors shadow-card"
+          class="arrow-link inline-flex items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-7 py-3.5 text-[15px] transition-colors shadow-card"
         >
           Get a free estimate
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
@@ -190,7 +208,7 @@ const marqueeItems = [
         />
         <a
           href="/services/"
-          class="reveal shrink-0 inline-flex items-center gap-2 font-semibold text-accent-on-dark hover:text-fg-on-dark transition-colors"
+          class="reveal arrow-link shrink-0 inline-flex items-center gap-2 font-semibold text-accent-on-dark hover:text-fg-on-dark transition-colors"
         >
           All 16 services
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
@@ -224,7 +242,7 @@ const marqueeItems = [
           <div class="reveal mt-8">
             <a
               href="/portfolio/"
-              class="inline-flex items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-6 py-3 transition-colors"
+              class="arrow-link inline-flex items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-6 py-3 transition-colors"
             >
               See all 12 pairs
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
@@ -258,6 +276,23 @@ const marqueeItems = [
             eyebrow="Process"
             title="From the first call to the final walkthrough"
           />
+          <figure class="m-rise hidden lg:block mt-10 rounded-card bg-surface-raised p-2.5 pb-0 shadow-card max-w-[300px]">
+            <span class="block overflow-hidden rounded-media">
+              <Image
+                src={photoImage('stairs-01')}
+                alt={photoById('stairs-01').alt}
+                widths={[300, 600]}
+                sizes="300px"
+                class="aspect-[4/5] w-full object-cover"
+                format="webp"
+                quality={70}
+              />
+            </span>
+            <figcaption class="px-2.5 py-3.5 text-[13px] text-fg-muted">
+              <span class="block font-display font-medium text-[15px] text-fg">Every job, owner on site</span>
+              Alexandru measures, quotes and installs himself.
+            </figcaption>
+          </figure>
         </div>
         <ol class="border-t border-hairline">
           {steps.map((step, i) => (
@@ -289,7 +324,7 @@ const marqueeItems = [
         />
         <a
           href="/portfolio/"
-          class="reveal shrink-0 inline-flex items-center gap-2 font-semibold text-accent-on-light hover:text-fg transition-colors"
+          class="reveal arrow-link shrink-0 inline-flex items-center gap-2 font-semibold text-accent-on-light hover:text-fg transition-colors"
         >
           Browse the full portfolio
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
@@ -300,13 +335,15 @@ const marqueeItems = [
 
       <ul class="grid grid-cols-2 lg:grid-cols-4 auto-rows-[150px] sm:auto-rows-[190px] gap-3 sm:gap-4">
         {previewPhotos.map((p, i) => {
+          // 4+2+1+1+1+1+4+2 = 16 cells: the 4-wide grid closes with no hole.
           const spans = [
             'col-span-2 row-span-2',
             'row-span-2',
             '',
             '',
-            'row-span-2',
             '',
+            '',
+            'col-span-2 row-span-2',
             'col-span-2',
           ];
           return (
