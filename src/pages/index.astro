@@ -442,7 +442,7 @@ const steps = [
          deci harta e centrata pe Sacramento in loc sa arate un pin inventat.
          Se incarca lazy, deci nu costa nimic pana cand sectiunea se apropie. -->
     <iframe
-      class="absolute inset-0 -z-10 h-full w-full border-0 pointer-events-none [filter:grayscale(1)_sepia(0.35)_saturate(0.65)_contrast(0.95)]"
+      class="absolute -z-10 border-0 pointer-events-none [filter:grayscale(1)_sepia(0.35)_saturate(0.65)_contrast(0.95)] -top-16 -left-16 -right-16 bottom-0 w-[calc(100%+8rem)] h-[calc(100%+4rem)]"
       src="https://www.google.com/maps?q=Sacramento,+CA&z=10&output=embed"
       loading="lazy"
       referrerpolicy="no-referrer-when-downgrade"
@@ -450,7 +450,7 @@ const steps = [
       aria-hidden="true"
       tabindex="-1"
     ></iframe>
-    <div class="absolute inset-0 -z-10 bg-surface-sunken/88" aria-hidden="true"></div>
+    <div class="absolute inset-0 -z-10 bg-surface-sunken/72" aria-hidden="true"></div>
 
     <div class="relative mx-auto max-w-6xl px-4 sm:px-6 text-center">
       {hasReviews && (
