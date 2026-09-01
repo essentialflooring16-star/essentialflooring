@@ -1,11 +1,21 @@
 ---
 import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import FaqList from '../../components/FaqList.astro';
 import { SITE, SERVICES } from '../../data/site';
 import { photos, photoImage, photoById } from '../../lib/photos';
+// Stock behind the title only. The client's phone photos sit low in a
+// full-bleed hero, and carpet and laminate had no photos of their own at all,
+// so each page opens on a licensed room shot of that material instead. The
+// "related" strip below stays real work. Sources: docs/PHOTO-CREDITS.md.
+import stockHardwood from '../../assets/stock/hero-hardwood.jpg';
+import stockLvp from '../../assets/stock/hero-lvp.jpg';
+import stockStairs from '../../assets/stock/hero-stairs.jpg';
+import stockLaminate from '../../assets/stock/hero-laminate.jpg';
+import stockCarpet from '../../assets/stock/hero-carpet.jpg';
 import servicesCopy from '../../data/services-copy.json';
 
 export function getStaticPaths() {
@@ -58,14 +68,26 @@ const serviceSchema = {
 };
 
 const otherServices = SERVICES.filter((s) => s.slug !== page.slug);
+
+const STOCK_HERO: Record<string, { src: ImageMetadata; alt: string }> = {
+  'hardwood-floor-refinishing': { src: stockHardwood, alt: 'Wide plank hardwood floor in a bright bedroom with a mountain view' },
+  'lvp-vinyl-plank-flooring': { src: stockLvp, alt: 'Empty living room with new plank flooring and a sliding glass door' },
+  'stairs-installation-refinishing': { src: stockStairs, alt: 'Oak staircase with white balusters seen from the landing' },
+  'laminate-flooring': { src: stockLaminate, alt: 'Bedroom corner with dark plank flooring and a beige nightstand' },
+  'carpet-installation': { src: stockCarpet, alt: 'Close-up of dark grey woven textile' },
+};
+const hero = STOCK_HERO[page.slug] ?? {
+  src: photoImage(meta.image),
+  alt: 'imageAlt' in meta ? meta.imageAlt : photoById(meta.image).alt,
+};
 ---
 
 <Base title={page.metaTitle} description={page.metaDescription} schema={[serviceSchema]}>
   <!-- HERO -->
   <section class="relative overflow-hidden bg-surface-dark">
     <Image
-      src={photoImage(meta.image)}
-      alt={'imageAlt' in meta ? meta.imageAlt : photoById(meta.image).alt}
+      src={hero.src}
+      alt={hero.alt}
       widths={[768, 1280, 1920]}
       sizes="100vw"
       class="absolute inset-0 h-full w-full object-cover opacity-35"

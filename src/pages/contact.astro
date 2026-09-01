@@ -1,12 +1,12 @@
 ---
 import { Image } from 'astro:assets';
+// Stock room shot for the card, not one of our jobs. Source: docs/PHOTO-CREDITS.md.
+import contactRoom from '../assets/stock/contact-room.jpg';
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import ContactForm from '../components/ContactForm.tsx';
 import { SITE } from '../data/site';
-import { photoImage, photoById } from '../lib/photos';
 
-const contactPhoto = photoById('hardwood-refinishing-03');
 ---
 
 <Base
@@ -82,8 +82,8 @@ const contactPhoto = photoById('hardwood-refinishing-03');
 
           <div class="mt-10 relative rounded-media overflow-hidden max-w-lg shadow-lift reveal-scale">
             <Image
-              src={photoImage(contactPhoto.id)}
-              alt={contactPhoto.alt}
+              src={contactRoom}
+              alt="Sunlit living room with a hardwood floor and a wooden staircase"
               widths={[480, 760]}
               sizes="(min-width:1024px) 40vw, 100vw"
               class="w-full aspect-[16/9] object-cover"
