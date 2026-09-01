@@ -5,14 +5,14 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import CtaBand from '../components/CtaBand.astro';
 import FaqList from '../components/FaqList.astro';
 import { SITE } from '../data/site';
-import { photoImage, photoById } from '../lib/photos';
+// Stock, not a job of ours: hands comparing flooring samples, which is what
+// this page is about. Pexels #6583355 (Pexels License, commercial use, no
+// attribution required); source and photographer in docs/PHOTO-CREDITS.md.
+import faqSamples from '../assets/stock/faq-samples.jpg';
 import faqData from '../data/faq.json';
 
 const items = faqData as { q: string; a: string }[];
 
-// Pagina era numai text aliniat la stanga. Acum are aceeasi rama de hartie ca
-// tablourile de servicii, cu o poza reala din portofoliu langa titlu.
-const heroPhoto = photoById('lvp-vinyl-03');
 ---
 
 <Base
@@ -46,8 +46,8 @@ const heroPhoto = photoById('lvp-vinyl-03');
         <figure class="reveal lg:w-[420px] rounded-card bg-surface-raised p-2.5 shadow-card">
           <div class="parallax overflow-hidden rounded-media">
             <Image
-              src={photoImage(heroPhoto.file)}
-              alt={heroPhoto.alt}
+              src={faqSamples}
+              alt="Two people comparing oak and walnut flooring samples on a table"
               widths={[420, 840]}
               sizes="(min-width: 1024px) 420px, 100vw"
               class="parallax-img h-full w-full object-cover aspect-[4/3]"
