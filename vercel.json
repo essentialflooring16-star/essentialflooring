@@ -2,6 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "astro",
   "trailingSlash": true,
+  "rewrites": [
+    {
+      "source": "/api/:fn/",
+      "destination": "/api/:fn"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

@@ -1,3 +1,5 @@
+import { leadEmailHtml, leadEmailSubject, leadEmailText } from './_email';
+
 // Vercel serverless function: primeste formularul de contact, salveaza cererea
 // in Supabase si trimite email prin Resend.
 //
@@ -33,15 +35,6 @@ const json = (body: unknown, status: number) =>
     status,
     headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
   });
-
-function esc(s: string): string {
-  return s
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
 
 function clientIp(req: Request): string {
   const fwd = req.headers.get('x-forwarded-for') ?? '';
@@ -171,26 +164,16 @@ export default async function handler(req: Request): Promise<Response> {
       : json({ error: 'Email not configured' }, 503);
   }
 
-  const rows = [
-    ['Name', name],
-    ['Phone', phone],
-    ['Email', validEmail || 'not provided'],
-    ['City', city || 'not provided'],
-    ['Service', service || 'not chosen'],
-  ]
-    .map(
-      ([k, v]) =>
-        `<tr><td style="padding:6px 14px 6px 0;color:#5d594d;white-space:nowrap"><strong>${k}</strong></td><td style="padding:6px 0">${esc(v)}</td></tr>`,
-    )
-    .join('');
+  // Ora locala a clientului, nu UTC. El citeste emailul in Sacramento.
+  const receivedAt = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles',
+    dateStyle: 'full',
+    timeStyle: 'short',
+  }).format(new Date());
 
-  const html = `
-    <div style="font-family:Arial,sans-serif;max-width:560px">
-      <h2 style="color:#16150f">New estimate request from the website</h2>
-      <table style="font-size:15px;border-collapse:collapse">${rows}</table>
-      ${message ? `<p style="font-size:15px;background:#e6e2d6;padding:12px 16px;border-radius:8px;color:#16150f">${esc(message)}</p>` : ''}
-      <p style="font-size:12px;color:#999">Sent automatically by essentialflooringinc.com</p>
-    </div>`;
+  const lead = { name, phone, email: validEmail, city, service, message, receivedAt };
+  const html = leadEmailHtml(lead);
+  const text = leadEmailText(lead);
 
   try {
     const res = await fetch('https://api.resend.com/emails', {
@@ -199,8 +182,9 @@ export default async function handler(req: Request): Promise<Response> {
       body: JSON.stringify({
         from,
         to: [to],
-        subject: `New estimate request: ${name}${city ? ` (${city})` : ''}`,
+        subject: leadEmailSubject(lead),
         html,
+        text,
         ...(validEmail ? { reply_to: validEmail } : {}),
       }),
     });

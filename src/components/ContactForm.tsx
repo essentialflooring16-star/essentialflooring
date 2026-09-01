@@ -46,7 +46,7 @@ export default function ContactForm() {
 
     // Primary channel: the serverless function stores the lead AND emails it.
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch('/api/contact/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...lead, elapsedMs: Date.now() - openedAt.current }),
