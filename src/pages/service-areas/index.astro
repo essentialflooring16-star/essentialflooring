@@ -1,76 +1,111 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import CtaBand from '../../components/CtaBand.astro';
-import { CORE_CITIES, EXTENDED_CITIES } from '../../data/site';
-import citiesCopy from '../../data/cities.json';
+import SectionHeading from '../../components/SectionHeading.astro';
+import Icon from '../../components/Icon.astro';
+import { SITE, CORE_CITIES, EXTENDED_CITIES, ALL_CITIES } from '../../data/site';
+import { photoById, photoImage, CATEGORY_LABELS, type Photo } from '../../lib/photos';
 
-const blurbs = new Map(
-  (citiesCopy as any[]).map((c) => [c.slug, c.metaDescription as string]),
-);
+// Four finished jobs, one per town, picked by hand rather than by score: the
+// top four by quality would be three staircases. Together they trace a line
+// east out of Sacramento along Highway 50, so the row reads like pins on the
+// map behind it. Each card links to the town's own page.
+const jobIds = ['hardwood-refinishing-01', 'lvp-vinyl-01', 'stairs-15', 'stairs-04'];
+const jobs = jobIds.map((id) => {
+  const p = photoById(id) as Photo & { city?: string };
+  const town = ALL_CITIES.find((c) => c.city === p.city);
+  return {
+    ...p,
+    city: p.city ?? 'Sacramento',
+    href: town ? `/service-areas/${town.slug}/` : '/portfolio/',
+    label: CATEGORY_LABELS[p.category] ?? 'Flooring',
+  };
+});
+
+const townCount = ALL_CITIES.length;
 ---
 
 <Base
   title="Flooring Service Areas Near Sacramento | Essential Flooring"
-  description="Essential Flooring installs and refinishes floors across the Sacramento region: Roseville, Folsom, Citrus Heights, Carmichael and more. Free estimates."
+  description={`Licensed flooring contractor working in ${townCount} towns across Sacramento, Placer, El Dorado, Yolo and Sutter counties: Roseville, Folsom, Elk Grove, Carmichael and more.`}
 >
-  <section class="pt-10 pb-20">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+  <!-- HERO ON THE MAP
+       The map is the ground, not a widget: the same decorative, untouchable
+       embed the home page uses, pulled back to zoom 9 so the whole ring of
+       towns is inside the frame. The veil keeps the type readable. The four
+       job photographs sit on the map in paper mats, one per town. -->
+  <section class="relative isolate overflow-hidden bg-surface-sunken">
+    <iframe
+      class="absolute -top-16 -left-16 -right-16 bottom-0 w-[calc(100%+8rem)] h-[calc(100%+4rem)] -z-10 border-0 pointer-events-none [filter:grayscale(1)_sepia(0.35)_saturate(0.65)_contrast(0.95)]"
+      src="https://www.google.com/maps?q=Sacramento,+CA&z=9&output=embed"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      title="Map of the Sacramento area"
+      aria-hidden="true"
+      tabindex="-1"
+    ></iframe>
+    <div class="absolute inset-0 -z-10 bg-surface-sunken/88" aria-hidden="true"></div>
+
+    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 pt-10 pb-14 sm:pb-20">
       <Breadcrumbs crumbs={[{ label: 'Service Areas' }]} />
-      <div class="mt-8 mb-12 max-w-2xl">
-        <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-fg">
-          Where we work
+
+      <div class="mt-8 sm:mt-10 max-w-2xl">
+        <h1
+          class="m-intro font-display font-semibold text-4xl sm:text-5xl lg:text-[56px] leading-[1.06] tracking-tight text-fg [text-wrap:balance]"
+          style="--i:0"
+        >
+          Where we work <span class="accent-italic">around Sacramento</span>
         </h1>
-        <p class="mt-5 text-[17px] leading-relaxed text-fg-muted">
-          Essential Flooring is based in Sacramento and works across the region every week.
-          Pick your city below to see how we can help with hardwood refinishing, LVP,
-          laminate and carpet where you live.
+        <p class="m-intro mt-5 text-[17px] leading-relaxed text-fg-muted" style="--i:1">
+          Based in Sacramento, working in homes across Sacramento, Placer, El Dorado,
+          Yolo and Sutter counties.
+        </p>
+        <p class="m-intro mt-6 flex flex-wrap items-center gap-x-7 gap-y-3 text-[15px]" style="--i:2">
+          <a
+            href="#towns"
+            class="arrow-link inline-flex items-center gap-2 min-h-11 font-semibold text-accent-on-light hover:text-fg transition-colors"
+          >
+            <Icon name="pin" size={20} class="shrink-0" />
+            All {townCount} towns
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+              <path d="M12 5v14m-6-6 6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
+          <a
+            href={SITE.phoneHref}
+            class="inline-flex items-center min-h-11 font-display font-medium text-fg text-[19px] underline-offset-[6px] decoration-accent/60 hover:underline"
+          >
+            {SITE.phone}
+          </a>
         </p>
       </div>
 
-      <h2 class="reveal font-display font-semibold text-2xl text-fg mb-6">Greater Sacramento</h2>
-      <ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {CORE_CITIES.map((c, i) => (
-          <li class="reveal" style={`transition-delay:${(i % 6) * 40}ms`}>
+      <ul class="m-stagger mt-12 sm:mt-16 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6" aria-label="Recent jobs by town">
+        {jobs.map((p, i) => (
+          <li style={`--i:${i}`}>
             <a
-              href={`/service-areas/${c.slug}/`}
-              class="group flex flex-col h-full rounded-card border border-hairline bg-surface-raised p-6 shadow-card hover:shadow-lift transition-shadow"
+              href={p.href}
+              class="card-lift group block rounded-card bg-surface-raised p-2.5 pb-0 shadow-card"
             >
-              <h3 class="font-display font-semibold text-[19px] text-fg group-hover:text-accent-on-light transition-colors">
-                {c.city}, CA
-              </h3>
-              <p class="mt-2 text-[14px] leading-relaxed text-fg-muted line-clamp-2">
-                {blurbs.get(c.slug)}
-              </p>
-              <span class="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold text-accent-on-light">
-                Flooring in {c.city}
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true">
-                  <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
+              <span class="parallax block overflow-hidden rounded-media">
+                <Image
+                  src={photoImage(p.file)}
+                  alt={p.alt}
+                  widths={[360, 540, 720]}
+                  sizes="(min-width:1024px) 270px, (min-width:640px) 45vw, 50vw"
+                  class="parallax-img aspect-[4/5] w-full object-cover"
+                  format="webp"
+                  quality={70}
+                />
               </span>
-            </a>
-          </li>
-        ))}
-      </ul>
-
-      <h2 class="reveal font-display font-semibold text-2xl text-fg mt-14 mb-3">
-        Surrounding areas
-      </h2>
-      <p class="reveal text-[15px] text-fg-muted max-w-2xl mb-6">
-        The same work, a little further out, across Placer, El Dorado, Yolo and Sutter counties.
-        Estimates in these areas are free too, with no call-out fee.
-      </p>
-      <ul class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {EXTENDED_CITIES.map((c) => (
-          <li class="reveal">
-            <a
-              href={`/service-areas/${c.slug}/`}
-              class="group block rounded-card border border-hairline bg-surface-sunken/50 p-5 hover:bg-surface-raised hover:shadow-card transition-all"
-            >
-              <h3 class="font-semibold text-[16px] text-fg group-hover:text-accent-on-light transition-colors">
-                {c.city}
-              </h3>
-              <span class="mt-1 block text-[13.5px] text-fg-muted">Free estimates</span>
+              <span class="block px-2.5 py-3.5">
+                <span class="block font-display font-medium text-[17px] sm:text-[19px] leading-snug text-fg group-hover:text-accent-on-light transition-colors">
+                  {p.city}
+                </span>
+                <span class="mt-0.5 block text-[12.5px] text-fg-muted">{p.label}</span>
+              </span>
             </a>
           </li>
         ))}
@@ -78,8 +113,74 @@ const blurbs = new Map(
     </div>
   </section>
 
-  <CtaBand
-    title="Not sure if we cover your street?"
-    text="If you are anywhere near Sacramento, the answer is almost certainly yes. Call us and ask."
-  />
+  <!-- DIRECTORY
+       The 24 towns as a ruled index, not cards: the heading holds the left
+       column while the names run past it in columns, each on its own hairline.
+       Every link keeps its trailing slash, these pages are the SEO backbone. -->
+  <section id="towns" class="scroll-mt-24 py-16 sm:py-24">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="grid lg:grid-cols-[280px_1fr] gap-8 lg:gap-16 items-start">
+        <div class="lg:sticky lg:top-28">
+          <SectionHeading
+            eyebrow="Inner ring"
+            title="Greater Sacramento"
+            text={`${CORE_CITIES.length} towns inside the metro, from Elk Grove up to Roseville.`}
+          />
+        </div>
+        <ul class="m-stagger border-t border-hairline grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6">
+          {CORE_CITIES.map((c, i) => (
+            <li class="border-b border-hairline" style={`--i:${i % 4}`}>
+              <a
+                href={`/service-areas/${c.slug}/`}
+                class="arrow-link group flex items-center justify-between gap-3 py-3.5 min-h-12 text-fg hover:text-accent-on-light focus-visible:text-accent-on-light transition-colors"
+              >
+                <span class="font-display font-medium text-[16px] sm:text-[18px] leading-snug">{c.city}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" class="shrink-0 text-fg-subtle group-hover:text-accent-on-light transition-colors" aria-hidden="true">
+                  <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="mt-16 sm:mt-24 grid lg:grid-cols-[280px_1fr] gap-8 lg:gap-16 items-start">
+        <div class="lg:sticky lg:top-28">
+          <SectionHeading
+            eyebrow="Outer ring"
+            title="Surrounding areas"
+            text={`${EXTENDED_CITIES.length} towns further out, from Yuba City down to Galt and from Davis over to El Dorado Hills.`}
+          />
+        </div>
+        <ul class="m-stagger border-t border-hairline grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6">
+          {EXTENDED_CITIES.map((c, i) => (
+            <li class="border-b border-hairline" style={`--i:${i % 4}`}>
+              <a
+                href={`/service-areas/${c.slug}/`}
+                class="arrow-link group flex items-center justify-between gap-3 py-3.5 min-h-12 text-fg hover:text-accent-on-light focus-visible:text-accent-on-light transition-colors"
+              >
+                <span class="font-display font-medium text-[16px] sm:text-[18px] leading-snug">{c.city}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" class="shrink-0 text-fg-subtle group-hover:text-accent-on-light transition-colors" aria-hidden="true">
+                  <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <p class="reveal mt-14 sm:mt-20 text-[17px] leading-relaxed text-fg-body max-w-2xl">
+        Not on the list? Call
+        <a
+          href={SITE.phoneHref}
+          class="font-semibold text-accent-on-light underline underline-offset-4 decoration-2 hover:text-fg transition-colors"
+        >
+          {SITE.phone}
+        </a>
+        and ask. If you are anywhere near Sacramento, the answer is usually yes.
+      </p>
+    </div>
+  </section>
+
+  <CtaBand />
 </Base>

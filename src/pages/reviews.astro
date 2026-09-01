@@ -1,8 +1,11 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import CtaBand from '../components/CtaBand.astro';
+import Icon from '../components/Icon.astro';
 import { SITE } from '../data/site';
+import { photoImage, photoById } from '../lib/photos';
 import { getReviews, ratingSummary, reviewDate } from '../lib/reviews';
 
 // Reviews are pasted into the admin cabinet and fetched at build time. The
@@ -10,6 +13,36 @@ import { getReviews, ratingSummary, reviewDate } from '../lib/reviews';
 // HTML. src/data/reviews.json remains the fallback before Supabase is wired.
 const reviews = await getReviews();
 const summary = ratingSummary(reviews);
+const hasReviews = summary !== null;
+
+// There are no reviews yet, and we do not invent any: fabricated testimonials
+// on a US commercial site fall under the FTC rule on fake reviews (16 CFR Part
+// 465). The empty state therefore leads with the work and asks for the review.
+//
+// Write-review link. A direct Google form link needs the Place ID
+// (https://search.google.com/local/writereview?placeid=ChIJ...). The client's
+// share.google link only resolves inside a signed-in Google session, so the
+// Place ID could not be read at build time. Paste it here once known and the
+// button jumps straight to the review form instead of the profile.
+const placeId: string | null = null;
+const reviewUrl = placeId
+  ? `https://search.google.com/local/writereview?placeid=${placeId}`
+  : SITE.googleProfile;
+
+// Hero photograph: the strongest finished shot in the library. It is a
+// portrait phone frame, so it sits on the same 4:5 paper mat the home page
+// uses for its portrait of the work, and nothing gets cropped away.
+const heroPhoto = photoById('stairs-15');
+
+// Three finished floors from three services, as the proof a reviews page
+// would otherwise be missing. All three are portrait frames, like the hero.
+const proofPhotos = ['hardwood-refinishing-01', 'lvp-vinyl-01', 'stairs-01'].map(photoById);
+
+const facts = [
+  { icon: 'shield', title: 'Licensed and insured', text: SITE.license },
+  { icon: 'hammer', title: `Founded ${SITE.founded}`, text: `${SITE.experienceYears}+ years of hands-on experience` },
+  { icon: 'ruler', title: 'Free written estimates', text: 'no hidden fees' },
+] as const;
 
 // AggregateRating is only emitted when real reviews exist. Publishing a rating
 // with nothing behind it would be a fabricated claim.
@@ -39,39 +72,79 @@ const schema = summary
 
 <Base
   title="Reviews | Essential Flooring, Sacramento CA"
-  description="Essential Flooring reviews and ratings on Google. Licensed Sacramento flooring contractor for hardwood refinishing, LVP, laminate and carpet installation."
+  description="Essential Flooring reviews live on Google. Licensed Sacramento flooring contractor for hardwood refinishing, LVP, laminate, stairs and carpet installation."
   schema={schema}
 >
-  <section class="pt-10 pb-20">
+  <!-- HERO: the statement on the left, a finished floor on the paper mat on
+       the right. One honest sentence says where the reviews live. -->
+  <section class="pt-10 pb-16 sm:pb-20">
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
       <Breadcrumbs crumbs={[{ label: 'Reviews' }]} />
-      <div class="mt-8 max-w-2xl">
-        <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-fg">
-          What our clients say
-        </h1>
-        <p class="mt-5 text-[17px] leading-relaxed text-fg-muted">
-          We would rather let the work and the people we worked for speak for us.
-          These reviews come from our Google Business profile.
-        </p>
-        {summary && (
-          <p class="mt-6 inline-flex items-center gap-3 rounded-btn border border-hairline bg-surface-raised px-4 py-2.5">
-            <span class="flex items-center gap-1 text-accent-display" aria-hidden="true">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill={i < Math.round(summary.average) ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.6">
-                  <path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6L2.5 9.5l6.6-.8z" />
-                </svg>
-              ))}
-            </span>
-            <span class="text-[15px] font-semibold text-fg">{summary.average.toFixed(1)}</span>
-            <span class="text-[14px] text-fg-muted">
-              from {summary.count} {summary.count === 1 ? 'review' : 'reviews'}
-            </span>
-          </p>
-        )}
-      </div>
 
-      {reviews.length > 0 ? (
-        <ul class="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div class="mt-8 grid lg:grid-cols-[1fr_auto] gap-10 lg:gap-14 items-center">
+        <div class="max-w-xl">
+          <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-fg [text-wrap:balance]">
+            {hasReviews ? 'What our clients say' : 'The work speaks first'}
+          </h1>
+          <p class="mt-5 text-[17px] leading-relaxed text-fg-muted">
+            {hasReviews
+              ? 'Every review below was left on our Google Business Profile by someone we worked for.'
+              : 'Our reviews live on Google. Here, the floors do the talking.'}
+          </p>
+          <a
+            href={SITE.googleProfile}
+            target="_blank"
+            rel="noopener"
+            class="arrow-link mt-6 inline-flex items-center gap-2 font-semibold text-accent-on-light hover:text-fg transition-colors"
+          >
+            See our Google Business Profile
+            <span class="sr-only">(opens in a new tab)</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+              <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
+          {summary && (
+            <p class="mt-5 inline-flex items-center gap-3 rounded-btn border border-hairline bg-surface-raised px-4 py-2.5">
+              <span class="flex items-center gap-1 text-accent-display" aria-hidden="true">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill={i < Math.round(summary.average) ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.6">
+                    <path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6L2.5 9.5l6.6-.8z" />
+                  </svg>
+                ))}
+              </span>
+              <span class="text-[15px] font-semibold text-fg">{summary.average.toFixed(1)}</span>
+              <span class="text-[14px] text-fg-muted">
+                from {summary.count} Google {summary.count === 1 ? 'review' : 'reviews'}
+              </span>
+            </p>
+          )}
+        </div>
+
+        <figure class="reveal lg:w-[380px] rounded-card bg-surface-raised p-2.5 pb-0 shadow-card">
+          <div class="parallax overflow-hidden rounded-media">
+            <Image
+              src={photoImage(heroPhoto.file)}
+              alt={heroPhoto.alt}
+              widths={[400, 800, 1200]}
+              sizes="(min-width: 1024px) 400px, 100vw"
+              class="parallax-img w-full object-cover aspect-[4/5]"
+              loading="eager"
+              fetchpriority="high"
+            />
+          </div>
+          <figcaption class="px-2.5 py-3.5 text-[13px] text-fg-muted">
+            <span class="block font-display font-medium text-[15px] text-fg">{heroPhoto.city}, California</span>
+            {heroPhoto.caption}
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  {hasReviews && (
+    <section class="pb-16 sm:pb-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {reviews.map((r) => (
             <li class="reveal rounded-card bg-surface-raised border border-hairline p-7 shadow-card flex flex-col">
               <div class="flex items-center gap-1 text-accent-display">
@@ -93,47 +166,97 @@ const schema = summary
             </li>
           ))}
         </ul>
-      ) : (
-        <div class="reveal mt-12 rounded-card border border-hairline bg-surface-raised shadow-card p-10 sm:p-14 text-center max-w-2xl mx-auto">
-          <div class="inline-flex items-center justify-center size-14 rounded-btn bg-accent-wash text-accent-on-light" aria-hidden="true">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-              <path d="M21 11.5a8.5 8.5 0 1 1-4.6-7.6" stroke-linecap="round" />
-              <path d="M21 4.5v4h-4" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </div>
-          <h2 class="mt-5 font-display font-semibold text-2xl text-fg">
-            Find us on Google
-          </h2>
-          <p class="mt-3 text-[16px] leading-relaxed text-fg-muted">
-            Our clients leave their feedback directly on our Google Business profile.
-            Search for <strong>Essential Flooring Sacramento</strong> on Google to read
-            recent reviews, or ask us for references from projects near you.
-          </p>
-          <a
-            href={SITE.googleProfile}
-            target="_blank"
-            rel="noopener"
-            class="mt-6 inline-flex items-center gap-2 rounded-btn bg-control-dark hover:bg-control-dark-hover text-fg-on-dark font-semibold px-6 py-3 transition-colors"
-          >
-            See our Google profile
-          </a>
-        </div>
-      )}
+      </div>
+    </section>
+  )}
 
-      <div class="reveal mt-14 rounded-card bg-surface-sunken/70 border border-hairline p-7 sm:p-9 text-center max-w-2xl mx-auto">
-        <h2 class="font-display font-semibold text-xl text-fg">Worked with us recently?</h2>
-        <p class="mt-2 text-[15px] text-fg-muted leading-relaxed">
-          A short Google review helps a small local business more than any ad ever could. Thank you.
-        </p>
+  <!-- INVITATION: the one thing this page asks of a past client. The five
+       stars are a motif, not a rating: they are hidden from assistive tech and
+       no number sits next to them. -->
+  <section class="grain relative overflow-hidden bg-surface-dark">
+    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 text-center">
+      <div class="reveal m-stagger flex items-center justify-center gap-1.5 text-accent-on-dark" aria-hidden="true">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" style={`--i:${i}`}>
+            <path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.3 1.3-6.6L2.5 9.5l6.6-.8z" />
+          </svg>
+        ))}
+      </div>
+      <h2 class="reveal mt-6 font-display font-semibold text-3xl sm:text-4xl text-fg-on-dark tracking-tight max-w-2xl mx-auto [text-wrap:balance]">
+        Worked with us? Leave a review
+      </h2>
+      <p class="reveal mt-4 text-fg-on-dark/75 text-[17px] max-w-xl mx-auto leading-relaxed">
+        A short Google review helps a small local business more than any ad could.
+      </p>
+      <div class="reveal mt-8">
         <a
-          href={SITE.instagram}
+          href={reviewUrl}
           target="_blank"
           rel="noopener"
-          class="mt-4 inline-flex items-center gap-2 font-semibold text-accent-on-light hover:text-fg transition-colors"
+          class="arrow-link inline-flex items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-7 py-3.5 transition-colors shadow-lift"
         >
-          Follow our latest projects on Instagram
+          Write a review on Google
+          <span class="sr-only">(opens in a new tab)</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+            <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
         </a>
       </div>
+    </div>
+  </section>
+
+  <!-- PROOF: three facts already true across the site, then three finished
+       floors. Both are what a reviews page is really for. -->
+  <section class="py-16 sm:py-20">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <ul class="reveal grid sm:grid-cols-3 gap-x-6 gap-y-5 text-[13.5px] text-fg-muted">
+        {facts.map((f) => (
+          <li class="flex items-center gap-3">
+            <Icon name={f.icon} size={26} class="shrink-0 text-fg" />
+            <span><span class="block text-fg font-semibold">{f.title}</span>{f.text}</span>
+          </li>
+        ))}
+      </ul>
+
+      {!hasReviews && (
+        <div class="mt-14">
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <h2 class="reveal font-display font-semibold text-2xl sm:text-3xl text-fg tracking-tight">
+              See the work for yourself
+            </h2>
+            <a
+              href="/portfolio/"
+              class="reveal arrow-link shrink-0 inline-flex items-center gap-2 font-semibold text-accent-on-light hover:text-fg transition-colors"
+            >
+              Browse the full portfolio
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </a>
+          </div>
+          <ul class="m-stagger grid grid-cols-3 gap-3 sm:gap-4">
+            {proofPhotos.map((p, i) => (
+              <li style={`--i:${i}`}>
+                <a href="/portfolio/" class="card-lift group relative block overflow-hidden rounded-media" aria-label={`${p.caption}. Open the portfolio`}>
+                  <Image
+                    src={photoImage(p.file)}
+                    alt={p.alt}
+                    widths={[320, 640, 960]}
+                    sizes="(min-width: 1024px) 340px, 33vw"
+                    class="aspect-[4/5] w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+                    format="webp"
+                    quality={70}
+                  />
+                  <span class="absolute inset-0 bg-gradient-to-t from-scrim-media/55 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
+                  <span class="absolute bottom-0 left-0 right-0 p-4 text-fg-on-media text-[13.5px] font-medium opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all hidden sm:block" aria-hidden="true">
+                    {p.city}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   </section>
 

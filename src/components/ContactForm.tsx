@@ -204,8 +204,15 @@ export default function ContactForm() {
       >
         {status === 'sending' ? 'Sending...' : 'Request Free Estimate'}
       </button>
-      <p className="text-[13px] text-fg-muted/80">
-        We only use your details to respond to your request. No spam, ever.
+      <p className="text-[13px] leading-relaxed text-fg-muted">
+        By sending this request you agree to our{' '}
+        <a
+          href="/privacy-policy/"
+          className="underline underline-offset-2 decoration-1 text-accent-on-light hover:text-fg transition-colors"
+        >
+          Privacy Policy
+        </a>
+        . We use your details only to respond to your estimate request.
       </p>
     </form>
   );
