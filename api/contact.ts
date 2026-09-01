@@ -262,15 +262,31 @@ const RATE_WINDOW_MIN = 10;
 // Un om nu completeaza formularul in sub doua secunde.
 const MIN_FILL_MS = 2000;
 
-const json = (body: unknown, status: number) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
-  });
+// Forma minima a obiectelor pe care le da @vercel/node. Nu importam tipurile
+// pachetului ca sa nu adaugam o dependenta doar pentru doua semnaturi.
+type Req = {
+  method?: string;
+  headers: Record<string, string | string[] | undefined>;
+  body?: unknown;
+};
+type Res = {
+  status(code: number): Res;
+  setHeader(name: string, value: string): Res;
+  json(body: unknown): void;
+};
 
-function clientIp(req: Request): string {
-  const fwd = req.headers.get('x-forwarded-for') ?? '';
-  return fwd.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'unknown';
+const send = (res: Res, body: unknown, status: number) => {
+  res.status(status).setHeader('Cache-Control', 'no-store').json(body);
+};
+
+function header(req: Req, name: string): string {
+  const v = req.headers[name];
+  return (Array.isArray(v) ? v[0] : v) ?? '';
+}
+
+function clientIp(req: Req): string {
+  const fwd = header(req, 'x-forwarded-for');
+  return fwd.split(',')[0]?.trim() || header(req, 'x-real-ip') || 'unknown';
 }
 
 // Hash-uim IP-ul ca sa nu stocam date personale in clar.
@@ -322,20 +338,27 @@ async function isRateLimited(s: Supa | null, ipHash: string): Promise<boolean> {
   }
 }
 
-export default async function handler(req: Request): Promise<Response> {
-  if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
+// Semnatura clasica (req, res). Varianta web, care returna un Response, nu
+// era trimisa niciodata de runtime: functia ramanea "running" pana la timeout,
+// iar site-ul vedea 500. Verificat local cu `vercel dev`.
+export default async function handler(req: Req, res: Res): Promise<void> {
+  if (req.method !== 'POST') return send(res, { error: 'Method not allowed' }, 405);
 
+  // Vercel parseaza singur JSON-ul cand Content-Type e application/json, dar
+  // acceptam si un string, in caz ca antetul lipseste.
   let body: Lead;
   try {
-    body = (await req.json()) as Lead;
+    const raw = req.body;
+    body = (typeof raw === 'string' ? JSON.parse(raw) : raw ?? {}) as Lead;
+    if (!body || typeof body !== 'object') throw new Error('not an object');
   } catch {
-    return json({ error: 'Invalid JSON' }, 400);
+    return send(res, { error: 'Invalid JSON' }, 400);
   }
 
   // Honeypot si verificarea de timp: raspundem 200 ca sa nu invatam botul nimic.
-  if (body.company) return json({ ok: true }, 200);
+  if (body.company) return send(res, { ok: true }, 200);
   if (typeof body.elapsedMs === 'number' && body.elapsedMs >= 0 && body.elapsedMs < MIN_FILL_MS) {
-    return json({ ok: true }, 200);
+    return send(res, { ok: true }, 200);
   }
 
   const cut = (v: unknown, n: number) => (v ?? '').toString().trim().slice(0, n);
@@ -346,7 +369,7 @@ export default async function handler(req: Request): Promise<Response> {
   const service = cut(body.service, MAX.service);
   const message = cut(body.message, MAX.message);
 
-  if (!name || !phone) return json({ error: 'Name and phone are required' }, 400);
+  if (!name || !phone) return send(res, { error: 'Name and phone are required' }, 400);
   // Un email invalid ar rupe reply_to, deci il ignoram in loc sa respingem cererea.
   const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ? email : '';
 
@@ -354,7 +377,7 @@ export default async function handler(req: Request): Promise<Response> {
   const ipHash = await hashIp(clientIp(req));
 
   if (await isRateLimited(s, ipHash)) {
-    return json({ error: 'Too many requests. Please call us instead.' }, 429);
+    return send(res, { error: 'Too many requests. Please call us instead.' }, 429);
   }
 
   // 1) Salvam cererea. Asta e partea care nu are voie sa se piarda.
@@ -378,11 +401,15 @@ export default async function handler(req: Request): Promise<Response> {
     } catch (err) {
       console.error('lead insert threw', err);
     }
-    supaFetch(s, 'contact_hits', {
-      method: 'POST',
-      headers: { Prefer: 'return=minimal' },
-      body: JSON.stringify({ ip_hash: ipHash }),
-    }).catch(() => {});
+    try {
+      await supaFetch(s, 'contact_hits', {
+        method: 'POST',
+        headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify({ ip_hash: ipHash }),
+      });
+    } catch {
+      /* contorul e doar pentru rate limiting, nu blocheaza cererea */
+    }
   }
 
   // 2) Trimitem emailul.
@@ -392,8 +419,8 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (!apiKey || !to) {
     return stored
-      ? json({ ok: true, emailed: false }, 200)
-      : json({ error: 'Email not configured' }, 503);
+      ? send(res, { ok: true, emailed: false }, 200)
+      : send(res, { error: 'Email not configured' }, 503);
   }
 
   // Ora locala a clientului, nu UTC. El citeste emailul in Sacramento.
@@ -431,13 +458,13 @@ export default async function handler(req: Request): Promise<Response> {
       console.error('resend failed', res.status, await res.text());
       // Cererea e deja salvata, deci pentru vizitator trimiterea a reusit.
       return stored
-        ? json({ ok: true, emailed: false }, 200)
-        : json({ error: 'Email delivery failed' }, 502);
+        ? send(res, { ok: true, emailed: false }, 200)
+        : send(res, { error: 'Email delivery failed' }, 502);
     }
   } catch (err) {
     console.error('resend threw', err);
-    return stored ? json({ ok: true, emailed: false }, 200) : json({ error: 'Email delivery failed' }, 502);
+    return stored ? send(res, { ok: true, emailed: false }, 200) : send(res, { error: 'Email delivery failed' }, 502);
   }
 
-  return json({ ok: true, emailed: true }, 200);
+  return send(res, { ok: true, emailed: true }, 200);
 }

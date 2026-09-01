@@ -105,7 +105,6 @@ const steps = [
           <defs>
             <path id="stamp-arc" d="M82 12a70 70 0 1 1 0 140a70 70 0 1 1 0-140" />
           </defs>
-          <circle cx="82" cy="82" r="80" fill="none" stroke="var(--ef-rule)" stroke-width="1" />
           <text class="font-display" fill="var(--ef-accent-on-light)" font-size="13.5" font-weight="600" letter-spacing="3.4">
             <textPath href="#stamp-arc" startOffset="0">EST. 2023 · SACRAMENTO CA · LICENSED &amp; INSURED ·</textPath>
           </text>
@@ -116,15 +115,18 @@ const steps = [
         </svg>
       </div>
 
-      <p class="m-intro eyebrow on-light">Sacramento flooring contractor</p>
+      <!-- The statement enters one line at a time, each line rising out of a
+           soft blur, so the first thing the visitor reads is also the first
+           thing that moves. The h1 keeps the search terms intact. -->
       <h1
-        style="--i:1"
-        class="m-intro mt-5 font-display font-medium text-fg text-[38px] sm:text-[56px] lg:text-[68px] leading-[1.02] tracking-[-0.01em] max-w-[17ch] [text-wrap:balance]"
+        class="font-display font-medium text-fg text-[38px] sm:text-[56px] lg:text-[68px] leading-[1.02] tracking-[-0.01em] max-w-[17ch] [text-wrap:balance]"
       >
-        Hardwood refinishing, vinyl plank <span class="accent-italic">and stairs</span> in greater Sacramento
+        <span class="m-line block" style="--i:0">Hardwood refinishing,</span>
+        <span class="m-line block" style="--i:1">vinyl plank <span class="accent-italic">and stairs</span></span>
+        <span class="m-line block" style="--i:2">in greater Sacramento</span>
       </h1>
 
-      <div class="m-intro mt-8 sm:mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" style="--i:2">
+      <div class="m-intro mt-8 sm:mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" style="--i:4">
         <a
           href="/contact/"
           class="arrow-link inline-flex items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-7 py-3.5 text-[15px] transition-colors shadow-card"
@@ -147,7 +149,7 @@ const steps = [
     </div>
 
     <div class="mx-auto max-w-[1400px] px-3 sm:px-5 mt-10 sm:mt-14">
-      <figure class="m-media relative overflow-hidden rounded-card shadow-lift">
+      <figure class="m-media parallax relative overflow-hidden rounded-card shadow-lift">
         <Image
           src={photoImage(heroPhoto.file)}
           alt={heroPhoto.alt}
@@ -155,7 +157,7 @@ const steps = [
           sizes="100vw"
           loading="eager"
           fetchpriority="high"
-          class="h-[46svh] min-h-[320px] sm:h-[56svh] lg:h-[64svh] w-full object-cover [object-position:50%_74%]"
+          class="parallax-img h-[46svh] min-h-[320px] sm:h-[56svh] lg:h-[64svh] w-full object-cover [object-position:50%_74%]"
         />
         <figcaption
           class="absolute left-4 bottom-4 sm:left-6 sm:bottom-6 inline-flex items-center gap-2.5 rounded-btn bg-scrim-media/55 backdrop-blur-[2px] text-fg-on-media text-[12px] font-semibold uppercase tracking-[0.14em] px-3.5 py-2"
@@ -264,13 +266,13 @@ const steps = [
             title="From the first call to the final walkthrough"
           />
           <figure class="m-rise hidden lg:block mt-10 rounded-card bg-surface-raised p-2.5 pb-0 shadow-card max-w-[300px]">
-            <span class="block overflow-hidden rounded-media">
+            <span class="parallax block overflow-hidden rounded-media">
               <Image
                 src={photoImage('stairs-01')}
                 alt={photoById('stairs-01').alt}
                 widths={[300, 600]}
                 sizes="300px"
-                class="aspect-[4/5] w-full object-cover"
+                class="parallax-img aspect-[4/5] w-full object-cover"
                 format="webp"
                 quality={70}
               />
@@ -504,30 +506,3 @@ const steps = [
 
   <CtaBand />
 </Base>
-
-<script>
-  // Gentle parallax drift on hero images (transform-only, rAF-throttled).
-  const els = [...document.querySelectorAll<HTMLElement>('[data-parallax]')];
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (els.length && !reduced) {
-    let ticking = false;
-    const apply = () => {
-      ticking = false;
-      const y = window.scrollY;
-      for (const el of els) {
-        const f = Number(el.dataset.parallax || '0');
-        el.style.transform = `translateY(${Math.round(y * f * 100) / 100}px)`;
-      }
-    };
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (!ticking) {
-          ticking = true;
-          requestAnimationFrame(apply);
-        }
-      },
-      { passive: true },
-    );
-  }
-</script>

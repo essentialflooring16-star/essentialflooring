@@ -418,12 +418,34 @@ html.js .reveal-scale.is-visible {
    paint part way through its own reveal and only finish once the visitor
    scrolls, which on a primary call to action reads as a rendering fault. The
    hero therefore runs on time, once, on load. */
+@keyframes m-line-k {
+  from { opacity: 0; transform: translateY(0.45em); filter: blur(10px); }
+  60%  { filter: blur(0); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes m-parallax-k {
+  from { transform: translateY(-9%) scale(1.18); }
+  to   { transform: translateY(9%) scale(1.18); }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .m-intro {
     animation: m-rise-k 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: calc(var(--i, 0) * 90ms + 60ms);
   }
+  /* Headline lines: each one rises out of a blur, 120ms apart. */
+  .m-line {
+    animation: m-line-k 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--i, 0) * 120ms + 40ms);
+    will-change: transform, filter, opacity;
+  }
 }
+
+/* Parallax without a scroll listener: the frame clips, the picture inside is
+   overscaled and glides from top to bottom as the frame crosses the viewport.
+   Browsers without scroll-driven animations simply show the still photo. */
+.parallax { overflow: hidden; }
+.parallax-img { will-change: transform; }
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
@@ -454,6 +476,12 @@ html.js .reveal-scale.is-visible {
        to give a long section some parallax without a scroll listener. */
     .m-lift {
       animation: m-lift-k linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+
+    .parallax .parallax-img {
+      animation: m-parallax-k linear both;
       animation-timeline: view();
       animation-range: entry 0% exit 100%;
     }

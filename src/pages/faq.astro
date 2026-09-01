@@ -44,13 +44,13 @@ const heroPhoto = photoById('lvp-vinyl-03');
         </div>
 
         <figure class="reveal lg:w-[420px] rounded-card bg-surface-raised p-2.5 shadow-card">
-          <div class="overflow-hidden rounded-media">
+          <div class="parallax overflow-hidden rounded-media">
             <Image
               src={photoImage(heroPhoto.file)}
               alt={heroPhoto.alt}
               widths={[420, 840]}
               sizes="(min-width: 1024px) 420px, 100vw"
-              class="h-full w-full object-cover aspect-[4/3]"
+              class="parallax-img h-full w-full object-cover aspect-[4/3]"
               loading="eager"
             />
           </div>
