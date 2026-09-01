@@ -494,3 +494,102 @@ html.js .reveal-scale.is-visible {
     }
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Header, the BPE anatomy: small tracked caps for the MENU and CONTACT words,
+   the rolling MENU / CLOSE cube, and the curtain menu's staggered links.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@layer components {
+.hdr-caps {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--ef-font-body);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  line-height: 1;
+}
+/* A 12px overlay above and below grows every tap target to 44px without
+   changing anything visible. */
+.hdr-caps::before {
+  content: '';
+  position: absolute;
+  inset: -12px 0;
+}
+.hdr-caps::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hdr-caps:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.cube.hdr-caps::after {
+  display: none;
+}
+
+/* MENU and CLOSE sit on adjacent faces of a box; opening rolls the box a
+   quarter turn, so MENU tips up and away while CLOSE arrives from below.
+   The turn is held while the menu is open. */
+.cube {
+  perspective: 20rem;
+}
+.cube .cube-box {
+  position: relative;
+  display: inline-flex;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cube .cube-face {
+  display: inline-flex;
+  align-items: center;
+  backface-visibility: hidden;
+  transform: translateZ(0.62em);
+}
+.cube .cube-face + .cube-face {
+  position: absolute;
+  inset: 0;
+  transform: rotateX(-90deg) translateZ(0.62em);
+  speak: never;
+}
+.cube.cube-turned .cube-box {
+  transform: rotateX(90deg);
+}
+
+/* Curtain items: invisible and 26px low with no delay, so closing snaps them
+   away together under the rising curtain; opening lifts each on its own beat. */
+#menu-overlay .m-stag {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+#menu-overlay[data-open] .m-stag {
+  opacity: 1;
+  transform: none;
+  transition-duration: 0.65s, 0.65s;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(0.26s + var(--i, 0) * 0.07s);
+}
+body.menu-open {
+  overflow: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  #menu-overlay,
+  #menu-overlay .m-stag,
+  .cube .cube-box,
+  #site-header {
+    transition: none !important;
+  }
+}
+}

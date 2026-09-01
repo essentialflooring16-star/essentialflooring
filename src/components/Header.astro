@@ -2,15 +2,24 @@
 import { SITE } from '../data/site';
 import BrandLogo from './BrandLogo.astro';
 
-const nav = [
+// The anatomy Artiom liked on BPE Cleaning: menu on the LEFT, logo dead
+// centre, contact on the RIGHT, at every width. On phones the menu is a
+// forest green curtain that slides down over the page, links centred in the
+// serif; the header floats above it, so the logo never moves or duplicates.
+// Desktop splits the nav around the centred logo, four links left, three
+// right, then the estimate button.
+const navLeft = [
   { href: '/services/', label: 'Services' },
   { href: '/portfolio/', label: 'Our Work' },
   { href: '/service-areas/', label: 'Service Areas' },
   { href: '/reviews/', label: 'Reviews' },
+];
+const navRight = [
   { href: '/about/', label: 'About' },
   { href: '/blog/', label: 'Blog' },
   { href: '/faq/', label: 'FAQ' },
 ];
+const nav = [...navLeft, ...navRight];
 
 // Compare with trailing slashes stripped from both sides: the nav hrefs end in
 // '/' to match vercel.json trailingSlash, the pathname may or may not.
@@ -20,98 +29,134 @@ const isActive = (href: string) => {
   const h = strip(href);
   return path === h || (h !== '/' && path.startsWith(h + '/'));
 };
+const linkClass = 'nav-link text-[14px] xl:text-[14.5px] font-medium text-fg-muted hover:text-fg transition-colors whitespace-nowrap';
 ---
 
 <header
   id="site-header"
-  class="sticky top-0 z-50 bg-surface/92 backdrop-blur-md border-b border-hairline transition-shadow"
+  class="sticky top-0 z-[70] bg-surface/92 backdrop-blur-md border-b border-hairline transition-transform duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] data-[hidden]:-translate-y-full"
 >
-  <div class="mx-auto max-w-6xl px-4 sm:px-6 flex items-center justify-between h-[72px]">
-    <a href="/" class="block group" aria-label="Essential Flooring, home">
-      <BrandLogo variant="header" tone="light" />
-    </a>
-
-    <nav class="hidden lg:flex items-center gap-7" aria-label="Main">
-      {nav.map((item) => (
-        <a
-          href={item.href}
-          class="nav-link text-[14.5px] font-medium text-fg-muted hover:text-fg transition-colors"
-          aria-current={isActive(item.href) ? 'page' : undefined}
-        >
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 grid grid-cols-[1fr_auto_1fr] items-center h-[72px]">
+    <!-- LEFT: desktop nav, or the rolling MENU / CLOSE word on phones -->
+    <nav class="hidden lg:flex items-center gap-5 xl:gap-7 justify-self-start" aria-label="Main">
+      {navLeft.map((item) => (
+        <a href={item.href} class={linkClass} aria-current={isActive(item.href) ? 'page' : undefined}>
           {item.label}
         </a>
       ))}
     </nav>
+    <button
+      id="menu-toggle"
+      type="button"
+      class="cube hdr-caps justify-self-start lg:hidden text-fg"
+      aria-expanded="false"
+      aria-controls="menu-overlay"
+      aria-label="Open menu"
+    >
+      <span class="cube-box">
+        <span class="cube-face">Menu</span>
+        <span class="cube-face">Close</span>
+      </span>
+    </button>
 
-    <div class="flex items-center gap-3">
+    <!-- CENTRE: the client's lockup, same place at every width -->
+    <a href="/" class="justify-self-center block" aria-label="Essential Flooring, home">
+      <BrandLogo variant="header" tone="light" />
+    </a>
+
+    <!-- RIGHT: the rest of the nav and the estimate button; on phones a
+         single CONTACT word, the bottom bar carries the phone and WhatsApp -->
+    <div class="flex items-center justify-self-end gap-5 xl:gap-7">
+      <nav class="hidden lg:flex items-center gap-5 xl:gap-7" aria-label="More pages">
+        {navRight.map((item) => (
+          <a href={item.href} class={linkClass} aria-current={isActive(item.href) ? 'page' : undefined}>
+            {item.label}
+          </a>
+        ))}
+      </nav>
       <a
         href="/contact/"
-        class="arrow-link hidden sm:inline-flex items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold text-[15px] px-5 py-2.5 transition-colors shadow-card"
+        class="arrow-link hidden lg:inline-flex items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold text-[15px] px-5 py-2.5 transition-colors shadow-card whitespace-nowrap"
       >
         Free Estimate
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
           <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </a>
-
-      <button
-        id="menu-toggle"
-        type="button"
-        class="lg:hidden grid place-items-center size-11 rounded-btn border border-hairline text-fg"
-        aria-expanded="false"
-        aria-controls="mobile-menu"
-        aria-label="Open menu"
-      >
-        <svg class="menu-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
-        </svg>
-        <svg class="menu-close hidden" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
-        </svg>
-      </button>
+      <a href="/contact/" class="hdr-caps lg:hidden text-accent-on-light">Contact</a>
     </div>
   </div>
+</header>
 
-  <div id="mobile-menu" class="hidden lg:hidden border-t border-hairline bg-surface">
-    <nav class="mx-auto max-w-6xl px-4 sm:px-6 py-4 flex flex-col" aria-label="Mobile">
-      {nav.map((item) => (
+<!-- The curtain. Transform only, so it cannot stutter; the header above it
+     stays put at z-70 while this slides under it at z-60. -->
+<div
+  id="menu-overlay"
+  class="lg:hidden pointer-events-none fixed inset-0 z-[60] -translate-y-full overflow-y-auto overscroll-contain bg-surface-dark text-fg-on-dark transition-transform duration-700 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] data-[open]:pointer-events-auto data-[open]:translate-y-0"
+  aria-hidden="true"
+>
+  <div class="flex min-h-full flex-col pt-[72px] pb-28">
+    <nav class="my-auto flex flex-col items-center gap-2 px-6 py-10 text-center" aria-label="Menu">
+      {[...nav, { href: '/contact/', label: 'Contact' }].map((item, i) => (
         <a
           href={item.href}
-          class="py-3 text-[17px] font-medium text-fg border-b border-hairline last:border-0"
+          class="m-stag font-display font-medium text-[2.1rem] leading-[1.2] text-fg-on-dark/90 hover:text-accent-on-dark transition-colors py-1"
+          style={`--i: ${i}`}
           aria-current={isActive(item.href) ? 'page' : undefined}
         >
           {item.label}
         </a>
       ))}
-      <a
-        href="/contact/"
-        class="mt-4 inline-flex justify-center items-center rounded-btn bg-accent text-fg-on-accent font-semibold px-5 py-3"
-      >
-        Get a Free Estimate
-      </a>
-      <a href={SITE.phoneHref} class="mt-3 text-center text-fg font-medium py-2">
-        Call {SITE.phone}
-      </a>
     </nav>
+
+    <div class="grid shrink-0 grid-cols-2 gap-x-6 gap-y-4 px-6">
+      <div class="flex flex-col items-start gap-4">
+        <a href={SITE.phoneHref} class="m-stag hdr-caps text-accent-on-dark" style="--i: 9">{SITE.phone}</a>
+        <a href="https://wa.me/19164251361" class="m-stag hdr-caps text-fg-on-dark/70" style="--i: 10" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+      <div class="flex flex-col items-end gap-4">
+        <a href="/contact/" class="m-stag hdr-caps text-accent-on-dark" style="--i: 11">Free estimate</a>
+        <a href="/portfolio/" class="m-stag hdr-caps text-fg-on-dark/70" style="--i: 12">Our work</a>
+      </div>
+    </div>
   </div>
-</header>
+</div>
 
 <script>
+  const header = document.getElementById('site-header');
+  const overlay = document.getElementById('menu-overlay');
   const toggle = document.getElementById('menu-toggle');
-  const menu = document.getElementById('mobile-menu');
-  const setOpen = (open: boolean) => {
-    menu?.classList.toggle('hidden', !open);
-    toggle?.setAttribute('aria-expanded', String(open));
-    toggle?.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-    toggle?.querySelector('.menu-open')?.classList.toggle('hidden', open);
-    toggle?.querySelector('.menu-close')?.classList.toggle('hidden', !open);
+
+  // Scrolling down slides the header away; scrolling up brings it back. A
+  // 6px deadband ignores jitter, and the top 28px always shows it.
+  let lastY = window.scrollY;
+  const onScroll = () => {
+    if (!header || overlay?.hasAttribute('data-open')) return;
+    const y = window.scrollY;
+    if (y < 28) header.removeAttribute('data-hidden');
+    else if (y > lastY + 6) header.setAttribute('data-hidden', '');
+    else if (y < lastY - 6) header.removeAttribute('data-hidden');
+    lastY = y;
   };
-  toggle?.addEventListener('click', () => {
-    setOpen(menu?.classList.contains('hidden') ?? true);
-  });
-  // Escape closes the mobile nav and returns focus to the toggle.
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape' || !menu || menu.classList.contains('hidden')) return;
+  addEventListener('scroll', onScroll, { passive: true });
+
+  // The cube stays turned for as long as the menu is open, so the button
+  // reads CLOSE the whole time. The page underneath is held still with a
+  // class on body; there is no Lenis on phones, so nothing else to stop.
+  const setOpen = (open: boolean) => {
+    if (!overlay || !toggle) return;
+    overlay.toggleAttribute('data-open', open);
+    overlay.setAttribute('aria-hidden', String(!open));
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.classList.toggle('cube-turned', open);
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    document.body.classList.toggle('menu-open', open);
+    if (open) header?.removeAttribute('data-hidden');
+  };
+  toggle?.addEventListener('click', () => setOpen(!overlay?.hasAttribute('data-open')));
+  overlay?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || !overlay?.hasAttribute('data-open')) return;
     setOpen(false);
     toggle?.focus();
   });
