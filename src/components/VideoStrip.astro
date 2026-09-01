@@ -3,6 +3,11 @@
 // lazy: nothing downloads until the strip is scrolled into view. Each clip has
 // a poster frame so the boxes are never empty, which also means visitors who
 // asked for reduced motion still see the work instead of three blank panels.
+//
+// There is no bar button to stop the clips any more. Moving content that starts
+// on its own still needs a control, so the control moved onto the clips: each
+// one toggles on click or tap, and shows its glyph on hover and on keyboard
+// focus. Reduced motion keeps the posters and never starts a video at all.
 const videos = [
   { src: '/videos/work-01.mp4', poster: '/videos/work-01-poster.jpg', label: 'Plank install in progress' },
   { src: '/videos/work-02.mp4', poster: '/videos/work-02-poster.jpg', label: 'Subfloor stripped back before the new floor goes down' },
@@ -12,29 +17,10 @@ const videos = [
 
 <section class="py-16 sm:py-20 bg-surface-sunken/60 overflow-hidden" data-video-strip>
   <div class="mx-auto max-w-6xl px-4 sm:px-6">
-    <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-4 mb-9">
-      <div class="reveal">
-        <p class="text-[13px] font-semibold uppercase tracking-[0.18em] text-accent-on-light mb-3">On site</p>
-        <h2 class="font-display font-semibold text-3xl sm:text-4xl text-fg tracking-tight">
-          Clips from jobs in progress
-        </h2>
-      </div>
-      <button
-        type="button"
-        data-video-toggle
-        hidden
-        class="inline-flex items-center gap-2 rounded-btn border border-hairline hover:border-accent bg-surface-raised text-fg text-[14px] font-medium px-4 py-2 transition-colors"
-        aria-pressed="false"
-      >
-        <svg data-icon-pause width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M7 5h3v14H7zm7 0h3v14h-3z" />
-        </svg>
-        <svg data-icon-play class="hidden" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M8 5.5v13l11-6.5z" />
-        </svg>
-        <span data-video-toggle-label>Pause videos</span>
-      </button>
-    </div>
+    <h2 class="reveal font-display font-semibold text-3xl sm:text-4xl text-fg tracking-tight text-center mb-9">
+      Clips from jobs in progress
+    </h2>
+
     <div class="grid sm:grid-cols-3 gap-4 sm:gap-5">
       {videos.map((v, i) => (
         <figure class={`reveal-scale relative rounded-media overflow-hidden shadow-card aspect-[3/4] sm:aspect-[4/5] ${i === 1 ? 'sm:translate-y-6' : ''}`} style={`transition-delay:${i * 70}ms`}>
@@ -47,7 +33,29 @@ const videos = [
             poster={v.poster}
             data-lazy-video={v.src}
           ></video>
-          <figcaption class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-scrim-media/65 to-transparent px-4 pt-8 pb-3.5 text-fg-on-media text-[13.5px] font-medium">
+
+          <button
+            type="button"
+            data-clip-toggle
+            hidden
+            class="group absolute inset-0 grid place-items-center focus-visible:outline-none"
+            aria-pressed="false"
+          >
+            <span class="sr-only" data-clip-label>Pause this clip</span>
+            <span
+              class="grid place-items-center size-11 rounded-full bg-scrim-media/55 text-fg-on-media opacity-0 scale-90 transition group-hover:opacity-100 group-hover:scale-100 group-focus-visible:opacity-100 group-focus-visible:scale-100 group-focus-visible:ring-2 group-focus-visible:ring-fg-on-media"
+              aria-hidden="true"
+            >
+              <svg data-icon-pause width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 5h3v14H7zm7 0h3v14h-3z" />
+              </svg>
+              <svg data-icon-play class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5.5v13l11-6.5z" />
+              </svg>
+            </span>
+          </button>
+
+          <figcaption class="pointer-events-none absolute bottom-0 inset-x-0 bg-gradient-to-t from-scrim-media/65 to-transparent px-4 pt-8 pb-3.5 text-fg-on-media text-[13.5px] font-medium">
             {v.label}
           </figcaption>
         </figure>
@@ -59,56 +67,72 @@ const videos = [
 <script>
   const strip = document.querySelector('[data-video-strip]');
   if (strip) {
-    const vids = strip.querySelectorAll<HTMLVideoElement>('video[data-lazy-video]');
-    const toggle = strip.querySelector<HTMLButtonElement>('[data-video-toggle]');
-    const label = strip.querySelector<HTMLElement>('[data-video-toggle-label]');
-    const iconPause = strip.querySelector<HTMLElement>('[data-icon-pause]');
-    const iconPlay = strip.querySelector<HTMLElement>('[data-icon-play]');
+    const figures = Array.from(strip.querySelectorAll('figure'));
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Visitors who asked for reduced motion keep the poster frames and are not
-    // offered a control they do not need.
-    let paused = reduced;
-    let visible = new Set<HTMLVideoElement>();
-
-    const sync = () => {
-      for (const v of vids) {
-        if (paused || !visible.has(v)) {
-          v.pause();
-        } else {
-          if (!v.src) v.src = v.dataset.lazyVideo!;
-          v.play().catch(() => {});
-        }
-      }
-      if (toggle && label && iconPause && iconPlay) {
-        toggle.setAttribute('aria-pressed', String(paused));
-        label.textContent = paused ? 'Play videos' : 'Pause videos';
-        iconPause.classList.toggle('hidden', paused);
-        iconPlay.classList.toggle('hidden', !paused);
-      }
+    type Clip = {
+      video: HTMLVideoElement;
+      button: HTMLButtonElement | null;
+      label: HTMLElement | null;
+      iconPause: HTMLElement | null;
+      iconPlay: HTMLElement | null;
+      paused: boolean;
+      visible: boolean;
     };
 
-    if (toggle && !reduced) {
-      toggle.hidden = false;
-      toggle.addEventListener('click', () => {
-        paused = !paused;
-        sync();
+    const clips: Clip[] = [];
+    for (const fig of figures) {
+      const video = fig.querySelector<HTMLVideoElement>('video[data-lazy-video]');
+      if (!video) continue;
+      clips.push({
+        video,
+        button: fig.querySelector<HTMLButtonElement>('[data-clip-toggle]'),
+        label: fig.querySelector<HTMLElement>('[data-clip-label]'),
+        iconPause: fig.querySelector<HTMLElement>('[data-icon-pause]'),
+        iconPlay: fig.querySelector<HTMLElement>('[data-icon-play]'),
+        // Reduced motion means the clip starts paused and stays on its poster.
+        paused: reduced,
+        visible: false,
       });
     }
 
-    if (vids.length && 'IntersectionObserver' in window) {
+    const sync = (c: Clip) => {
+      if (c.paused || !c.visible) {
+        c.video.pause();
+      } else {
+        if (!c.video.src) c.video.src = c.video.dataset.lazyVideo!;
+        c.video.play().catch(() => {});
+      }
+      if (c.button && c.label && c.iconPause && c.iconPlay) {
+        c.button.setAttribute('aria-pressed', String(c.paused));
+        c.label.textContent = c.paused ? 'Play this clip' : 'Pause this clip';
+        c.iconPause.classList.toggle('hidden', c.paused);
+        c.iconPlay.classList.toggle('hidden', !c.paused);
+      }
+    };
+
+    for (const c of clips) {
+      if (!c.button) continue;
+      c.button.hidden = false;
+      c.button.addEventListener('click', () => {
+        c.paused = !c.paused;
+        sync(c);
+      });
+    }
+
+    if (clips.length && 'IntersectionObserver' in window) {
       const io = new IntersectionObserver(
         (entries) => {
           for (const e of entries) {
-            const v = e.target as HTMLVideoElement;
-            if (e.isIntersecting) visible.add(v);
-            else visible.delete(v);
+            const c = clips.find((x) => x.video === e.target);
+            if (!c) continue;
+            c.visible = e.isIntersecting;
+            sync(c);
           }
-          sync();
         },
         { threshold: 0.35 },
       );
-      vids.forEach((v) => io.observe(v));
+      clips.forEach((c) => io.observe(c.video));
     }
   }
 </script>

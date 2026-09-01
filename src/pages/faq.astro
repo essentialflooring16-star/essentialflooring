@@ -1,29 +1,66 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import CtaBand from '../components/CtaBand.astro';
 import FaqList from '../components/FaqList.astro';
+import { SITE } from '../data/site';
+import { photoImage, photoById } from '../lib/photos';
 import faqData from '../data/faq.json';
 
 const items = faqData as { q: string; a: string }[];
+
+// Pagina era numai text aliniat la stanga. Acum are aceeasi rama de hartie ca
+// tablourile de servicii, cu o poza reala din portofoliu langa titlu.
+const heroPhoto = photoById('lvp-vinyl-03');
 ---
 
 <Base
   title="FAQ | Flooring Questions Answered | Essential Flooring"
   description="Answers about estimates, timelines, dust, waterproof floors, preparation and more from Essential Flooring, Sacramento's licensed flooring contractor."
 >
-  <section class="pt-10 pb-20">
-    <div class="mx-auto max-w-3xl px-4 sm:px-6">
+  <section class="pt-10 pb-16 sm:pb-20">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
       <Breadcrumbs crumbs={[{ label: 'FAQ' }]} />
-      <div class="mt-8 mb-12">
-        <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-fg">
-          Questions, answered
-        </h1>
-        <p class="mt-5 text-[17px] leading-relaxed text-fg-muted">
-          Everything homeowners usually ask before starting a flooring project.
-          If your question is not here, call us at (916) 425-1361 and just ask.
-        </p>
+
+      <div class="mt-8 grid lg:grid-cols-[1fr_auto] gap-10 lg:gap-14 items-center">
+        <div class="max-w-xl">
+          <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-fg">
+            Questions, answered
+          </h1>
+          <p class="mt-5 text-[17px] leading-relaxed text-fg-muted">
+            Everything homeowners usually ask before starting a flooring project.
+          </p>
+          <p class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[16px] text-fg-body">
+            Not here?
+            <a
+              href={SITE.phoneHref}
+              class="font-semibold text-accent-on-light underline underline-offset-4 decoration-2 hover:text-fg transition-colors"
+            >
+              Call {SITE.phone}
+            </a>
+            and just ask.
+          </p>
+        </div>
+
+        <figure class="reveal lg:w-[420px] rounded-card bg-surface-raised p-2.5 shadow-card">
+          <div class="overflow-hidden rounded-media">
+            <Image
+              src={photoImage(heroPhoto.file)}
+              alt={heroPhoto.alt}
+              widths={[420, 840]}
+              sizes="(min-width: 1024px) 420px, 100vw"
+              class="h-full w-full object-cover aspect-[4/3]"
+              loading="eager"
+            />
+          </div>
+        </figure>
       </div>
+    </div>
+  </section>
+
+  <section class="pb-20">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6">
       <FaqList items={items} />
     </div>
   </section>

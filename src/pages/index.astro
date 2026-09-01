@@ -4,7 +4,6 @@ import Base from '../layouts/Base.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import CtaBand from '../components/CtaBand.astro';
 import FaqList from '../components/FaqList.astro';
-import Marquee from '../components/Marquee.astro';
 import Stats from '../components/Stats.astro';
 import ServiceCards from '../components/ServiceCards.astro';
 import VideoStrip from '../components/VideoStrip.astro';
@@ -85,10 +84,6 @@ const steps = [
   },
 ];
 
-const marqueeItems = [
-  'Hardwood Refinishing', 'LVP Installation', 'Stairs', 'Laminate', 'Tile',
-  'Carpet', 'Floor Repairs', 'Baseboards', 'Free Estimates',
-];
 ---
 
 <Base
@@ -193,7 +188,6 @@ const marqueeItems = [
       </ul>
     </div>
 
-    <Marquee items={marqueeItems} dark />
   </section>
 
   <!-- SERVICES: framed pictures on the green wall -->
@@ -219,13 +213,6 @@ const marqueeItems = [
 
       <ServiceCards />
 
-      <ul class="reveal mt-9 flex flex-wrap gap-2">
-        {ALL_SERVICES.map((s) => (
-          <li class="rounded-btn border border-hairline-on-dark/25 text-fg-on-dark/85 px-3.5 py-1.5 text-[13px] font-medium">
-            {s}
-          </li>
-        ))}
-      </ul>
     </div>
   </section>
 
@@ -311,7 +298,6 @@ const marqueeItems = [
     </div>
   </section>
 
-  <Marquee items={[...CORE_CITIES.map((c) => c.city)]} />
 
   <!-- PORTFOLIO MOSAIC -->
   <section class="py-16 sm:py-24">
@@ -448,8 +434,23 @@ const marqueeItems = [
   <!-- REVIEWS TEASER: the star row and the rating claim only appear once real
        reviews exist in reviews.json. With none, we link out to Google instead
        of implying a rating we cannot show. -->
-  <section class="py-16 bg-surface-sunken/60">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 text-center">
+  <section class="relative isolate overflow-hidden py-20 sm:py-24 bg-surface-sunken">
+    <!-- Harta ca fundal, nu ca widget: e decorativa, nu se poate atinge si nu
+         primeste focus. Nu avem adresa de strada de la client, doar orasul,
+         deci harta e centrata pe Sacramento in loc sa arate un pin inventat.
+         Se incarca lazy, deci nu costa nimic pana cand sectiunea se apropie. -->
+    <iframe
+      class="absolute inset-0 -z-10 h-full w-full border-0 pointer-events-none [filter:grayscale(1)_sepia(0.35)_saturate(0.65)_contrast(0.95)]"
+      src="https://www.google.com/maps?q=Sacramento,+CA&z=10&output=embed"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      title="Map of the Sacramento area"
+      aria-hidden="true"
+      tabindex="-1"
+    ></iframe>
+    <div class="absolute inset-0 -z-10 bg-surface-sunken/88" aria-hidden="true"></div>
+
+    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 text-center">
       {hasReviews && (
         <div class="reveal inline-flex items-center gap-2">
           <span class="flex items-center gap-1 text-accent-display" aria-hidden="true">

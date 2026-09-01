@@ -163,15 +163,10 @@
   --shadow-lift: 0 2px 4px rgb(var(--ef-shadow-tint) / 0.08),
     0 16px 40px -12px rgb(var(--ef-shadow-tint) / 0.22);
 
-  --animate-marquee: marquee 36s linear infinite;
   --animate-drift: drift 9s ease-in-out infinite alternate;
   --animate-float: floaty 6s ease-in-out infinite alternate;
   --animate-pulse-ring: pulse-ring 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
 
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
   @keyframes drift {
     from { transform: translateY(0); }
     to { transform: translateY(-14px); }
@@ -259,40 +254,18 @@ h1, h2, h3, .font-display {
    pass (walkerwarner.com, liljewall.se, mesura.eu, franklinazzi.fr) all do
    the same quieter thing instead: a short rule, then a small caps label. */
 .eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.8rem;
+  display: inline-block;
   font-family: var(--ef-font-body);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.2em;
 }
-.eyebrow::before {
-  content: '';
-  width: 1.75rem;
-  height: 1px;
-  flex: none;
-  background: currentColor;
-  opacity: 0.5;
-}
 .eyebrow.on-light {
   color: var(--ef-accent-on-light);
 }
 .eyebrow.on-dark {
   color: var(--ef-accent-on-dark);
-}
-
-/* Marquee ribbon */
-.marquee-track {
-  display: flex;
-  width: max-content;
-  animation: var(--animate-marquee);
-}
-/* Pause on hover for mice, and on focus so keyboard users can stop it too. */
-.marquee:hover .marquee-track,
-.marquee:focus-within .marquee-track {
-  animation-play-state: paused;
 }
 
 /* Reveal-on-scroll with a no-JS failsafe: elements start visible,
@@ -329,9 +302,6 @@ html.js .reveal-scale.is-visible {
     opacity: 1;
     transform: none;
     transition: none;
-  }
-  .marquee-track {
-    animation: none;
   }
   [data-parallax] {
     transform: none !important;
