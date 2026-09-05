@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { SERVICES as SITE_SERVICES } from '../data/site';
+import { SERVICES as SITE_SERVICES, SITE } from '../data/site';
 
 const supaUrl = import.meta.env.PUBLIC_SUPABASE_URL as string | undefined;
 const supaKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string | undefined;
@@ -8,11 +8,43 @@ const supaKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string | undefined;
 // never arrives naming a service that does not exist on the site.
 const SERVICE_OPTIONS = [...SITE_SERVICES.map((s) => s.name), 'Not sure yet'];
 
+// Derived from the one place the number is written, the same way the rest of
+// the site derives its phone links.
+const WHATSAPP = `https://wa.me/${SITE.phoneHref.replace(/\D/g, '')}`;
+
+type Lead = {
+  name?: string;
+  phone?: string;
+  email?: string | null;
+  city?: string | null;
+  service?: string | null;
+  message?: string | null;
+};
+
+// If the form cannot reach the server, the visitor still has to be able to
+// reach Alex. WhatsApp is the channel he actually runs the business on, so the
+// same details go there prefilled instead of being retyped.
+function whatsappHref(lead: Lead | null): string {
+  if (!lead) return WHATSAPP;
+  const lines = [
+    'Hi Essential Flooring, I would like a free estimate.',
+    '',
+    `Name: ${lead.name || ''}`,
+    `Phone: ${lead.phone || ''}`,
+  ];
+  if (lead.email) lines.push(`Email: ${lead.email}`);
+  if (lead.city) lines.push(`City: ${lead.city}`);
+  if (lead.service) lines.push(`Service: ${lead.service}`);
+  if (lead.message) lines.push('', lead.message);
+  return `${WHATSAPP}?text=${encodeURIComponent(lines.join('\n'))}`;
+}
+
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
 export default function ContactForm() {
   const [status, setStatus] = useState<Status>('idle');
   const doneRef = useRef<HTMLHeadingElement>(null);
+  const [lastLead, setLastLead] = useState<Lead | null>(null);
   // How long the visitor spent on the form. Bots submit almost instantly.
   const openedAt = useRef<number>(Date.now());
 
@@ -79,6 +111,7 @@ export default function ContactForm() {
 
     setStatus(delivered ? 'sent' : 'error');
     if (delivered) form.reset();
+    else setLastLead(lead);
   }
 
   if (status === 'sent') {
@@ -95,8 +128,8 @@ export default function ContactForm() {
         <p className="mt-2 text-fg-muted leading-relaxed">
           Thank you. We will get back to you shortly to schedule your free estimate.
           For anything urgent, call us at{' '}
-          <a href="tel:+19164251361" className="font-semibold text-accent-on-light">
-            (916) 425-1361
+          <a href={SITE.phoneHref} className="font-semibold text-accent-on-light">
+            {SITE.phone}
           </a>
           .
         </p>
@@ -191,10 +224,41 @@ export default function ContactForm() {
       />
 
       {status === 'error' && (
-        <p role="alert" className="rounded-card bg-red-50 border border-red-200 text-red-700 text-[14.5px] px-4 py-3">
-          Something went wrong sending your request. Please call us directly at (916) 425-1361 or
-          email essentialflooring16@gmail.com.
-        </p>
+        <div
+          role="alert"
+          className="rounded-card border border-hairline bg-surface-sunken px-5 py-4"
+        >
+          <p className="text-[15px] font-semibold text-fg">We could not send that just now.</p>
+          <p className="mt-1 text-[14.5px] leading-relaxed text-fg-muted">
+            Your details are still here. Send them straight through on WhatsApp, already filled in,
+            or call and we will pick up.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <a
+              href={whatsappHref(lastLead)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-5 py-3 text-[15px] transition-colors shadow-card"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12.04 2C6.6 2 2.2 6.4 2.2 11.84c0 1.94.53 3.76 1.46 5.32L2 22l4.98-1.6a9.8 9.8 0 0 0 5.06 1.4h.01c5.43 0 9.84-4.4 9.84-9.84C21.89 6.4 17.47 2 12.04 2Zm5.76 13.9c-.24.68-1.4 1.3-1.94 1.34-.5.05-.98.23-3.3-.7-2.78-1.1-4.54-3.95-4.68-4.14-.13-.19-1.11-1.48-1.11-2.83 0-1.34.7-2 .95-2.28.25-.27.54-.34.72-.34h.52c.17 0 .4-.06.62.48.24.57.8 1.98.87 2.12.07.14.11.3.02.49-.09.19-.13.3-.26.47l-.4.46c-.13.13-.26.28-.11.54.14.27.64 1.06 1.38 1.72.94.84 1.74 1.1 2 1.23.25.14.4.11.55-.07.14-.19.63-.74.8-.99.16-.25.33-.2.55-.12.23.08 1.44.68 1.69.8.25.13.41.19.47.29.06.1.06.58-.18 1.25Z" />
+              </svg>
+              Send on WhatsApp
+            </a>
+            <a
+              href={SITE.phoneHref}
+              className="inline-flex items-center rounded-btn border border-hairline bg-surface-raised hover:border-accent text-fg font-semibold px-5 py-3 text-[15px] transition-colors"
+            >
+              Call {SITE.phone}
+            </a>
+          </div>
+          <p className="mt-3 text-[13.5px] text-fg-muted">
+            Or email{' '}
+            <a href={`mailto:${SITE.email}`} className="underline underline-offset-2">
+              {SITE.email}
+            </a>
+          </p>
+        </div>
       )}
 
       <button
