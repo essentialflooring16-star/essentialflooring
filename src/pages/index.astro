@@ -65,6 +65,11 @@ const showcasePairs = await Promise.all(
 // one high-quality frame that is already 4:3, so a wide crop of it keeps
 // real pixels instead of upscaling a portrait.
 const heroPhoto = photoById('hardwood-refinishing-02');
+// Cel mai mare paint al paginii. Doua formate, ca telefoanele care stiu AVIF sa
+// ia jumatate din octeti, si trepte mici, fiindca un Moto G cere ~720px, nu 900.
+const HERO_WIDTHS = [560, 760, 900, 1400, 2000, 2600];
+const heroAvif = await getImage({ src: photoImage(heroPhoto.file), widths: HERO_WIDTHS, format: 'avif', quality: 44 });
+const heroWebp = await getImage({ src: photoImage(heroPhoto.file), widths: HERO_WIDTHS, format: 'webp', quality: 70 });
 
 const previewPhotos = photos
   .filter((p) => p.state === 'after')
@@ -113,6 +118,15 @@ const steps = [
   title="Sacramento Flooring Contractor | Hardwood, LVP & Stairs | Essential Flooring"
   description="Licensed Sacramento flooring contractor. Hardwood refinishing, waterproof LVP, stair installation, laminate and carpet. Free estimates, call (916) 425-1361."
 >
+  <link
+    slot="head"
+    rel="preload"
+    as="image"
+    type="image/avif"
+    imagesrcset={heroAvif.srcSet.attribute}
+    imagesizes="100vw"
+    fetchpriority="high"
+  />
   <!-- HERO
        Direction E: the editorial opening of the premium wood-flooring class
        (tedtodd.co.uk is the palette anchor). The statement comes first, set
@@ -183,15 +197,21 @@ const steps = [
            fold the browser held it at partial opacity and the measured paint
            landed 2.5s late. The parallax drift stays, it moves no opacity. -->
       <figure class="parallax relative overflow-hidden rounded-card shadow-lift">
-        <Image
-          src={photoImage(heroPhoto.file)}
-          alt={heroPhoto.alt}
-          widths={[900, 1400, 2000, 2600]}
-          sizes="100vw"
-          loading="eager"
-          fetchpriority="high"
-          class="parallax-img h-[46svh] min-h-[320px] sm:h-[56svh] lg:h-[64svh] w-full object-cover [object-position:50%_74%]"
-        />
+        <picture>
+          <source type="image/avif" srcset={heroAvif.srcSet.attribute} sizes="100vw" />
+          <img
+            src={heroWebp.src}
+            srcset={heroWebp.srcSet.attribute}
+            sizes="100vw"
+            alt={heroPhoto.alt}
+            width={heroWebp.attributes.width}
+            height={heroWebp.attributes.height}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            class="parallax-img h-[46svh] min-h-[320px] sm:h-[56svh] lg:h-[64svh] w-full object-cover [object-position:50%_74%]"
+          />
+        </picture>
         <figcaption
           class="absolute left-4 bottom-4 sm:left-6 sm:bottom-6 inline-flex items-center gap-2.5 rounded-btn bg-scrim-media/55 backdrop-blur-[2px] text-fg-on-media text-[12px] font-semibold uppercase tracking-[0.14em] px-3.5 py-2"
         >

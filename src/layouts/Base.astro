@@ -103,6 +103,11 @@ const schemas = [localBusiness, ...schema];
     <script is:inline>
       document.documentElement.classList.add('js');
     </script>
+
+    <!-- A page that knows which picture is its largest paint can say so here,
+         so the browser starts fetching it while it is still reading the head
+         instead of finding the tag after the inlined stylesheet. -->
+    <slot name="head" />
   </head>
   <body class="min-h-screen flex flex-col">
     <a
