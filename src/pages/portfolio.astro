@@ -4,7 +4,7 @@ import type { ImageMetadata } from 'astro';
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import CtaBand from '../components/CtaBand.astro';
-import Gallery from '../components/Gallery.tsx';
+import Gallery from '../components/Gallery.astro';
 import { galleryPhotos, photoImage, CATEGORY_LABELS } from '../lib/photos';
 import pairsData from '../data/before-after.json';
 import { getContent } from '../lib/content';
@@ -68,7 +68,7 @@ const pairs = await Promise.all(
         </p>
       </div>
 
-      <Gallery client:load items={items} categories={CATEGORY_LABELS} />
+      <Gallery items={items} categories={CATEGORY_LABELS} />
     </div>
   </section>
 

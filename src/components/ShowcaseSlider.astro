@@ -1,0 +1,189 @@
+---
+// The before and after comparison, without a framework.
+//
+// It used to be a React island with client:load, which meant the visitor's
+// phone downloaded and parsed the whole React runtime before the first pair
+// could appear. Here the first pair is in the HTML, so it is on screen with
+// the page, and the script only swaps sources and moves the divider.
+export type ShowcasePair = {
+  id: string;
+  beforeSrc: string;
+  afterSrc: string;
+  thumbSrc: string;
+  label: string;
+  city: string;
+  caption: string;
+};
+
+interface Props {
+  pairs: ShowcasePair[];
+}
+
+const { pairs } = Astro.props;
+const first = pairs[0];
+const START = 56;
+---
+
+{first && (
+  <div data-showcase>
+    <div
+      data-frame
+      class="relative aspect-[16/10] w-full overflow-hidden rounded-media select-none shadow-lift touch-pan-y has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-accent has-[:focus-visible]:ring-offset-2"
+    >
+      <img
+        data-after
+        src={first.afterSrc}
+        alt={`After: ${first.caption}`}
+        class="absolute inset-0 h-full w-full object-cover"
+        decoding="async"
+      />
+      <div data-clip class="absolute inset-0 overflow-hidden" style={`clip-path: inset(0 ${100 - START}% 0 0)`}>
+        <img
+          data-before
+          src={first.beforeSrc}
+          alt={`Before: ${first.caption}`}
+          class="absolute inset-0 h-full w-full object-cover"
+          decoding="async"
+        />
+      </div>
+
+      <div
+        data-divider
+        class="absolute inset-y-0 w-[3px] bg-fg-on-media shadow-[0_0_12px_rgba(0,0,0,0.45)]"
+        style={`left: calc(${START}% - 1.5px)`}
+        aria-hidden="true"
+      >
+        <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 grid place-items-center size-11 rounded-btn bg-fg-on-media shadow-lg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ef-fg)" stroke-width="2.2">
+            <path d="m9 6-5 6 5 6M15 6l5 6-5 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </div>
+
+      <input
+        data-range
+        type="range"
+        min="0"
+        max="100"
+        value={START}
+        aria-label="Compare before and after"
+        aria-valuetext={`${START}% of the before photo shown`}
+        class="absolute inset-0 h-full w-full cursor-ew-resize opacity-0 focus:outline-none"
+      />
+
+      <span class="absolute top-4 left-4 rounded-btn bg-scrim-media/55 text-fg-on-media text-[12px] font-semibold uppercase tracking-wider px-3 py-1.5 pointer-events-none">
+        Before
+      </span>
+      <span class="absolute top-4 right-4 rounded-btn bg-accent text-fg-on-accent text-[12px] font-semibold uppercase tracking-wider px-3 py-1.5 pointer-events-none">
+        After
+      </span>
+
+      <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-scrim-media/70 to-transparent px-5 pt-10 pb-4 pointer-events-none">
+        <p data-caption class="text-fg-on-media text-[15px] font-medium">{first.caption}</p>
+        <p data-meta class="text-fg-on-media/75 text-[13px] mt-0.5">
+          {first.label} &middot; {first.city}, CA
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="mt-4 flex gap-2.5 overflow-x-auto pb-2 snap-x"
+      role="group"
+      aria-label="Choose a transformation project"
+    >
+      {pairs.map((p, i) => (
+        <button
+          type="button"
+          data-thumb={i}
+          aria-pressed={i === 0 ? 'true' : 'false'}
+          class:list={[
+            'relative shrink-0 snap-start overflow-hidden rounded-media w-24 aspect-[4/3] transition-all cursor-pointer',
+            i === 0
+              ? 'ring-2 ring-accent ring-offset-2 ring-offset-surface'
+              : 'opacity-65 hover:opacity-100',
+          ]}
+        >
+          <img
+            src={p.thumbSrc}
+            alt={`${p.label} in ${p.city}`}
+            loading="lazy"
+            decoding="async"
+            class="h-full w-full object-cover"
+          />
+        </button>
+      ))}
+    </div>
+
+    <script type="application/json" data-pairs set:html={JSON.stringify(pairs)} />
+  </div>
+)}
+
+<script>
+  const root = document.querySelector('[data-showcase]');
+  if (root) {
+    const raw = root.querySelector('[data-pairs]');
+    const pairs = raw ? JSON.parse(raw.textContent || '[]') : [];
+    const frame = root.querySelector('[data-frame]') as HTMLElement;
+    const clip = root.querySelector('[data-clip]') as HTMLElement;
+    const divider = root.querySelector('[data-divider]') as HTMLElement;
+    const range = root.querySelector('[data-range]') as HTMLInputElement;
+    const beforeImg = root.querySelector('[data-before]') as HTMLImageElement;
+    const afterImg = root.querySelector('[data-after]') as HTMLImageElement;
+    const caption = root.querySelector('[data-caption]') as HTMLElement;
+    const meta = root.querySelector('[data-meta]') as HTMLElement;
+    const thumbs = Array.from(root.querySelectorAll('[data-thumb]')) as HTMLButtonElement[];
+
+    const ON = ['ring-2', 'ring-accent', 'ring-offset-2', 'ring-offset-surface'];
+    const OFF = ['opacity-65', 'hover:opacity-100'];
+
+    function place(pct: number) {
+      const p = Math.min(97, Math.max(3, pct));
+      clip.style.clipPath = `inset(0 ${100 - p}% 0 0)`;
+      divider.style.left = `calc(${p}% - 1.5px)`;
+      range.setAttribute('aria-valuetext', `${Math.round(p)}% of the before photo shown`);
+      return p;
+    }
+
+    function fromClientX(clientX: number) {
+      const rect = frame.getBoundingClientRect();
+      const pct = place(((clientX - rect.left) / rect.width) * 100);
+      range.value = String(Math.round(pct));
+    }
+
+    let dragging = false;
+    frame.addEventListener('pointerdown', (e: PointerEvent) => {
+      dragging = true;
+      (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+      fromClientX(e.clientX);
+    });
+    frame.addEventListener('pointermove', (e: PointerEvent) => {
+      if (dragging) fromClientX(e.clientX);
+    });
+    const stop = () => { dragging = false; };
+    frame.addEventListener('pointerup', stop);
+    frame.addEventListener('pointercancel', stop);
+
+    range.addEventListener('input', () => place(Number(range.value)));
+
+    thumbs.forEach((btn, i) => {
+      btn.addEventListener('click', () => {
+        const p = pairs[i];
+        if (!p) return;
+        beforeImg.src = p.beforeSrc;
+        beforeImg.alt = `Before: ${p.caption}`;
+        afterImg.src = p.afterSrc;
+        afterImg.alt = `After: ${p.caption}`;
+        caption.textContent = p.caption;
+        meta.textContent = `${p.label} · ${p.city}, CA`;
+        thumbs.forEach((other, j) => {
+          const on = i === j;
+          other.setAttribute('aria-pressed', on ? 'true' : 'false');
+          other.classList.toggle('opacity-65', !on);
+          other.classList.toggle('hover:opacity-100', !on);
+          ON.forEach((c) => other.classList.toggle(c, on));
+        });
+        void OFF;
+      });
+    });
+  }
+</script>

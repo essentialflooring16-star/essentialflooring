@@ -1,0 +1,264 @@
+---
+// The portfolio grid and its photo viewer, without a framework.
+//
+// Every photo is in the HTML, so the grid is complete before any script runs
+// and the page needs no React runtime. Filtering hides list items, the viewer
+// is one dialog that gets filled in on open, and the photos the client uploads
+// from the cabinet are added to the front of the grid when they arrive.
+export type GalleryItem = {
+  src: string;
+  thumb: string;
+  alt: string;
+  caption: string;
+  category: string;
+  width?: number;
+  height?: number;
+};
+
+interface Props {
+  items: GalleryItem[];
+  categories: Record<string, string>;
+}
+
+const { items, categories } = Astro.props;
+const present = new Set(items.map((i) => i.category));
+const cats = Object.entries(categories).filter(([k]) => present.has(k));
+
+const ACTIVE = 'bg-control-dark text-fg-on-dark';
+const IDLE = 'bg-surface-raised border border-hairline text-fg-body hover:border-accent';
+---
+
+<div data-gallery>
+  <div class="flex flex-wrap gap-2.5 mb-8" role="group" aria-label="Filter projects">
+    <button
+      type="button"
+      data-filter="all"
+      aria-pressed="true"
+      class={`rounded-btn px-4.5 py-2 text-[14px] font-semibold transition-colors px-5 ${ACTIVE}`}
+    >
+      All projects
+    </button>
+    {cats.map(([key, label]) => (
+      <button
+        type="button"
+        data-filter={key}
+        aria-pressed="false"
+        class={`rounded-btn px-5 py-2 text-[14px] font-semibold transition-colors ${IDLE}`}
+      >
+        {label}
+      </button>
+    ))}
+  </div>
+
+  <ul data-grid class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+    {items.map((item) => (
+      <li data-category={item.category}>
+        <button
+          type="button"
+          data-open
+          data-src={item.src}
+          data-alt={item.alt}
+          data-caption={item.caption}
+          class="group relative block w-full overflow-hidden rounded-media aspect-[4/3] shadow-card focus-visible:outline-2 focus-visible:outline-accent"
+          aria-label={`Open photo: ${item.caption || item.alt}`}
+        >
+          <img
+            src={item.thumb}
+            alt={item.alt}
+            loading="lazy"
+            decoding="async"
+            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+          />
+          <span class="absolute inset-0 bg-gradient-to-t from-scrim-media/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></span>
+          <span class="absolute bottom-0 left-0 right-0 p-3.5 text-left text-fg-on-media text-[13.5px] font-medium leading-snug opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all">
+            {item.caption}
+          </span>
+        </button>
+      </li>
+    ))}
+  </ul>
+
+  <div
+    data-viewer
+    hidden
+    class="fixed inset-0 z-[90] bg-scrim-media/90 flex items-center justify-center p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Photo viewer"
+  >
+    <figure data-figure class="max-w-5xl w-full">
+      <img data-full src="" alt="" class="w-full max-h-[78vh] object-contain rounded-card" />
+      <figcaption data-figcaption class="mt-3 text-center text-fg-on-media/85 text-[15px]"></figcaption>
+    </figure>
+
+    <p data-live aria-live="polite" class="sr-only"></p>
+
+    <button
+      type="button"
+      data-close
+      class="absolute top-4 right-4 grid place-items-center size-11 rounded-btn bg-fg-on-media/10 hover:bg-fg-on-media/25 text-fg-on-media transition-colors"
+      aria-label="Close viewer"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round" />
+      </svg>
+    </button>
+    <button
+      type="button"
+      data-prev
+      class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 grid place-items-center size-11 rounded-btn bg-fg-on-media/10 hover:bg-fg-on-media/25 text-fg-on-media transition-colors"
+      aria-label="Previous photo"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="m14 6-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+    <button
+      type="button"
+      data-next
+      class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 grid place-items-center size-11 rounded-btn bg-fg-on-media/10 hover:bg-fg-on-media/25 text-fg-on-media transition-colors"
+      aria-label="Next photo"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="m10 6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  const root = document.querySelector('[data-gallery]');
+  if (root) {
+    const ACTIVE = ['bg-control-dark', 'text-fg-on-dark'];
+    const IDLE = ['bg-surface-raised', 'border', 'border-hairline', 'text-fg-body', 'hover:border-accent'];
+
+    const grid = root.querySelector('[data-grid]') as HTMLUListElement;
+    const viewer = root.querySelector('[data-viewer]') as HTMLElement;
+    const full = root.querySelector('[data-full]') as HTMLImageElement;
+    const figcap = root.querySelector('[data-figcaption]') as HTMLElement;
+    const live = root.querySelector('[data-live]') as HTMLElement;
+    const closeBtn = root.querySelector('[data-close]') as HTMLButtonElement;
+    const prevBtn = root.querySelector('[data-prev]') as HTMLButtonElement;
+    const nextBtn = root.querySelector('[data-next]') as HTMLButtonElement;
+    const figure = root.querySelector('[data-figure]') as HTMLElement;
+
+    let filter = 'all';
+    let openIdx: number | null = null;
+    let trigger: HTMLElement | null = null;
+
+    const shown = () =>
+      Array.from(grid.querySelectorAll('li')).filter((li) => !li.hidden);
+
+    function applyFilter() {
+      Array.from(grid.querySelectorAll('li')).forEach((li) => {
+        li.hidden = filter !== 'all' && li.dataset.category !== filter;
+      });
+    }
+
+    root.querySelectorAll('[data-filter]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        filter = (btn as HTMLElement).dataset.filter || 'all';
+        root.querySelectorAll('[data-filter]').forEach((other) => {
+          const on = other === btn;
+          other.setAttribute('aria-pressed', on ? 'true' : 'false');
+          ACTIVE.forEach((c) => other.classList.toggle(c, on));
+          IDLE.forEach((c) => other.classList.toggle(c, !on));
+        });
+        applyFilter();
+      });
+    });
+
+    function show(idx: number) {
+      const list = shown();
+      if (!list.length) return;
+      openIdx = ((idx % list.length) + list.length) % list.length;
+      const btn = list[openIdx].querySelector('[data-open]') as HTMLElement;
+      full.src = btn.dataset.src || '';
+      full.alt = btn.dataset.alt || '';
+      figcap.textContent = btn.dataset.caption || '';
+      live.textContent = `Photo ${openIdx + 1} of ${list.length}. ${btn.dataset.alt || ''}`;
+    }
+
+    function open(li: HTMLElement, from: HTMLElement) {
+      trigger = from;
+      show(shown().indexOf(li as HTMLLIElement));
+      viewer.hidden = false;
+      document.body.style.overflow = 'hidden';
+      closeBtn.focus();
+    }
+
+    function close() {
+      viewer.hidden = true;
+      openIdx = null;
+      document.body.style.overflow = '';
+      trigger?.focus();
+    }
+
+    function wireThumb(btn: HTMLElement) {
+      btn.addEventListener('click', () => open(btn.closest('li') as HTMLElement, btn));
+    }
+    grid.querySelectorAll('[data-open]').forEach((b) => wireThumb(b as HTMLElement));
+
+    viewer.addEventListener('click', close);
+    figure.addEventListener('click', (e) => e.stopPropagation());
+    closeBtn.addEventListener('click', (e) => { e.stopPropagation(); close(); });
+    prevBtn.addEventListener('click', (e) => { e.stopPropagation(); if (openIdx !== null) show(openIdx - 1); });
+    nextBtn.addEventListener('click', (e) => { e.stopPropagation(); if (openIdx !== null) show(openIdx + 1); });
+
+    window.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (viewer.hidden) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowRight' && openIdx !== null) show(openIdx + 1);
+      if (e.key === 'ArrowLeft' && openIdx !== null) show(openIdx - 1);
+      if (e.key === 'Tab') {
+        // Keep focus inside the dialog while it is open.
+        const focusables = Array.from(viewer.querySelectorAll('button'));
+        if (!focusables.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement as HTMLElement | null;
+        if (e.shiftKey && (active === first || !viewer.contains(active))) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && (active === last || !viewer.contains(active))) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    });
+
+    // Photos uploaded from the cabinet join the front of the grid.
+    const supaUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+    const supaKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+    if (supaUrl && supaKey) {
+      fetch(
+        `${supaUrl}/rest/v1/portfolio_items?select=image_url,caption,alt,category&published=eq.true&order=created_at.desc`,
+        { headers: { apikey: supaKey, Authorization: `Bearer ${supaKey}` } },
+      )
+        .then((r) => (r.ok ? r.json() : []))
+        .then((rows) => {
+          const template = grid.querySelector('li');
+          if (!template) return;
+          rows.reverse().forEach((row: any) => {
+            const li = template.cloneNode(true) as HTMLLIElement;
+            const alt = row.alt || row.caption || 'Flooring project by Essential Flooring';
+            li.dataset.category = row.category || 'other';
+            const btn = li.querySelector('[data-open]') as HTMLElement;
+            btn.dataset.src = row.image_url;
+            btn.dataset.alt = alt;
+            btn.dataset.caption = row.caption || '';
+            btn.setAttribute('aria-label', `Open photo: ${row.caption || alt}`);
+            const img = li.querySelector('img') as HTMLImageElement;
+            img.src = row.image_url;
+            img.alt = alt;
+            const cap = li.querySelector('span:last-of-type') as HTMLElement;
+            if (cap) cap.textContent = row.caption || '';
+            grid.prepend(li);
+            wireThumb(btn);
+          });
+          applyFilter();
+        })
+        .catch(() => {});
+    }
+  }
+</script>

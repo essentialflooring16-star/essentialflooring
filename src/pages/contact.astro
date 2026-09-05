@@ -4,7 +4,7 @@ import { Image } from 'astro:assets';
 import contactRoom from '../assets/stock/contact-room.jpg';
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
-import ContactForm from '../components/ContactForm.tsx';
+import ContactForm from '../components/ContactForm.astro';
 import { getContent } from '../lib/content';
 
 const c = await getContent();
@@ -105,7 +105,7 @@ const c = await getContent();
 
         <div class="reveal rounded-card bg-surface-raised border border-hairline shadow-lift p-7 sm:p-9 h-fit">
           <h2 class="font-display font-semibold text-2xl text-fg mb-6">{c('contact.form.title')}</h2>
-          <ContactForm client:load />
+          <ContactForm />
         </div>
       </div>
     </div>

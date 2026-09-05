@@ -7,7 +7,7 @@ import FaqList from '../components/FaqList.astro';
 import Stats from '../components/Stats.astro';
 import ServiceCards from '../components/ServiceCards.astro';
 import WorkInProgress from '../components/WorkInProgress.astro';
-import ShowcaseSlider from '../components/ShowcaseSlider.tsx';
+import ShowcaseSlider from '../components/ShowcaseSlider.astro';
 import Icon from '../components/Icon.astro';
 import { ALL_SERVICES, CORE_CITIES, EXTENDED_CITIES } from '../data/site';
 import { photos, photoImage, photoById } from '../lib/photos';
@@ -264,7 +264,7 @@ const steps = [
           </div>
         </div>
         <div class="m-rise">
-          <ShowcaseSlider client:load pairs={showcasePairs} />
+          <ShowcaseSlider pairs={showcasePairs} />
         </div>
       </div>
 
