@@ -4,8 +4,11 @@ import sanitizeHtml from 'sanitize-html';
 import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import CtaBand from '../../components/CtaBand.astro';
-import { SITE } from '../../data/site';
+
 import { getPublishedPosts, postDate, type Post } from '../../lib/blog';
+import { getContent } from '../../lib/content';
+
+const c = await getContent();
 
 export async function getStaticPaths() {
   const posts = await getPublishedPosts();
@@ -50,8 +53,8 @@ const schema = {
   headline: post.title,
   datePublished: post.created_at,
   dateModified: post.updated_at,
-  author: { '@type': 'Organization', name: SITE.name },
-  publisher: { '@id': `${SITE.domain}/#business` },
+  author: { '@type': 'Organization', name: c.site.name },
+  publisher: { '@id': `${c.site.domain}/#business` },
   ...(post.cover_url ? { image: post.cover_url } : {}),
 };
 ---
@@ -98,7 +101,7 @@ const schema = {
           Thinking about your own floors?
         </p>
         <p class="mt-2 text-[15px] text-fg-muted">
-          Estimates are free and honest. Call {SITE.phone} or send us your project.
+          Estimates are free and honest. Call {c.site.phone} or send us your project.
         </p>
         <a
           href="/contact/"

@@ -6,21 +6,23 @@ import CtaBand from '../components/CtaBand.astro';
 import FaqList from '../components/FaqList.astro';
 import Stats from '../components/Stats.astro';
 import ServiceCards from '../components/ServiceCards.astro';
-import VideoStrip from '../components/VideoStrip.astro';
+import WorkInProgress from '../components/WorkInProgress.astro';
 import ShowcaseSlider from '../components/ShowcaseSlider.tsx';
 import Icon from '../components/Icon.astro';
-import { SITE, ALL_SERVICES, CORE_CITIES, EXTENDED_CITIES } from '../data/site';
+import { ALL_SERVICES, CORE_CITIES, EXTENDED_CITIES } from '../data/site';
 import { photos, photoImage, photoById } from '../lib/photos';
 import faqData from '../data/faq.json';
 import pairsData from '../data/before-after.json';
 import { getReviews, ratingSummary } from '../lib/reviews';
+import { getContent } from '../lib/content';
+
+const c = await getContent();
 
 // The teaser shows stars only when real reviews exist, and shows the true
 // average rather than a decorative five.
 const homeReviews = await getReviews();
 const reviewSummary = ratingSummary(homeReviews);
 const hasReviews = reviewSummary !== null;
-
 
 // Before/After showcase: real client-labeled pairs, same-spot first.
 const baModules = import.meta.glob<{ default: import('astro').ImageMetadata }>(
@@ -63,7 +65,22 @@ const previewPhotos = photos
   .sort((a, b) => b.quality - a.quality)
   .slice(0, 8);
 
-const faqPreview = (faqData as { q: string; a: string }[]).slice(0, 4);
+const faqAll = c.isEdited('faq.items')
+  ? parseQA(c('faq.items'))
+  : (faqData as { q: string; a: string }[]).map((i) => ({ q: c.apply(i.q), a: c.apply(i.a) }));
+const faqPreview = faqAll.slice(0, 4);
+
+// "Also serving" splits the extended list into towns and regions so a region
+// entry (the Bay Area) reads as its own clause instead of as one more town.
+const extendedTowns = EXTENDED_CITIES.filter((c) => !('region' in c && c.region));
+const extendedRegions = EXTENDED_CITIES.filter((c) => 'region' in c && c.region);
+const alsoServing =
+  'Also serving ' +
+  extendedTowns.map((c) => c.city).join(', ') +
+  (extendedRegions.length
+    ? ', and the ' + extendedRegions.map((c) => c.city).join(' and ') + ' for select projects'
+    : '') +
+  '.';
 
 const steps = [
   {
@@ -87,15 +104,18 @@ const steps = [
 ---
 
 <Base
-  title="Essential Flooring | Flooring Contractor in Sacramento, CA"
-  description="Licensed Sacramento flooring contractor. Hardwood floor refinishing, waterproof LVP, stairs, laminate and carpet. Free estimates, call (916) 425-1361."
+  title="Sacramento Flooring Contractor | Hardwood, LVP & Stairs | Essential Flooring"
+  description="Licensed Sacramento flooring contractor. Hardwood refinishing, waterproof LVP, stair installation, laminate and carpet. Free estimates, call (916) 425-1361."
 >
   <!-- HERO
        Direction E: the editorial opening of the premium wood-flooring class
        (tedtodd.co.uk is the palette anchor). The statement comes first, set
        in the serif with one italic copper flourish; the photograph follows,
        framed in the paper ground, with the place label pinned to its corner.
-       The h1 keeps the search terms: the work and the region, by name. -->
+       The h1 carries the search terms: contractor plus city on the first
+       line, the three services on the second, and the sub-headline under it
+       repeats the long-tail phrase (refinishing, vinyl plank, stairs,
+       greater Sacramento). -->
   <section class="relative bg-surface overflow-hidden">
     <div class="relative mx-auto max-w-6xl px-4 sm:px-6 pt-12 sm:pt-16 lg:pt-20">
       <!-- Maker's stamp: fills the right of the statement on wide screens,
@@ -117,33 +137,36 @@ const steps = [
 
       <!-- The statement enters one line at a time, each line rising out of a
            soft blur, so the first thing the visitor reads is also the first
-           thing that moves. The h1 keeps the search terms intact. -->
-      <h1
-        class="font-display font-medium text-fg text-[38px] sm:text-[56px] lg:text-[68px] leading-[1.02] tracking-[-0.01em] max-w-[17ch] [text-wrap:balance]"
-      >
-        <span class="m-line block" style="--i:0">Hardwood refinishing,</span>
-        <span class="m-line block" style="--i:1">vinyl plank <span class="accent-italic">and stairs</span></span>
-        <span class="m-line block" style="--i:2">in greater Sacramento</span>
+           thing that moves. Line one is the contractor and the city, line two
+           the three services; the sub-headline below takes the same entrance
+           as a third line, and the CTA row follows at the next index.
+           Weight and tracking come from the global h1 rule (800, -0.028em).
+           From lg the h1 stops 190px short of the column edge so neither
+           line can run under the stamp (164px wide, 24px in). -->
+      <h1 class="font-display text-fg text-[30px] sm:text-[46px] xl:text-[52px] leading-[1.06] lg:max-w-[calc(100%-190px)] [text-wrap:balance]">
+        <span class="m-line block" style="--i:0">{c('home.hero.title_line_1')}</span>
+        <span class="m-line block" style="--i:1">{c('home.hero.title_line_2')} <span class="accent-italic">{c('home.hero.title_accent')}</span></span>
       </h1>
+      <p class="m-line mt-5 sm:mt-6 max-w-2xl text-[17px] sm:text-[20px] leading-snug text-fg-muted" style="--i:2">{c('home.hero.subtitle')}</p>
 
-      <div class="m-intro mt-8 sm:mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" style="--i:4">
+      <div class="m-intro mt-8 sm:mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" style="--i:3">
         <a
           href="/contact/"
           class="arrow-link inline-flex items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-7 py-3.5 text-[15px] transition-colors shadow-card"
         >
-          Get a free estimate
+          {c('home.hero.cta_label')}
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
             <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </a>
         <a
-          href={SITE.phoneHref}
+          href={c.site.phoneHref}
           class="font-display font-medium text-fg text-[20px] sm:text-[22px] underline-offset-[6px] decoration-accent/60 hover:underline"
         >
-          {SITE.phone}
+          {c.site.phone}
         </a>
         <p class="basis-full sm:basis-auto text-[13.5px] text-fg-muted">
-          Free estimates, no call-out fee
+          {c('home.hero.cta_note')}
         </p>
       </div>
     </div>
@@ -173,7 +196,7 @@ const steps = [
       <ul class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5 text-[13.5px] text-fg-muted border-t border-hairline pt-6">
         <li class="flex items-center gap-3">
           <Icon name="shield" size={26} class="shrink-0 text-fg" />
-          <span><span class="block text-fg font-semibold">Licensed &amp; insured</span>{SITE.license}</span>
+          <span><span class="block text-fg font-semibold">Licensed &amp; insured</span>{c.site.license}</span>
         </li>
         <li class="flex items-center gap-3">
           <Icon name="clock" size={26} class="shrink-0 text-fg" />
@@ -181,7 +204,7 @@ const steps = [
         </li>
         <li class="flex items-center gap-3">
           <Icon name="pin" size={26} class="shrink-0 text-fg" />
-          <span><span class="block text-fg font-semibold">{CORE_CITIES.length + EXTENDED_CITIES.length} cities</span>around Sacramento</span>
+          <span><span class="block text-fg font-semibold">{CORE_CITIES.length + EXTENDED_CITIES.length} cities and areas</span>across Northern California</span>
         </li>
         <li class="flex items-center gap-3">
           <Icon name="ruler" size={26} class="shrink-0 text-fg" />
@@ -198,8 +221,8 @@ const steps = [
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
         <SectionHeading
           eyebrow="Services"
-          title="What we install and refinish"
-          text="From tear-out to the last baseboard, one licensed contractor owns the whole job. No handoffs, no finger-pointing."
+          title={c('home.services.title')}
+          text={c('home.services.intro')}
           light
         />
         <a
@@ -225,8 +248,8 @@ const steps = [
         <div class="lg:sticky lg:top-28">
           <SectionHeading
             eyebrow="Before and after"
-            title="The same room, photographed twice"
-            text="Every pair below was shot on real Sacramento area projects. Pick a project, pull the slider, and see exactly what we walked into and what we left behind."
+            title={c('home.before_after.title')}
+            text={c('home.before_after.intro')}
           />
           <div class="reveal mt-8">
             <a
@@ -263,7 +286,7 @@ const steps = [
         <div class="lg:sticky lg:top-28">
           <SectionHeading
             eyebrow="Process"
-            title="From the first call to the final walkthrough"
+            title={c('home.process.title')}
           />
           <figure class="m-rise hidden lg:block mt-10 rounded-card bg-surface-raised p-2.5 pb-0 shadow-card max-w-[300px]">
             <span class="parallax block overflow-hidden rounded-media">
@@ -278,8 +301,8 @@ const steps = [
               />
             </span>
             <figcaption class="px-2.5 py-3.5 text-[13px] text-fg-muted">
-              <span class="block font-display font-medium text-[15px] text-fg">Every job, owner on site</span>
-              Alexandru measures, quotes and installs himself.
+              <span class="block font-display font-medium text-[15px] text-fg">Owner operated</span>
+              One person responsible from estimate to final walkthrough.
             </figcaption>
           </figure>
         </div>
@@ -300,15 +323,14 @@ const steps = [
     </div>
   </section>
 
-
   <!-- PORTFOLIO MOSAIC -->
   <section class="py-16 sm:py-24">
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
       <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
         <SectionHeading
           eyebrow="Recent work"
-          title="Floors we finished around Sacramento"
-          text="Every photo is our own work in the Sacramento area, straight off the phone, on the job."
+          title={c('home.portfolio.title')}
+          text={c('home.portfolio.intro')}
         />
         <a
           href="/portfolio/"
@@ -358,7 +380,7 @@ const steps = [
     </div>
   </section>
 
-  <VideoStrip />
+  <WorkInProgress />
 
   <!-- WHY US + AREAS -->
   <section class="py-16 sm:py-24">
@@ -366,13 +388,13 @@ const steps = [
       <div>
         <SectionHeading
           eyebrow="About"
-          title="Licensed, insured, and on the job himself"
+          title={c('home.why.title')}
         />
         <ul class="mt-8 space-y-5">
           {[
             {
               t: 'California licensed contractor',
-              d: `We operate under ${SITE.license}, fully insured. You are protected, and the work is up to code.`,
+              d: `We operate under ${c.site.license}, fully insured. You are protected, and the work is up to code.`,
             },
             {
               t: 'Transparent quotes',
@@ -403,9 +425,9 @@ const steps = [
       </div>
 
       <div class="reveal rounded-card bg-surface-raised border border-hairline shadow-card p-7 sm:p-9 h-fit">
-        <h3 class="font-display font-semibold text-2xl text-fg">Where we work</h3>
+        <h3 class="font-display font-semibold text-2xl text-fg">{c('home.areas.title')}</h3>
         <p class="mt-2 text-[15px] text-fg-muted leading-relaxed">
-          Based in Sacramento, serving homes across the region.
+          {c('home.areas.intro')}
         </p>
         <ul class="mt-6 grid grid-cols-2 gap-x-6 gap-y-2.5 text-[15px]">
           {CORE_CITIES.map((c) => (
@@ -421,7 +443,7 @@ const steps = [
           ))}
         </ul>
         <p class="mt-5 text-[13.5px] text-fg-muted/85 leading-relaxed">
-          Also serving {EXTENDED_CITIES.map((c) => c.city).join(', ')}.
+          {alsoServing}
         </p>
         <a href="/service-areas/" class="mt-4 inline-flex items-center gap-1.5 font-semibold text-accent-on-light hover:text-fg transition-colors text-[15px]">
           All service areas
@@ -479,7 +501,7 @@ const steps = [
           : 'Our reviews live on our Google Business Profile, along with photos from recent jobs around Sacramento.'}
       </p>
       <a
-        href={hasReviews ? '/reviews' : SITE.googleProfile}
+        href={hasReviews ? '/reviews' : c.site.googleProfile}
         target={hasReviews ? undefined : '_blank'}
         rel={hasReviews ? undefined : 'noopener'}
         class="reveal mt-6 inline-flex items-center gap-2 rounded-btn bg-control-dark hover:bg-control-dark-hover text-fg-on-dark font-semibold px-6 py-3 transition-colors"
@@ -492,7 +514,7 @@ const steps = [
   <!-- FAQ PREVIEW -->
   <section class="py-20 sm:py-24">
     <div class="mx-auto max-w-3xl px-4 sm:px-6">
-      <SectionHeading eyebrow="FAQ" title="Questions we get asked" align="center" />
+      <SectionHeading eyebrow="FAQ" title={c('home.faq.title')} align="center" />
       <div class="reveal mt-10">
         <FaqList items={faqPreview} withSchema={false} />
       </div>

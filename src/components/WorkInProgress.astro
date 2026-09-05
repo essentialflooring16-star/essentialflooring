@@ -1,0 +1,61 @@
+---
+// Three stills from the client's own job-site Live Photos, shown as plain
+// photographs at his request. They replace the former looping clips, which
+// were the motion halves of the same Live Photos and looked odd as video.
+// No script, no controls: the only movement is the CSS scroll parallax that
+// the rest of the site already uses on photographs.
+import { Image } from 'astro:assets';
+import work01 from '../assets/progress/work-01.jpg';
+import work02 from '../assets/progress/work-02.jpg';
+import work03 from '../assets/progress/work-03.jpg';
+
+const shots = [
+  {
+    src: work01,
+    label: 'Plank install in progress',
+    alt: 'Newly laid wide light-toned planks running from a kitchen island toward a brick fireplace, with someone kneeling at the far end where the planks stop.',
+  },
+  {
+    src: work02,
+    label: 'Subfloor stripped back before the new floor goes down',
+    alt: 'Kitchen with the old floor removed down to bare plywood subfloor, patchy with adhesive residue, with oak cabinets and a tile-topped island still in place, a wooden staircase on the right and a yellow extension cord across the floor.',
+  },
+  {
+    src: work03,
+    label: 'Dust walls up while the old tile comes out',
+    alt: 'Entry area with plastic sheeting taped over the walls and stair railing, broken pieces of dark gray tile scattered on the floor and a red bucket by the banister.',
+  },
+];
+---
+
+<section class="py-16 sm:py-20 bg-surface-sunken/60 overflow-hidden">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <h2 class="reveal font-display font-semibold text-3xl sm:text-4xl text-fg tracking-tight text-center mb-9">
+      Jobs in progress
+    </h2>
+
+    <div class="grid sm:grid-cols-3 gap-4 sm:gap-5">
+      {shots.map((s, i) => (
+        <figure class={`reveal-scale relative rounded-media overflow-hidden shadow-card aspect-[3/4] sm:aspect-[4/5] ${i === 1 ? 'sm:translate-y-6' : ''}`} style={`transition-delay:${i * 70}ms`}>
+          <span class="parallax absolute inset-0 block">
+            <Image
+              src={s.src}
+              alt={s.alt}
+              widths={[360, 540, 720]}
+              sizes="(min-width: 640px) 33vw, 100vw"
+              format="webp"
+              quality={72}
+              class="parallax-img h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          </span>
+
+          <figcaption class="pointer-events-none absolute bottom-0 inset-x-0 bg-gradient-to-t from-scrim-media/80 to-transparent px-4 pt-10 pb-3.5 text-fg-on-media text-[13.5px] font-medium">
+            {s.label}
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>

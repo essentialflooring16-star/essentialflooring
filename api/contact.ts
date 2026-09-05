@@ -441,7 +441,9 @@ export default async function handler(req: Req, res: Res): Promise<void> {
   const text = leadEmailText(lead);
 
   try {
-    const res = await fetch('https://api.resend.com/emails', {
+    // Numele e `sent`, nu `res`: `res` e raspunsul functiei si umbrirea lui aici
+    // trimitea obiectul gresit in send().
+    const sent = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -454,8 +456,8 @@ export default async function handler(req: Req, res: Res): Promise<void> {
       }),
     });
 
-    if (!res.ok) {
-      console.error('resend failed', res.status, await res.text());
+    if (!sent.ok) {
+      console.error('resend failed', sent.status, await sent.text());
       // Cererea e deja salvata, deci pentru vizitator trimiterea a reusit.
       return stored
         ? send(res, { ok: true, emailed: false }, 200)

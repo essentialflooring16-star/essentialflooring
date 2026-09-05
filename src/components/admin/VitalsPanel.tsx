@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useT, type Vars } from '../../lib/admin-i18n';
 import {
   VITAL_METRICS,
   VITALS_THRESHOLDS,
@@ -15,43 +16,48 @@ type VitalRow = {
   device: string | null;
 };
 
-const RANGES = [
-  { days: 7, label: '7 days' },
-  { days: 30, label: '30 days' },
-];
+// Hook-ul nu poate fi apelat dintr-o functie de modul, deci ajutoarele care produc
+// text primesc t ca parametru si traduc in momentul randarii.
+type TFn = (key: string, vars?: Vars) => string;
+
+// Eticheta perioadei se compune la randare din cheia cu plural, ca sa iasa forma
+// corecta in fiecare limba ("30 de zile"), deci aici raman doar cifrele.
+const RANGES = [7, 30];
 
 // Ceiling on how many rows one query pulls. Five metrics per page load, so this is
 // roughly 4000 page loads. The query takes the newest rows first, so hitting the cap
 // drops the oldest part of the window rather than the part the client cares about.
 const ROW_CAP = 20000;
 
-const METRIC_INFO: Record<VitalName, { title: string; blurb: string }> = {
+// LCP, CLS, INP, FCP si TTFB sunt numele metricii asa cum ajung din baza de date si
+// raman neatinse; se traduce doar textul pe care il citeste omul, prin cheia lui.
+const METRIC_INFO_KEYS: Record<VitalName, { title: string; blurb: string }> = {
   LCP: {
-    title: 'Largest paint',
-    blurb: 'How long before the main photo or headline is on screen.',
+    title: 'vitals.metric_lcp_title',
+    blurb: 'vitals.metric_lcp_blurb',
   },
   CLS: {
-    title: 'Layout shift',
-    blurb: 'How much the page jumps around while it finishes loading.',
+    title: 'vitals.metric_cls_title',
+    blurb: 'vitals.metric_cls_blurb',
   },
   INP: {
-    title: 'Tap response',
-    blurb: 'How quickly the page reacts after a visitor taps or clicks.',
+    title: 'vitals.metric_inp_title',
+    blurb: 'vitals.metric_inp_blurb',
   },
   FCP: {
-    title: 'First paint',
-    blurb: 'How long before anything at all appears instead of a blank screen.',
+    title: 'vitals.metric_fcp_title',
+    blurb: 'vitals.metric_fcp_blurb',
   },
   TTFB: {
-    title: 'Server response',
-    blurb: 'How fast the server starts sending the page.',
+    title: 'vitals.metric_ttfb_title',
+    blurb: 'vitals.metric_ttfb_blurb',
   },
 };
 
-const RATING_LABEL: Record<VitalRating, string> = {
-  good: 'Good',
-  'needs-improvement': 'Needs work',
-  poor: 'Poor',
+const RATING_LABEL_KEYS: Record<VitalRating, string> = {
+  good: 'vitals.rating_good',
+  'needs-improvement': 'vitals.rating_needs_improvement',
+  poor: 'vitals.rating_poor',
 };
 
 const RATING_BAR: Record<VitalRating, string> = {
@@ -80,12 +86,12 @@ function p75(values: number[]): number | null {
   return sorted[index];
 }
 
-function formatValue(metric: VitalName, value: number): string {
+function formatValue(t: TFn, metric: VitalName, value: number): string {
   if (metric === 'CLS') return value.toFixed(3);
   // Round before choosing the unit, otherwise 999.6 ms prints as "1000 ms".
   const ms = Math.round(value);
-  if (ms >= 1000) return `${(ms / 1000).toFixed(1)} s`;
-  return `${ms} ms`;
+  if (ms >= 1000) return t('vitals.unit_seconds', { n: (ms / 1000).toFixed(1) });
+  return t('vitals.unit_milliseconds', { n: ms });
 }
 
 type DeviceStatValue = { p75: number | null; samples: number };
@@ -101,6 +107,7 @@ type MetricSummary = {
 };
 
 export default function VitalsPanel() {
+  const { t } = useT();
   const [days, setDays] = useState(30);
   const [rows, setRows] = useState<VitalRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -124,9 +131,7 @@ export default function VitalsPanel() {
         if (cancelled) return;
         if (error) {
           console.error(error);
-          setError(
-            'Could not load the speed measurements. Refresh the page, and if it keeps failing contact your developer.',
-          );
+          setError(t('vitals.load_error'));
         } else {
           setRows((data as VitalRow[]) ?? []);
         }
@@ -209,28 +214,23 @@ export default function VitalsPanel() {
           the client just pressed keeps keyboard focus instead of being unmounted. */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="font-display font-semibold text-2xl text-fg">Site speed</h1>
-          <p className="text-[14.5px] text-fg-muted mt-1 max-w-2xl">
-            These numbers come from real visits to the live site, not from a test run on
-            one machine. Every number here is the p75, meaning 3 out of 4 page loads were
-            at least this fast. Google grades on the p75 rather than the average, because
-            averages hide slow phones.
-          </p>
+          <h1 className="font-display font-semibold text-2xl text-fg">{t('vitals.title')}</h1>
+          <p className="text-[14.5px] text-fg-muted mt-1 max-w-2xl">{t('vitals.intro')}</p>
         </div>
-        <div className="flex gap-2" role="group" aria-label="Time range">
+        <div className="flex gap-2" role="group" aria-label={t('vitals.range_group_label')}>
           {RANGES.map((r) => (
             <button
-              key={r.days}
+              key={r}
               type="button"
-              aria-pressed={days === r.days}
-              onClick={() => setDays(r.days)}
+              aria-pressed={days === r}
+              onClick={() => setDays(r)}
               className={`rounded-btn px-4 py-1.5 text-[13.5px] font-semibold transition-colors ${
-                days === r.days
+                days === r
                   ? 'bg-control-dark text-fg-on-dark'
                   : 'bg-surface-raised border border-hairline text-fg-body'
               }`}
             >
-              {r.label}
+              {t('vitals.range_option', { n: r })}
             </button>
           ))}
         </div>
@@ -238,11 +238,9 @@ export default function VitalsPanel() {
 
       {status === 'unconfigured' && (
         <div className="rounded-card border border-hairline bg-surface-raised p-8 shadow-card">
-          <h2 className="font-semibold text-[16px] text-fg">Not connected</h2>
+          <h2 className="font-semibold text-[16px] text-fg">{t('vitals.unconfigured_title')}</h2>
           <p className="mt-2 text-[14.5px] text-fg-body leading-relaxed max-w-2xl">
-            The site is not connected to its database right now, so there is nothing to
-            show here. Nothing is lost, the measurements appear again once the connection
-            is restored.
+            {t('vitals.unconfigured_body')}
           </p>
         </div>
       )}
@@ -258,17 +256,15 @@ export default function VitalsPanel() {
 
       {status === 'loading' && (
         <p className="text-fg-muted" role="status">
-          Loading speed measurements...
+          {t('vitals.loading')}
         </p>
       )}
 
       {status === 'empty' && (
         <div className="rounded-card border border-hairline bg-surface-raised p-8 shadow-card">
-          <h2 className="font-semibold text-[16px] text-fg">No measurements yet</h2>
+          <h2 className="font-semibold text-[16px] text-fg">{t('vitals.empty_title')}</h2>
           <p className="mt-2 text-[14.5px] text-fg-body leading-relaxed max-w-2xl">
-            This page fills in on its own once the site is live and real people browse it.
-            Each visit quietly reports how fast the page loaded on that phone or computer.
-            Give it a few days of traffic, then come back and check which pages are slow.
+            {t('vitals.empty_body')}
           </p>
         </div>
       )}
@@ -277,10 +273,12 @@ export default function VitalsPanel() {
         <>
           <p className="text-[13px] text-fg-muted" role="status">
             {capped
-              ? `Showing the most recent ${ROW_CAP.toLocaleString('en-US')} measurements. Older ones inside this period are not counted.`
-              : `${totalSamples.toLocaleString('en-US')} measurements from the last ${days} days.`}{' '}
-            Some browsers report fewer of these numbers than others, so this is a large
-            sample of visits rather than every single one.
+              ? t('vitals.sample_capped', { n: ROW_CAP.toLocaleString('en-US') })
+              : t('vitals.sample_count', {
+                  n: totalSamples,
+                  range: t('vitals.range_option', { n: days }),
+                })}{' '}
+            {t('vitals.sample_caveat')}
           </p>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -289,33 +287,23 @@ export default function VitalsPanel() {
             ))}
           </div>
 
-          <p className="text-[13px] text-fg-muted max-w-2xl">
-            Largest paint, layout shift and tap response are the three Google grades. First
-            paint and server response are supporting numbers that help explain the others.
-          </p>
+          <p className="text-[13px] text-fg-muted max-w-2xl">{t('vitals.metrics_note')}</p>
 
           <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
-            <h2 className="font-semibold text-[15px] text-fg-body">Slowest pages</h2>
-            <p className="text-[13.5px] text-fg-muted mt-1 mb-4">
-              Ranked by how long the main content takes to appear. Fix the top of this list
-              first, and trust the rows with the most page loads behind them.
-            </p>
+            <h2 className="font-semibold text-[15px] text-fg-body">{t('vitals.slowest_title')}</h2>
+            <p className="text-[13.5px] text-fg-muted mt-1 mb-4">{t('vitals.slowest_note')}</p>
             {worstPages.length === 0 ? (
-              <p className="text-[14px] text-fg-muted">No page load times recorded yet.</p>
+              <p className="text-[14px] text-fg-muted">{t('vitals.slowest_empty')}</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-[14px] border-collapse">
                   <thead>
                     <tr className="text-left text-fg-muted border-b border-hairline">
                       <th scope="col" className="py-2 pr-4 font-semibold">
-                        Page
+                        {t('vitals.col_page')}
                       </th>
-                      <th scope="col" className="py-2 pr-4 font-semibold text-right">
-                        Page loads measured
-                      </th>
-                      <th scope="col" className="py-2 font-semibold text-right">
-                        Main content visible
-                      </th>
+                      <th scope="col" className="py-2 pr-4 font-semibold text-right">{t('vitals.col_page_loads')}</th>
+                      <th scope="col" className="py-2 font-semibold text-right">{t('vitals.col_main_content')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-hairline">
@@ -329,10 +317,10 @@ export default function VitalsPanel() {
                           </td>
                           <td className="py-2.5 text-right tabular-nums">
                             <span className="font-semibold text-fg">
-                              {formatValue('LCP', p.p75)}
+                              {formatValue(t, 'LCP', p.p75)}
                             </span>
                             <span className="ml-2 text-[12px] text-fg-muted">
-                              {RATING_LABEL[rating]}
+                              {t(RATING_LABEL_KEYS[rating])}
                             </span>
                           </td>
                         </tr>
@@ -350,8 +338,9 @@ export default function VitalsPanel() {
 }
 
 function MetricCard({ summary }: { summary: MetricSummary }) {
+  const { t } = useT();
   const { metric, p75: value, rating, samples, split } = summary;
-  const info = METRIC_INFO[metric];
+  const info = METRIC_INFO_KEYS[metric];
   const threshold = VITALS_THRESHOLDS[metric];
 
   return (
@@ -370,28 +359,30 @@ function MetricCard({ summary }: { summary: MetricSummary }) {
           <span
             className={`shrink-0 rounded-btn border px-3 py-1 text-[12px] font-semibold ${RATING_BADGE[rating]}`}
           >
-            {rating === 'good' ? 'Passing' : RATING_LABEL[rating]}
+            {rating === 'good' ? t('vitals.rating_passing') : RATING_LABEL_KEYS[rating]}
           </span>
         )}
       </div>
 
       {value === null ? (
-        <p className="mt-4 text-[14px] text-fg-muted">Not measured yet in this period.</p>
+        <p className="mt-4 text-[14px] text-fg-muted">{t('vitals.no_value')}</p>
       ) : (
         <>
           <p className="mt-4 font-display font-semibold text-4xl text-fg tabular-nums">
-            {formatValue(metric, value)}
+            {formatValue(t, metric, value)}
           </p>
           <p className="text-[12.5px] text-fg-muted mt-1">
-            p75 across {samples.toLocaleString('en-US')} page loads. Good is{' '}
-            {formatValue(metric, threshold.good)} or less.
+            {t('vitals.p75_note', {
+              n: samples.toLocaleString('en-US'),
+              threshold: formatValue(t, metric, threshold.good),
+            })}
           </p>
 
           <RatingBar split={split} samples={samples} />
 
           <dl className="mt-4 grid grid-cols-2 gap-3 text-[13.5px] border-t border-hairline pt-3">
-            <DeviceStat label="Phones" metric={metric} stat={summary.mobile} />
-            <DeviceStat label="Desktop and tablet" metric={metric} stat={summary.desktop} />
+            <DeviceStat label={t('vitals.device_mobile')} metric={metric} stat={summary.mobile} />
+            <DeviceStat label={t('vitals.device_desktop')} metric={metric} stat={summary.desktop} />
           </dl>
         </>
       )}
@@ -406,6 +397,7 @@ function RatingBar({
   split: Record<VitalRating, number>;
   samples: number;
 }) {
+  const { t } = useT();
   const percent = (n: number) => (samples > 0 ? (n / samples) * 100 : 0);
 
   return (
@@ -429,7 +421,7 @@ function RatingBar({
               className={`inline-block h-2 w-2 rounded-btn ${RATING_BAR[r]}`}
               aria-hidden="true"
             />
-            {RATING_LABEL[r]} {Math.round(percent(split[r]))}%
+            {t('vitals.rating_share', { label: t(RATING_LABEL_KEYS[r]), n: Math.round(percent(split[r])) })}
           </li>
         ))}
       </ul>
@@ -446,17 +438,18 @@ function DeviceStat({
   metric: VitalName;
   stat: DeviceStatValue;
 }) {
+  const { t } = useT();
   return (
     <div>
       <dt className="text-fg-muted">{label}</dt>
       <dd className="font-semibold text-fg tabular-nums">
         {stat.p75 === null ? (
-          <span className="font-normal text-fg-subtle">No data</span>
+          <span className="font-normal text-fg-subtle">{t('vitals.device_empty')}</span>
         ) : (
           <>
-            {formatValue(metric, stat.p75)}
+            {formatValue(t, metric, stat.p75)}
             <span className="ml-1.5 text-[12px] font-normal text-fg-muted">
-              ({stat.samples.toLocaleString('en-US')})
+              {t('vitals.device_samples', { n: stat.samples.toLocaleString('en-US') })}
             </span>
           </>
         )}

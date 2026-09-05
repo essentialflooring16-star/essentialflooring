@@ -4,9 +4,12 @@ import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Icon from '../components/Icon.astro';
-import { SITE } from '../data/site';
+
 import { photoImage, photoById } from '../lib/photos';
 import { getReviews, ratingSummary, reviewDate } from '../lib/reviews';
+import { getContent } from '../lib/content';
+
+const c = await getContent();
 
 // Reviews are pasted into the admin cabinet and fetched at build time. The
 // deploy hook rebuilds the site when the client saves, so they ship as static
@@ -27,7 +30,7 @@ const hasReviews = summary !== null;
 const placeId: string | null = null;
 const reviewUrl = placeId
   ? `https://search.google.com/local/writereview?placeid=${placeId}`
-  : SITE.googleProfile;
+  : c.site.googleProfile;
 
 // Hero photograph: the strongest finished shot in the library. It is a
 // portrait phone frame, so it sits on the same 4:5 paper mat the home page
@@ -39,8 +42,8 @@ const heroPhoto = photoById('stairs-15');
 const proofPhotos = ['hardwood-refinishing-01', 'lvp-vinyl-01', 'stairs-01'].map(photoById);
 
 const facts = [
-  { icon: 'shield', title: 'Licensed and insured', text: SITE.license },
-  { icon: 'hammer', title: `Founded ${SITE.founded}`, text: `${SITE.experienceYears}+ years of hands-on experience` },
+  { icon: 'shield', title: 'Licensed and insured', text: c.site.license },
+  { icon: 'hammer', title: `Founded ${c.site.founded}`, text: `${c.site.experienceYears}+ years of hands-on experience` },
   { icon: 'ruler', title: 'Free written estimates', text: 'no hidden fees' },
 ] as const;
 
@@ -50,8 +53,8 @@ const schema = summary
   ? [{
       '@context': 'https://schema.org',
       '@type': 'LocalBusiness',
-      '@id': `${SITE.domain}/#business`,
-      name: SITE.legalName,
+      '@id': `${c.site.domain}/#business`,
+      name: c.site.legalName,
       aggregateRating: {
         '@type': 'AggregateRating',
         ratingValue: summary.average,
@@ -84,15 +87,15 @@ const schema = summary
       <div class="mt-8 grid lg:grid-cols-[1fr_auto] gap-10 lg:gap-14 items-center">
         <div class="max-w-xl">
           <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-fg [text-wrap:balance]">
-            {hasReviews ? 'What our clients say' : 'The work speaks first'}
+            {hasReviews ? c('reviews.hero.title_with_reviews') : c('reviews.hero.title_no_reviews')}
           </h1>
           <p class="mt-5 text-[17px] leading-relaxed text-fg-muted">
             {hasReviews
-              ? 'Every review below was left on our Google Business Profile by someone we worked for.'
-              : 'Our reviews live on Google. Here, the floors do the talking.'}
+              ? c('reviews.hero.intro_with_reviews')
+              : c('reviews.hero.intro_no_reviews')}
           </p>
           <a
-            href={SITE.googleProfile}
+            href={c.site.googleProfile}
             target="_blank"
             rel="noopener"
             class="arrow-link mt-6 inline-flex items-center gap-2 font-semibold text-accent-on-light hover:text-fg transition-colors"
@@ -183,10 +186,10 @@ const schema = summary
         ))}
       </div>
       <h2 class="reveal mt-6 font-display font-semibold text-3xl sm:text-4xl text-fg-on-dark tracking-tight max-w-2xl mx-auto [text-wrap:balance]">
-        Worked with us? Leave a review
+        {c('reviews.invite.title')}
       </h2>
       <p class="reveal mt-4 text-fg-on-dark/75 text-[17px] max-w-xl mx-auto leading-relaxed">
-        A short Google review helps a small local business more than any ad could.
+        {c('reviews.invite.text')}
       </p>
       <div class="reveal mt-8">
         <a
@@ -195,7 +198,7 @@ const schema = summary
           rel="noopener"
           class="arrow-link inline-flex items-center gap-2 rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-7 py-3.5 transition-colors shadow-lift"
         >
-          Write a review on Google
+          {c('reviews.invite.button')}
           <span class="sr-only">(opens in a new tab)</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
             <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />

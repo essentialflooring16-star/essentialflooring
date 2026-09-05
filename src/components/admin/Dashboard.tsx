@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useT } from '../../lib/admin-i18n';
 
 type PageView = {
   created_at: string;
@@ -9,13 +10,12 @@ type PageView = {
   session_id: string | null;
 };
 
-const RANGES = [
-  { days: 7, label: '7 days' },
-  { days: 30, label: '30 days' },
-  { days: 90, label: '90 days' },
-];
+// Eticheta intervalului se compune la randare din cheia cu plural, ca sa iasa
+// forma corecta in fiecare limba ("30 de zile"), deci aici raman doar cifrele.
+const RANGES = [7, 30, 90];
 
 export default function Dashboard() {
+  const { t } = useT();
   const [days, setDays] = useState(30);
   const [rows, setRows] = useState<PageView[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +31,7 @@ export default function Dashboard() {
       .then(({ data, error }) => {
         if (error) {
           console.error(error);
-          setError("Could not load the traffic data. Refresh the page, and if it keeps failing contact your developer.");
+          setError(t('dashboard.load_error'));
         }
         else setRows(data as PageView[]);
       });
@@ -73,47 +73,47 @@ export default function Dashboard() {
   if (error) {
     return (
       <p className="rounded-card bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-[14.5px]">
-        Could not load analytics: {error}
+        {t('dashboard.error_banner', { message: error })}
       </p>
     );
   }
-  if (!stats) return <p className="text-fg-muted">Loading traffic data...</p>;
+  if (!stats) return <p className="text-fg-muted">{t('dashboard.loading')}</p>;
 
   const max = Math.max(1, ...stats.daily.map(([, v]) => v));
 
   return (
     <div className="grid gap-6">
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="font-display font-semibold text-2xl text-fg">Website traffic</h1>
+        <h1 className="font-display font-semibold text-2xl text-fg">{t('dashboard.title')}</h1>
         <div className="flex gap-2">
           {RANGES.map((r) => (
             <button
-              key={r.days}
+              key={r}
               type="button"
-              onClick={() => setDays(r.days)}
+              onClick={() => setDays(r)}
               className={`rounded-btn px-4 py-1.5 text-[13.5px] font-semibold transition-colors ${
-                days === r.days ? 'bg-control-dark text-fg-on-dark' : 'bg-surface-raised border border-hairline text-fg-body'
+                days === r ? 'bg-control-dark text-fg-on-dark' : 'bg-surface-raised border border-hairline text-fg-body'
               }`}
             >
-              {r.label}
+              {t('dashboard.range_days', { n: r })}
             </button>
           ))}
         </div>
       </div>
 
       <div className="grid sm:grid-cols-3 gap-4">
-        <StatCard label="Page views" value={stats.total} />
-        <StatCard label="Unique visits" value={stats.visitors} />
+        <StatCard label={t('dashboard.stat_page_views')} value={stats.total} />
+        <StatCard label={t('dashboard.stat_unique_visits')} value={stats.visitors} />
         <StatCard
-          label="Views per visit"
+          label={t('dashboard.stat_views_per_visit')}
           value={stats.visitors ? (stats.total / stats.visitors).toFixed(1) : '0'}
         />
       </div>
 
       {/* Daily bar chart */}
       <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
-        <h2 className="font-semibold text-[15px] text-fg-body mb-4">Daily page views</h2>
-        <svg viewBox={`0 0 ${stats.daily.length * 12} 120`} className="w-full h-36" role="img" aria-label="Daily page views chart">
+        <h2 className="font-semibold text-[15px] text-fg-body mb-4">{t('dashboard.chart_title')}</h2>
+        <svg viewBox={`0 0 ${stats.daily.length * 12} 120`} className="w-full h-36" role="img" aria-label={t('dashboard.chart_aria_label')}>
           {stats.daily.map(([day, v], i) => {
             const h = Math.max(2, (v / max) * 100);
             return (
@@ -126,7 +126,7 @@ export default function Dashboard() {
                   rx={2}
                   fill={v > 0 ? 'var(--ef-accent-fill)' : 'var(--ef-hairline)'}
                 >
-                  <title>{`${day}: ${v} views`}</title>
+                  <title>{t('dashboard.chart_bar_tooltip', { day, n: v })}</title>
                 </rect>
               </g>
             );
@@ -140,23 +140,23 @@ export default function Dashboard() {
 
       <div className="grid md:grid-cols-2 gap-4">
         <ListCard
-          title="Most visited pages"
+          title={t('dashboard.top_pages_title')}
           rows={stats.topPages}
           total={stats.total}
-          empty="No visits yet."
+          empty={t('dashboard.top_pages_empty')}
         />
         <div className="grid gap-4">
           <ListCard
-            title="Traffic sources"
+            title={t('dashboard.sources_title')}
             rows={stats.topReferrers}
             total={stats.total}
-            empty="Direct visits only so far."
+            empty={t('dashboard.sources_empty')}
           />
           <ListCard
-            title="Devices"
+            title={t('dashboard.devices_title')}
             rows={stats.devices}
             total={stats.total}
-            empty="No data yet."
+            empty={t('dashboard.devices_empty')}
           />
         </div>
       </div>

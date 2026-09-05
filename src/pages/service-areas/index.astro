@@ -5,8 +5,11 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
 import Icon from '../../components/Icon.astro';
-import { SITE, CORE_CITIES, EXTENDED_CITIES, ALL_CITIES } from '../../data/site';
+import { CORE_CITIES, EXTENDED_CITIES, ALL_CITIES } from '../../data/site';
 import { photoById, photoImage, CATEGORY_LABELS, type Photo } from '../../lib/photos';
+import { getContent } from '../../lib/content';
+
+const c = await getContent();
 
 // Four finished jobs, one per town, picked by hand rather than by score: the
 // top four by quality would be three staircases. Together they trace a line
@@ -24,12 +27,21 @@ const jobs = jobIds.map((id) => {
   };
 });
 
+// The Bay Area is a region page worked by arrangement, not a town in the five
+// counties, so the copy counts towns and regions separately. The guard keeps
+// the split right if the flag is ever added to or removed from another entry.
+const extendedTowns = EXTENDED_CITIES.filter((c) => !('region' in c && c.region));
+const extendedRegions = EXTENDED_CITIES.filter((c) => 'region' in c && c.region);
 const townCount = ALL_CITIES.length;
+const townsOnly = CORE_CITIES.length + extendedTowns.length;
+const regionClause = extendedRegions.length
+  ? `, plus ${extendedRegions.map((c) => `the ${c.city}`).join(' and ')} for select projects`
+  : '';
 ---
 
 <Base
   title="Flooring Service Areas Near Sacramento | Essential Flooring"
-  description={`Licensed flooring contractor working in ${townCount} towns across Sacramento, Placer, El Dorado, Yolo and Sutter counties: Roseville, Folsom, Elk Grove, Carmichael and more.`}
+  description={`Licensed flooring contractor in ${townsOnly} towns across Sacramento, Placer, El Dorado, Yolo and Sutter counties, plus the San Francisco Bay Area for select projects.`}
 >
   <!-- HERO ON THE MAP
        The map is the ground, not a widget: the same decorative, untouchable
@@ -56,11 +68,10 @@ const townCount = ALL_CITIES.length;
           class="m-intro font-display font-semibold text-4xl sm:text-5xl lg:text-[56px] leading-[1.06] tracking-tight text-fg [text-wrap:balance]"
           style="--i:0"
         >
-          Where we work <span class="accent-italic">around Sacramento</span>
+          {c('areas.hero.title')} <span class="accent-italic">{c('areas.hero.title_accent')}</span>
         </h1>
         <p class="m-intro mt-5 text-[17px] leading-relaxed text-fg-muted" style="--i:1">
-          Based in Sacramento, working in homes across Sacramento, Placer, El Dorado,
-          Yolo and Sutter counties.
+          {c('areas.hero.intro')}
         </p>
         <p class="m-intro mt-6 flex flex-wrap items-center gap-x-7 gap-y-3 text-[15px]" style="--i:2">
           <a
@@ -68,16 +79,16 @@ const townCount = ALL_CITIES.length;
             class="arrow-link inline-flex items-center gap-2 min-h-11 font-semibold text-accent-on-light hover:text-fg transition-colors"
           >
             <Icon name="pin" size={20} class="shrink-0" />
-            All {townCount} towns
+            All {townCount} areas
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
               <path d="M12 5v14m-6-6 6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </a>
           <a
-            href={SITE.phoneHref}
+            href={c.site.phoneHref}
             class="inline-flex items-center min-h-11 font-display font-medium text-fg text-[19px] underline-offset-[6px] decoration-accent/60 hover:underline"
           >
-            {SITE.phone}
+            {c.site.phone}
           </a>
         </p>
       </div>
@@ -114,16 +125,18 @@ const townCount = ALL_CITIES.length;
   </section>
 
   <!-- DIRECTORY
-       The 24 towns as a ruled index, not cards: the heading holds the left
-       column while the names run past it in columns, each on its own hairline.
-       Every link keeps its trailing slash, these pages are the SEO backbone. -->
+       Every service area as a ruled index, not cards: the heading holds the
+       left column while the names run past it in columns, each on its own
+       hairline. The outer ring ends with the Bay Area region page, worked by
+       arrangement. Every link keeps its trailing slash, these pages are the
+       SEO backbone. -->
   <section id="towns" class="scroll-mt-24 py-16 sm:py-24">
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
       <div class="grid lg:grid-cols-[280px_1fr] gap-8 lg:gap-16 items-start">
         <div class="lg:sticky lg:top-28">
           <SectionHeading
             eyebrow="Inner ring"
-            title="Greater Sacramento"
+            title={c('areas.inner.title')}
             text={`${CORE_CITIES.length} towns inside the metro, from Elk Grove up to Roseville.`}
           />
         </div>
@@ -148,8 +161,8 @@ const townCount = ALL_CITIES.length;
         <div class="lg:sticky lg:top-28">
           <SectionHeading
             eyebrow="Outer ring"
-            title="Surrounding areas"
-            text={`${EXTENDED_CITIES.length} towns further out, from Yuba City down to Galt and from Davis over to El Dorado Hills.`}
+            title={c('areas.outer.title')}
+            text={`${extendedTowns.length} towns further out, from Yuba City down to Galt and from Davis over to El Dorado Hills${regionClause}.`}
           />
         </div>
         <ul class="m-stagger border-t border-hairline grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6">
@@ -172,10 +185,10 @@ const townCount = ALL_CITIES.length;
       <p class="reveal mt-14 sm:mt-20 text-[17px] leading-relaxed text-fg-body max-w-2xl">
         Not on the list? Call
         <a
-          href={SITE.phoneHref}
+          href={c.site.phoneHref}
           class="font-semibold text-accent-on-light underline underline-offset-4 decoration-2 hover:text-fg transition-colors"
         >
-          {SITE.phone}
+          {c.site.phone}
         </a>
         and ask. If you are anywhere near Sacramento, the answer is usually yes.
       </p>

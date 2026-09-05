@@ -338,7 +338,60 @@ as $$
   delete from public.web_vitals where created_at < now() - interval '90 days';
 $$;
 
--- 11) Verificare rapida dupa rulare ---------------------------------------------
+-- 11) Continutul editabil al site-ului -----------------------------------------
+-- Textele de pe paginile publice raman scrise in cod, in src/data/content.ts, si
+-- ACELEA sunt valorile implicite. Tabelul de mai jos tine numai suprascrierile
+-- facute de client din cabinet. Un rand aici inseamna "clientul a schimbat textul
+-- asta"; lipsa lui inseamna "e cel din cod".
+--
+-- Consecinta practica: daca tabelul e gol, sau daca Supabase e indisponibil in
+-- timpul build-ului, site-ul se construieste exact cum arata azi. Nicio pagina nu
+-- depinde de existenta unui rand.
+create table if not exists public.site_content (
+  key text primary key,
+  value text not null default '',
+  updated_at timestamptz not null default now(),
+  updated_by text
+);
+
+alter table public.site_content enable row level security;
+
+-- Textele ajung oricum in paginile publice, deci nu e nimic secret in ele:
+-- oricine le poate citi, exact ca pe site. Scrie numai un administrator.
+drop policy if exists "anon read site_content" on public.site_content;
+create policy "anon read site_content"
+  on public.site_content for select to anon
+  using (true);
+
+drop policy if exists "admin manage site_content" on public.site_content;
+create policy "admin manage site_content"
+  on public.site_content for all to authenticated
+  using (public.is_admin()) with check (public.is_admin());
+
+-- O cheie inventata nu are ce cauta aici: paginile nu o citesc niciodata, deci ar
+-- fi doar text mort care creste tabelul. Lungimea e plafonata din acelasi motiv
+-- pentru care e plafonata la page_views: cheia anon e publica in bundle.
+alter table public.site_content drop constraint if exists site_content_sane;
+alter table public.site_content add constraint site_content_sane
+  check (char_length(key) between 3 and 120 and char_length(value) <= 20000);
+
+create or replace function public.touch_site_content()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at := now();
+  new.updated_by := coalesce(auth.jwt() ->> 'email', new.updated_by);
+  return new;
+end;
+$$;
+
+drop trigger if exists site_content_touch on public.site_content;
+create trigger site_content_touch
+  before insert or update on public.site_content
+  for each row execute function public.touch_site_content();
+
+-- 12) Verificare rapida dupa rulare ---------------------------------------------
 -- Ar trebui sa returneze true doar pentru adresele din admin_emails:
 --   select public.is_admin();
 -- Lista politicilor active:

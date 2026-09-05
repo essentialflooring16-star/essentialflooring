@@ -5,7 +5,7 @@ import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import FaqList from '../../components/FaqList.astro';
-import { SITE, SERVICES } from '../../data/site';
+import { SERVICES } from '../../data/site';
 import { photos, photoImage, photoById } from '../../lib/photos';
 // Stock behind the title only. The client's phone photos sit low in a
 // full-bleed hero, and carpet and laminate had no photos of their own at all,
@@ -17,6 +17,10 @@ import stockStairs from '../../assets/stock/hero-stairs.jpg';
 import stockLaminate from '../../assets/stock/hero-laminate.jpg';
 import stockCarpet from '../../assets/stock/hero-carpet.jpg';
 import servicesCopy from '../../data/services-copy.json';
+import { getContent } from '../../lib/content';
+import { parsePairs, parseQA } from '../../data/content/types';
+
+const c = await getContent();
 
 export function getStaticPaths() {
   return (servicesCopy as any[]).map((page) => ({
@@ -40,6 +44,21 @@ type ServicePage = {
 };
 
 const { page } = Astro.props as { page: ServicePage };
+
+// Textele acestei pagini pot fi schimbate de client din cabinet. Cheia se
+// compune din slug, dupa conventia din src/data/content/servicii.ts, deci nu e
+// nevoie de niciun tabel de corespondenta: un serviciu nou isi ia singur
+// cheile. Ce nu e suprascris vine, ca pana acum, din services-copy.json.
+const k = `service_${page.slug.replace(/-/g, '_')}`;
+const copy = {
+  name: c(`${k}.page.name`),
+  h1: c(`${k}.hero.title`),
+  intro: c(`${k}.intro.text`),
+  details: c(`${k}.expect.text`),
+  benefits: parsePairs(c(`${k}.benefits.items`)),
+  process: parsePairs(c(`${k}.process.items`)),
+  faq: parseQA(c(`${k}.faq.items`)),
+};
 const meta = SERVICES.find((s) => s.slug === page.slug)!;
 
 // Photos that visually match this service.
@@ -55,16 +74,17 @@ const related = photos
   .sort((a, b) => b.quality - a.quality)
   .slice(0, 6);
 
-const introParas = page.intro.split(/\n\n+/);
+const introParas = copy.intro.split(/\n\n+/);
+const metaDescription = c.apply(page.metaDescription);
 
 const serviceSchema = {
   '@context': 'https://schema.org',
   '@type': 'Service',
-  name: page.name,
-  serviceType: page.name,
-  provider: { '@id': `${SITE.domain}/#business` },
+  name: copy.name,
+  serviceType: copy.name,
+  provider: { '@id': `${c.site.domain}/#business` },
   areaServed: 'Sacramento CA and surrounding areas',
-  description: page.metaDescription,
+  description: metaDescription,
 };
 
 const otherServices = SERVICES.filter((s) => s.slug !== page.slug);
@@ -82,7 +102,7 @@ const hero = STOCK_HERO[page.slug] ?? {
 };
 ---
 
-<Base title={page.metaTitle} description={page.metaDescription} schema={[serviceSchema]}>
+<Base title={page.metaTitle} description={metaDescription} schema={[serviceSchema]}>
   <!-- HERO -->
   <section class="relative overflow-hidden bg-surface-dark">
     <Image
@@ -98,9 +118,9 @@ const hero = STOCK_HERO[page.slug] ?? {
     />
     <div class="absolute inset-0 bg-gradient-to-t from-scrim via-scrim/60 to-scrim/30" aria-hidden="true"></div>
     <div class="relative mx-auto max-w-6xl px-4 sm:px-6 pt-10 pb-20">
-      <Breadcrumbs light crumbs={[{ label: 'Services', href: '/services/' }, { label: page.name }]} />
+      <Breadcrumbs light crumbs={[{ label: 'Services', href: '/services/' }, { label: copy.name }]} />
       <h1 class="mt-10 font-display font-semibold text-fg-on-dark text-4xl sm:text-5xl leading-[1.08] tracking-tight max-w-2xl text-balance">
-        {page.h1}
+        {copy.h1}
       </h1>
       <div class="mt-8 flex flex-col sm:flex-row gap-4">
         <a
@@ -110,10 +130,10 @@ const hero = STOCK_HERO[page.slug] ?? {
           Get a Free Estimate
         </a>
         <a
-          href={SITE.phoneHref}
+          href={c.site.phoneHref}
           class="inline-flex justify-center items-center rounded-btn border border-hairline-on-dark/30 hover:border-hairline-on-dark/60 text-fg-on-dark font-semibold px-7 py-3.5 transition-colors"
         >
-          Call {SITE.phone}
+          Call {c.site.phone}
         </a>
       </div>
     </div>
@@ -128,7 +148,7 @@ const hero = STOCK_HERO[page.slug] ?? {
         ))}
         <div class="mt-10 rounded-card bg-surface-sunken/70 border border-hairline p-6">
           <h2 class="font-display font-semibold text-xl text-fg">What to expect</h2>
-          <p class="mt-2 text-[15.5px] leading-relaxed text-fg-muted">{page.details}</p>
+          <p class="mt-2 text-[15.5px] leading-relaxed text-fg-muted">{copy.details}</p>
         </div>
       </div>
 
@@ -137,7 +157,7 @@ const hero = STOCK_HERO[page.slug] ?? {
         <ul class="mt-4 space-y-3 text-[14.5px] text-fg-muted">
           <li class="flex gap-2.5">
             <span class="text-accent-on-light font-bold" aria-hidden="true">&check;</span>
-            Licensed &amp; Insured, {SITE.license}
+            Licensed &amp; Insured, {c.site.license}
           </li>
           <li class="flex gap-2.5">
             <span class="text-accent-on-light font-bold" aria-hidden="true">&check;</span>
@@ -159,7 +179,7 @@ const hero = STOCK_HERO[page.slug] ?? {
           Request an estimate
         </a>
         <p class="mt-4 text-[13px] text-fg-muted/80 text-center">
-          Or call <a href={SITE.phoneHref} class="font-semibold text-accent-on-light">{SITE.phone}</a>
+          Or call <a href={c.site.phoneHref} class="font-semibold text-accent-on-light">{c.site.phone}</a>
         </p>
       </aside>
     </div>
@@ -172,7 +192,7 @@ const hero = STOCK_HERO[page.slug] ?? {
         Why homeowners choose this
       </h2>
       <ul class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {page.benefits.map((b, i) => (
+        {copy.benefits.map((b, i) => (
           <li class="reveal rounded-card bg-surface-raised border border-hairline p-6 shadow-card" style={`transition-delay:${i * 50}ms`}>
             <h3 class="font-display font-semibold text-[18px] text-fg">{b.title}</h3>
             <p class="mt-2 text-[14.5px] leading-relaxed text-fg-muted">{b.text}</p>
@@ -187,7 +207,7 @@ const hero = STOCK_HERO[page.slug] ?? {
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
       <h2 class="reveal font-display font-semibold text-3xl text-fg tracking-tight">How we work</h2>
       <ol class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {page.process.map((step, i) => (
+        {copy.process.map((step, i) => (
           <li class="reveal rounded-card border border-hairline bg-surface-raised p-6 shadow-card" style={`transition-delay:${i * 50}ms`}>
             <span class="font-display font-semibold text-4xl text-accent-display">{String(i + 1).padStart(2, '0')}</span>
             <h3 class="mt-3 font-display font-semibold text-[18px] text-fg">{step.title}</h3>
@@ -235,10 +255,10 @@ const hero = STOCK_HERO[page.slug] ?? {
   <section class="py-16 sm:py-20">
     <div class="mx-auto max-w-3xl px-4 sm:px-6">
       <h2 class="reveal font-display font-semibold text-3xl text-fg tracking-tight text-center">
-        {page.name}: your questions
+        {copy.name}: your questions
       </h2>
       <div class="reveal mt-10">
-        <FaqList items={page.faq} />
+        <FaqList items={copy.faq} />
       </div>
     </div>
   </section>

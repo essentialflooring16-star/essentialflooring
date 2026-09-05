@@ -1,6 +1,9 @@
 ---
-import { SITE, SERVICES, CORE_CITIES } from '../data/site';
+import { SERVICES, CORE_CITIES } from '../data/site';
 import BrandLogo from './BrandLogo.astro';
+import { getContent } from '../lib/content';
+
+const c = await getContent();
 const year = new Date().getFullYear();
 ---
 
@@ -12,10 +15,10 @@ const year = new Date().getFullYear();
         Licensed flooring contractor serving the greater Sacramento area.
         Hardwood refinishing, LVP, laminate and carpet, done right and on time.
       </p>
-      <p class="mt-4 text-[14px] text-fg-on-dark/60">Licensed &amp; Insured, {SITE.license}</p>
+      <p class="mt-4 text-[14px] text-fg-on-dark/60">Licensed &amp; Insured, {c.site.license}</p>
       <div class="mt-4 flex items-center gap-4">
         <a
-          href={SITE.instagram}
+          href={c.site.instagram}
           rel="noopener"
           target="_blank"
           class="inline-flex items-center gap-2 text-[14px] text-fg-on-dark/70 hover:text-accent-on-dark transition-colors"
@@ -28,7 +31,7 @@ const year = new Date().getFullYear();
           Instagram
         </a>
         <a
-          href={SITE.facebook}
+          href={c.site.facebook}
           rel="noopener"
           target="_blank"
           class="inline-flex items-center gap-2 text-[14px] text-fg-on-dark/70 hover:text-accent-on-dark transition-colors"
@@ -72,13 +75,13 @@ const year = new Date().getFullYear();
       <p class="text-[13px] uppercase tracking-[0.16em] text-fg-on-dark/50 mb-4">Contact</p>
       <ul class="space-y-3 text-[15px]">
         <li>
-          <a href={SITE.phoneHref} class="font-semibold text-fg-on-dark hover:text-accent-on-dark transition-colors">
-            {SITE.phone}
+          <a href={c.site.phoneHref} class="font-semibold text-fg-on-dark hover:text-accent-on-dark transition-colors">
+            {c.site.phone}
           </a>
         </li>
         <li>
-          <a href={`mailto:${SITE.email}`} class="hover:text-accent-on-dark transition-colors break-all">
-            {SITE.email}
+          <a href={`mailto:${c.site.email}`} class="hover:text-accent-on-dark transition-colors break-all">
+            {c.site.email}
           </a>
         </li>
         <li>Sacramento, California</li>
@@ -95,7 +98,7 @@ const year = new Date().getFullYear();
 
   <div class="border-t border-hairline-on-dark/10">
     <div class="mx-auto max-w-6xl px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[13px] text-fg-on-dark/50">
-      <p>&copy; {year} {SITE.legalName}. All rights reserved.</p>
+      <p>&copy; {year} {c.site.legalName}. All rights reserved.</p>
       <div class="flex items-center gap-5">
         <a href="/privacy-policy/" class="hover:text-fg-on-dark/80 transition-colors">Privacy Policy</a>
         <a href="/sitemap-index.xml" class="hover:text-fg-on-dark/80 transition-colors">Sitemap</a>

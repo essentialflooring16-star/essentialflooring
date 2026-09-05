@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useT } from '../../lib/admin-i18n';
 
 type Post = {
   id: string;
@@ -23,6 +24,7 @@ function slugify(title: string): string {
 }
 
 export default function BlogManager() {
+  const { t } = useT();
   const [posts, setPosts] = useState<Post[]>([]);
   const [editing, setEditing] = useState<Post | null>(null);
   const [creating, setCreating] = useState(false);
@@ -48,7 +50,7 @@ export default function BlogManager() {
       .maybeSingle();
     const hook = data?.value;
     if (!hook) {
-      setMsg('Saved. Ask your developer to set the deploy hook so changes go live automatically.');
+      setMsg(t('blog.saved_no_hook'));
       return;
     }
     // The stored value is a credential and this browser POSTs to it. The database
@@ -56,14 +58,14 @@ export default function BlogManager() {
     // host first: a bad row here would turn the admin's browser into a client for
     // whatever host it named.
     if (!hook.startsWith('https://api.vercel.com/v1/integrations/deploy/')) {
-      setMsg('Saved, but the stored deploy hook does not look like a Vercel hook, so it was not called.');
+      setMsg(t('blog.saved_hook_invalid'));
       return;
     }
     try {
       await fetch(hook, { method: 'POST', mode: 'no-cors' });
-      setMsg('Saved. The website is rebuilding now, changes go live in 1-2 minutes.');
+      setMsg(t('blog.saved_rebuilding'));
     } catch {
-      setMsg('Saved, but the rebuild request failed. Try again or contact your developer.');
+      setMsg(t('blog.saved_rebuild_failed'));
     }
   }
 
@@ -86,7 +88,7 @@ export default function BlogManager() {
       let coverUrl = editing?.cover_url ?? null;
       const cover = fd.get('cover') as File | null;
       if (cover && cover.size > 0) {
-        if (cover.size > 8 * 1024 * 1024) throw new Error('Cover photo is over 8 MB.');
+        if (cover.size > 8 * 1024 * 1024) throw new Error(t('blog.cover_too_large'));
         const path = `blog/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${cover.name.split('.').pop() || 'jpg'}`;
         const { error: upErr } = await supabase!.storage.from('portfolio').upload(path, cover, {
           cacheControl: '31536000',
@@ -112,7 +114,7 @@ export default function BlogManager() {
       await triggerRebuild();
     } catch (err) {
       console.error(err);
-      setMsg("Could not save the post. Check your connection and try again.");
+      setMsg(t('blog.save_error'));
     } finally {
       setBusy(false);
     }
@@ -125,7 +127,7 @@ export default function BlogManager() {
   }
 
   async function remove(post: Post) {
-    if (!confirm(`Delete the article "${post.title}"?`)) return;
+    if (!confirm(t('blog.delete_confirm', { title: post.title }))) return;
     await supabase!.from('posts').delete().eq('id', post.id);
     await load();
     await triggerRebuild();
@@ -136,7 +138,7 @@ export default function BlogManager() {
       <form onSubmit={onSave} className="rounded-card border border-hairline bg-surface-raised p-6 sm:p-8 shadow-card grid gap-4 max-w-2xl">
         <div className="flex items-center justify-between">
           <h1 className="font-display font-semibold text-2xl text-fg">
-            {editing ? 'Edit article' : 'New article'}
+            {editing ? t('blog.form_title_edit') : t('blog.form_title_new')}
           </h1>
           <button
             type="button"
@@ -147,12 +149,12 @@ export default function BlogManager() {
             }}
             className="text-[14px] font-semibold text-fg-muted hover:text-fg"
           >
-            Back to list
+            {t('blog.back_to_list')}
           </button>
         </div>
 
         <label className="grid gap-1.5">
-          <span className="text-[14px] font-semibold text-fg-body">Title *</span>
+          <span className="text-[14px] font-semibold text-fg-body">{t('blog.field_title')}</span>
           <input
             name="title"
             required
@@ -164,7 +166,7 @@ export default function BlogManager() {
 
         <label className="grid gap-1.5">
           <span className="text-[14px] font-semibold text-fg-body">
-            Short summary (shown on the blog page and Google)
+            {t('blog.field_excerpt')}
           </span>
           <textarea
             name="excerpt"
@@ -176,7 +178,7 @@ export default function BlogManager() {
         </label>
 
         <label className="grid gap-1.5">
-          <span className="text-[14px] font-semibold text-fg-body">Cover photo</span>
+          <span className="text-[14px] font-semibold text-fg-body">{t('blog.field_cover')}</span>
           {editing?.cover_url && (
             <img src={editing.cover_url} alt="" className="w-48 aspect-[16/10] object-cover rounded-media mb-1" />
           )}
@@ -189,10 +191,8 @@ export default function BlogManager() {
         </label>
 
         <label className="grid gap-1.5">
-          <span className="text-[14px] font-semibold text-fg-body">Article text *</span>
-          <span className="text-[12.5px] text-fg-muted -mt-1">
-            Plain text works fine. For a subheading start a line with ## and for a list start lines with -
-          </span>
+          <span className="text-[14px] font-semibold text-fg-body">{t('blog.field_content')}</span>
+          <span className="text-[12.5px] text-fg-muted -mt-1">{t('blog.content_hint')}</span>
           <textarea
             name="content"
             rows={14}
@@ -204,7 +204,7 @@ export default function BlogManager() {
 
         <label className="flex items-center gap-2.5">
           <input type="checkbox" name="published" defaultChecked={editing?.published ?? true} className="size-4 accent-[var(--ef-accent-fill)]" />
-          <span className="text-[14.5px] font-semibold text-fg-body">Published (visible on the website)</span>
+          <span className="text-[14.5px] font-semibold text-fg-body">{t('blog.field_published')}</span>
         </label>
 
         {msg && <p className="rounded-card bg-surface-sunken border border-hairline text-fg-body text-[14px] px-4 py-3">{msg}</p>}
@@ -214,7 +214,7 @@ export default function BlogManager() {
           disabled={busy}
           className="justify-self-start rounded-btn bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-6 py-3 transition-colors"
         >
-          {busy ? 'Saving...' : editing ? 'Save changes' : 'Publish article'}
+          {busy ? t('blog.submit_saving') : editing ? t('blog.submit_update') : t('blog.submit_create')}
         </button>
       </form>
     );
@@ -223,7 +223,7 @@ export default function BlogManager() {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
-        <h1 className="font-display font-semibold text-2xl text-fg">Blog articles</h1>
+        <h1 className="font-display font-semibold text-2xl text-fg">{t('blog.heading')}</h1>
         <button
           type="button"
           onClick={() => {
@@ -232,19 +232,16 @@ export default function BlogManager() {
           }}
           className="rounded-btn bg-accent hover:bg-accent-hover text-fg-on-accent font-semibold px-5 py-2.5 transition-colors"
         >
-          New article
+          {t('blog.new_action')}
         </button>
       </div>
-      <p className="text-[14.5px] text-fg-muted mb-6">
-        Articles help the website rank on Google. Photos plus a few honest paragraphs about a
-        recent project work great.
-      </p>
+      <p className="text-[14.5px] text-fg-muted mb-6">{t('blog.intro')}</p>
 
       {msg && <p className="mb-4 rounded-card bg-surface-sunken border border-hairline text-fg-body text-[14px] px-4 py-3">{msg}</p>}
 
       {posts.length === 0 ? (
         <div className="rounded-card border border-hairline bg-surface-raised p-8 shadow-card text-center text-fg-muted">
-          No articles yet. Write the first one, a before and after story is a great start.
+          {t('blog.empty_state')}
         </div>
       ) : (
         <ul className="grid gap-3">
@@ -258,8 +255,10 @@ export default function BlogManager() {
               <div className="flex-1 min-w-[200px]">
                 <p className="font-semibold text-[16px] text-fg">{post.title}</p>
                 <p className="text-[13px] text-fg-muted mt-0.5">
-                  {new Date(post.created_at).toLocaleDateString('en-US', { dateStyle: 'medium' })}
-                  {' · '}/blog/{post.slug}
+                  {t('blog.post_meta', {
+                    date: new Date(post.created_at).toLocaleDateString('en-US', { dateStyle: 'medium' }),
+                    slug: post.slug,
+                  })}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -270,21 +269,21 @@ export default function BlogManager() {
                     post.published ? 'bg-accent-wash text-accent-on-light' : 'bg-surface-sunken text-fg-muted'
                   }`}
                 >
-                  {post.published ? 'Published' : 'Draft'}
+                  {post.published ? t('blog.status_published') : t('blog.status_draft')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditing(post)}
                   className="rounded-btn border border-hairline px-3 py-1.5 text-[12.5px] font-semibold text-fg-body hover:border-accent"
                 >
-                  Edit
+                  {t('blog.edit_action')}
                 </button>
                 <button
                   type="button"
                   onClick={() => remove(post)}
                   className="text-[12.5px] font-semibold text-red-600 hover:text-red-700 px-2"
                 >
-                  Delete
+                  {t('blog.delete_action')}
                 </button>
               </div>
             </li>

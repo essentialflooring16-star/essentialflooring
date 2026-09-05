@@ -7,7 +7,10 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import QuickContact from '../components/QuickContact.astro';
-import { SITE, AREA_SERVED } from '../data/site';
+import { AREA_SERVED } from '../data/site';
+import { getContent } from '../lib/content';
+
+const c = await getContent();
 
 interface Props {
   title: string;
@@ -33,24 +36,24 @@ const businessImage = new URL('/og-default.jpg', Astro.site).href;
 const localBusiness = {
   '@context': 'https://schema.org',
   '@type': 'HomeAndConstructionBusiness',
-  '@id': `${SITE.domain}/#business`,
-  name: SITE.name,
-  legalName: SITE.legalName,
-  url: `${SITE.domain}/`,
-  telephone: SITE.phoneSchema,
-  email: SITE.email,
+  '@id': `${c.site.domain}/#business`,
+  name: c.site.name,
+  legalName: c.site.legalName,
+  url: `${c.site.domain}/`,
+  telephone: c.site.phoneSchema,
+  email: c.site.email,
   image: businessImage,
   address: {
     '@type': 'PostalAddress',
-    addressLocality: SITE.address.locality,
-    addressRegion: SITE.address.region,
-    addressCountry: SITE.address.country,
+    addressLocality: c.site.address.locality,
+    addressRegion: c.site.address.region,
+    addressCountry: c.site.address.country,
   },
   areaServed: AREA_SERVED,
-  sameAs: [SITE.instagram, SITE.facebook, SITE.googleProfile],
-  openingHours: SITE.hoursSchema,
-  foundingDate: String(SITE.founded),
-  founder: { '@type': 'Person', name: SITE.founder },
+  sameAs: [c.site.instagram, c.site.facebook, c.site.googleProfile],
+  openingHours: c.site.hoursSchema,
+  foundingDate: String(c.site.founded),
+  founder: { '@type': 'Person', name: c.site.founder },
   knowsAbout: [
     'Hardwood floor refinishing', 'Hardwood installation', 'LVP flooring installation',
     'Laminate flooring installation', 'Tile installation', 'Carpet installation',
@@ -66,8 +69,8 @@ const schemas = [localBusiness, ...schema];
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
+    <title>{c.apply(title)}</title>
+    <meta name="description" content={c.apply(description)} />
     <link rel="canonical" href={canonical.href} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -78,18 +81,18 @@ const schemas = [localBusiness, ...schema];
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <meta property="og:type" content={ogType} />
-    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:site_name" content={c.site.name} />
     <meta property="og:locale" content="en_US" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={c.apply(title)} />
+    <meta property="og:description" content={c.apply(description)} />
     <meta property="og:url" content={canonical.href} />
     <meta property="og:image" content={ogImageUrl.href} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={ogImageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:title" content={c.apply(title)} />
+    <meta name="twitter:description" content={c.apply(description)} />
     <meta name="twitter:image" content={ogImageUrl.href} />
     <meta name="twitter:image:alt" content={ogImageAlt} />
 

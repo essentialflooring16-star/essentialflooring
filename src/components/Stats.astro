@@ -1,7 +1,10 @@
 ---
 // Animated count-up stat band. Numbers are real: founding year, experience,
 // cities from the GBP service area, capabilities list length.
-import { ALL_SERVICES, ALL_CITIES, SITE } from '../data/site';
+import { ALL_CITIES } from '../data/site';
+import { getContent } from '../lib/content';
+
+const c = await getContent();
 
 interface Props {
   dark?: boolean;
@@ -9,10 +12,10 @@ interface Props {
 const { dark = true } = Astro.props;
 
 const stats = [
-  { value: SITE.founded, label: 'Company founded', suffix: '' },
-  { value: SITE.experienceYears, label: 'Years of hands-on experience', suffix: '+' },
+  { value: c.site.founded, label: 'Company founded', suffix: '' },
+  { value: c.site.experienceYears, label: 'Years of hands-on experience', suffix: '+' },
   { value: ALL_CITIES.length, label: 'Cities and areas served', suffix: '' },
-  { value: ALL_SERVICES.length, label: 'Services under one roof', suffix: '' },
+  { value: c.list('services.full_list.items').length, label: 'Services under one roof', suffix: '' },
 ];
 ---
 

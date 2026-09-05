@@ -3,8 +3,11 @@ import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import CtaBand from '../components/CtaBand.astro';
-import { SITE } from '../data/site';
+
 import { photoImage, photoById } from '../lib/photos';
+import { getContent } from '../lib/content';
+
+const c = await getContent();
 
 const aboutPhoto = photoById('hardwood-refinishing-02');
 const detailPhoto = photoById('stairs-01');
@@ -43,21 +46,13 @@ const values = [
             Founded 2023 &middot; Sacramento, CA
           </p>
           <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-fg">
-            Quality is the foundation of everything we do
+            {c('about.hero.title')}
           </h1>
           <p class="mt-6 text-[17px] leading-relaxed text-fg-body">
-            Essential Flooring was founded in 2023 by Alexandru Szep with a clear goal:
-            deliver high-quality flooring through a fast, efficient and stress-free
-            process. With more than 5 years of hands-on experience in the flooring
-            industry, Alexandru brings knowledge, precision and reliability to every
-            project he takes on.
+            {c('about.story.paragraph_1')}
           </p>
           <p class="mt-4 text-[17px] leading-relaxed text-fg-body">
-            We specialize in professional floor preparation, installation and finishing,
-            for both residential and commercial spaces. Every job gets the same focus:
-            speed, precision, attention to detail and results that last. The goal is
-            simple, floors that raise the look, value and comfort of every space we
-            touch.
+            {c('about.story.paragraph_2')}
           </p>
           <div class="mt-8 flex flex-wrap gap-x-10 gap-y-4">
             <div>
@@ -69,7 +64,7 @@ const values = [
               <p class="text-[13.5px] text-fg-muted mt-1">Years of hands-on experience</p>
             </div>
             <div>
-              <p class="font-display font-semibold text-3xl text-fg">{SITE.license}</p>
+              <p class="font-display font-semibold text-3xl text-fg">{c.site.license}</p>
               <p class="text-[13.5px] text-fg-muted mt-1">California licensed &amp; insured</p>
             </div>
           </div>
@@ -87,9 +82,9 @@ const values = [
           <div class="grid grid-cols-[1fr_auto] items-center gap-5">
             <div class="rounded-card bg-surface-dark text-fg-on-dark p-6">
               <p class="font-display text-xl leading-snug">
-                "Fast, efficient and stress-free. That is the whole philosophy."
+                {c('about.quote.text')}
               </p>
-              <p class="mt-3 text-[13.5px] text-fg-on-dark/70">Alexandru Szep, founder</p>
+              <p class="mt-3 text-[13.5px] text-fg-on-dark/70">{c('about.quote.author')}</p>
             </div>
             <Image
               src={photoImage(detailPhoto.id)}
@@ -106,7 +101,7 @@ const values = [
 
       <div class="mt-20">
         <h2 class="reveal font-display font-semibold text-3xl text-fg tracking-tight">
-          What we stand for
+          {c('about.values.title')}
         </h2>
         <ul class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {values.map((v, i) => (

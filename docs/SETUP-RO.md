@@ -112,13 +112,15 @@ Pagina /reviews le afiseaza automat (acum arata fallback-ul cu link spre Google)
   `src/components/Header.astro` si `public/favicon.svg`.
 - Garantia: cand clientul confirma anii de garantie, actualizeaza textele care spun
   "workmanship warranty" (Home, About, FAQ) cu cifra reala.
-- Video: clipurile din WhatsApp se pot adauga in galerie mai tarziu (galeria e pregatita
-  doar pentru poze; clipurile pot merge intr-o sectiune hero sau pe pagini de serviciu).
+- Video: cele trei clipuri Live Photo din WhatsApp au fost inlocuite pe 2 sep cu cadre
+  statice (`src/assets/progress/`, componenta `WorkInProgress.astro`), la cererea clientului,
+  pentru ca aratau ciudat ca video. Galeria ramane doar pentru poze.
 
 ## 7. Structura site
 
-- `/` Home, `/services` + 4 pagini serviciu, `/portfolio`, `/service-areas` + 20 pagini
-  oras (16 core Sacramento + 4 extended: SF, Bay Area, Orange County, South Lake Tahoe),
+- `/` Home, `/services` + 5 pagini serviciu, `/portfolio`, `/service-areas` + 25 pagini
+  de zona (14 core Sacramento + 10 orase din jur + San Francisco Bay Area, pagina de
+  regiune, doar prin intelegere per proiect; Orange County si South Lake Tahoe raman scoase),
   `/about`, `/reviews`, `/faq`, `/contact`, `/privacy-policy`, `/404`, `/admin`.
 - SEO: meta unice pe fiecare pagina, JSON-LD (LocalBusiness pe toate, Service pe
   servicii/orase, FAQPage, BreadcrumbList), sitemap automat, robots.txt,

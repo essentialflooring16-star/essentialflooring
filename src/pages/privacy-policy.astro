@@ -1,7 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
-import { SITE } from '../data/site';
+import { getContent } from '../lib/content';
+
+const c = await getContent();
 
 // Textul de mai jos descrie exact ce face codul (api/contact.ts, lib/analytics.ts,
 // lib/vitals.ts, harta Google din index.astro). Daca se schimba fluxul de date,
@@ -30,8 +32,8 @@ const link =
 
       <div class="mt-8 space-y-6 text-[15.5px] leading-relaxed text-fg-body">
         <p>
-          This website is operated by {SITE.legalName}, a licensed flooring contractor in
-          Sacramento, California ({SITE.license}). This page explains what the site collects,
+          This website is operated by {c.site.legalName}, a licensed flooring contractor in
+          Sacramento, California ({c.site.license}). This page explains what the site collects,
           why, who handles it on our behalf, and how to ask us to show, correct or delete it.
           We collect the minimum needed to answer your estimate request.
         </p>
@@ -144,14 +146,14 @@ const link =
           <li>delete your request entirely.</li>
         </ul>
         <p>
-          Email <a href={`mailto:${SITE.email}`} class={link}>{SITE.email}</a> or call
-          <a href={SITE.phoneHref} class={link}>{SITE.phone}</a>, {SITE.hours}. We may ask you to
+          Email <a href={`mailto:${c.site.email}`} class={link}>{c.site.email}</a> or call
+          <a href={c.site.phoneHref} class={link}>{c.site.phone}</a>, {c.site.hours}. We may ask you to
           confirm you are the person who sent the request, for example by writing from the same
           email address or calling from the same phone number. There is no charge, and we will
           not treat you any differently for asking.
         </p>
         <p>
-          {SITE.legalName} is a small local business and does not meet the size thresholds that
+          {c.site.legalName} is a small local business and does not meet the size thresholds that
           bring a company under the California Consumer Privacy Act (CCPA, as amended by the
           CPRA). We honor the requests above regardless.
         </p>
@@ -180,11 +182,11 @@ const link =
 
         <h2 class={h2}>Contact</h2>
         <p>
-          {SITE.legalName}, Sacramento, CA, {SITE.license}.
+          {c.site.legalName}, Sacramento, CA, {c.site.license}.
           <br />
-          <a href={`mailto:${SITE.email}`} class={link}>{SITE.email}</a>
+          <a href={`mailto:${c.site.email}`} class={link}>{c.site.email}</a>
           <br />
-          <a href={SITE.phoneHref} class={link}>{SITE.phone}</a>
+          <a href={c.site.phoneHref} class={link}>{c.site.phone}</a>
         </p>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useT } from '../../lib/admin-i18n';
 
 type Lead = {
   id: string;
@@ -13,13 +14,16 @@ type Lead = {
   status: 'new' | 'contacted' | 'closed';
 };
 
-const STATUS_LABELS: Record<Lead['status'], string> = {
-  new: 'New',
-  contacted: 'Contacted',
-  closed: 'Closed',
+// Valorile 'new' | 'contacted' | 'closed' sunt statusurile din Supabase si raman
+// neatinse; se traduce doar eticheta pe care o vede omul, prin cheia de dictionar.
+const STATUS_LABEL_KEYS: Record<Lead['status'], string> = {
+  new: 'leads.status_new',
+  contacted: 'leads.status_contacted',
+  closed: 'leads.status_closed',
 };
 
 export default function LeadsInbox() {
+  const { t } = useT();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -41,18 +45,16 @@ export default function LeadsInbox() {
     setLeads((ls) => ls.map((l) => (l.id === lead.id ? { ...l, status } : l)));
   }
 
-  if (loading) return <p className="text-fg-muted">Loading leads...</p>;
+  if (loading) return <p className="text-fg-muted">{t('leads.loading')}</p>;
 
   return (
     <div>
-      <h1 className="font-display font-semibold text-2xl text-fg mb-1">Estimate requests</h1>
-      <p className="text-[14.5px] text-fg-muted mb-6">
-        Everything sent through the website contact form lands here (and in your email).
-      </p>
+      <h1 className="font-display font-semibold text-2xl text-fg mb-1">{t('leads.title')}</h1>
+      <p className="text-[14.5px] text-fg-muted mb-6">{t('leads.subtitle')}</p>
 
       {leads.length === 0 ? (
         <div className="rounded-card border border-hairline bg-surface-raised p-8 shadow-card text-center text-fg-muted">
-          No requests yet. When a visitor fills the form, it appears here instantly.
+          {t('leads.empty_state')}
         </div>
       ) : (
         <ul className="grid gap-4">
@@ -78,7 +80,7 @@ export default function LeadsInbox() {
                   </p>
                 </div>
                 <div className="flex gap-1.5">
-                  {(Object.keys(STATUS_LABELS) as Lead['status'][]).map((s) => (
+                  {(Object.keys(STATUS_LABEL_KEYS) as Lead['status'][]).map((s) => (
                     <button
                       key={s}
                       type="button"
@@ -94,7 +96,7 @@ export default function LeadsInbox() {
                           : 'bg-field border border-hairline text-fg-muted hover:border-accent'
                       }`}
                     >
-                      {STATUS_LABELS[s]}
+                      {t(STATUS_LABEL_KEYS[s])}
                     </button>
                   ))}
                 </div>
@@ -111,14 +113,14 @@ export default function LeadsInbox() {
                   href={`tel:${lead.phone.replace(/[^+\d]/g, '')}`}
                   className="inline-flex items-center gap-2 rounded-btn bg-control-dark text-fg-on-dark px-4 py-2 text-[13.5px] font-semibold hover:bg-control-dark-hover transition-colors"
                 >
-                  Call {lead.phone}
+                  {t('leads.call_action', { phone: lead.phone })}
                 </a>
                 {lead.email && (
                   <a
                     href={`mailto:${lead.email}`}
                     className="inline-flex items-center gap-2 rounded-btn border border-hairline px-4 py-2 text-[13.5px] font-semibold text-fg-body hover:border-accent transition-colors"
                   >
-                    Email {lead.email}
+                    {t('leads.email_action', { email: lead.email })}
                   </a>
                 )}
               </div>

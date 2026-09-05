@@ -3,6 +3,9 @@ import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import { getPublishedPosts, postDate } from '../../lib/blog';
+import { getContent } from '../../lib/content';
+
+const c = await getContent();
 
 const posts = await getPublishedPosts();
 ---
@@ -17,11 +20,10 @@ const posts = await getPublishedPosts();
       <div class="mt-8 mb-12 max-w-2xl">
         <p class="eyebrow on-light mb-5">From the job site</p>
         <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-fg">
-          Flooring advice for Sacramento homeowners
+          {c('blog.hero.title')}
         </h1>
         <p class="mt-5 text-[17px] leading-relaxed text-fg-muted">
-          Project stories, honest advice and floor care tips from Essential Flooring
-          in Sacramento.
+          {c('blog.hero.intro')}
         </p>
       </div>
 

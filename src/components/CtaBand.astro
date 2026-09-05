@@ -1,5 +1,7 @@
 ---
-import { SITE } from '../data/site';
+import { getContent } from '../lib/content';
+
+const c = await getContent();
 
 interface Props {
   title?: string;
@@ -28,12 +30,12 @@ const {
         </svg>
       </a>
       <a
-        href={SITE.phoneHref}
+        href={c.site.phoneHref}
         class="inline-flex items-center gap-2 rounded-btn border border-hairline-on-dark/25 hover:border-hairline-on-dark/50 text-fg-on-dark font-semibold px-7 py-3.5 transition-colors"
       >
-        Call {SITE.phone}
+        Call {c.site.phone}
       </a>
     </div>
-    <p class="reveal mt-6 text-[13px] text-fg-on-dark/50">Licensed &amp; Insured, {SITE.license}</p>
+    <p class="reveal mt-6 text-[13px] text-fg-on-dark/50">Licensed &amp; Insured, {c.site.license}</p>
   </div>
 </section>

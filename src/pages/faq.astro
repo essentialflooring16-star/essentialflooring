@@ -4,14 +4,19 @@ import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import CtaBand from '../components/CtaBand.astro';
 import FaqList from '../components/FaqList.astro';
-import { SITE } from '../data/site';
+
 // Stock, not a job of ours: hands comparing flooring samples, which is what
 // this page is about. Pexels #6583355 (Pexels License, commercial use, no
 // attribution required); source and photographer in docs/PHOTO-CREDITS.md.
 import faqSamples from '../assets/stock/faq-samples.jpg';
 import faqData from '../data/faq.json';
+import { getContent } from '../lib/content';
 
-const items = faqData as { q: string; a: string }[];
+const c = await getContent();
+
+const items = c.isEdited('faq.items')
+  ? parseQA(c('faq.items'))
+  : (faqData as { q: string; a: string }[]).map((i) => ({ q: c.apply(i.q), a: c.apply(i.a) }));
 
 ---
 
@@ -26,18 +31,18 @@ const items = faqData as { q: string; a: string }[];
       <div class="mt-8 grid lg:grid-cols-[1fr_auto] gap-10 lg:gap-14 items-center">
         <div class="max-w-xl">
           <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-fg">
-            Questions, answered
+            {c('faq.hero.title')}
           </h1>
           <p class="mt-5 text-[17px] leading-relaxed text-fg-muted">
-            Everything homeowners usually ask before starting a flooring project.
+            {c('faq.hero.intro')}
           </p>
           <p class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-[16px] text-fg-body">
             Not here?
             <a
-              href={SITE.phoneHref}
+              href={c.site.phoneHref}
               class="font-semibold text-accent-on-light underline underline-offset-4 decoration-2 hover:text-fg transition-colors"
             >
-              Call {SITE.phone}
+              Call {c.site.phone}
             </a>
             and just ask.
           </p>

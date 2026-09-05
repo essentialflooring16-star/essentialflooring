@@ -1,6 +1,9 @@
 ---
-import { SITE } from '../data/site';
+
 import BrandLogo from './BrandLogo.astro';
+import { getContent } from '../lib/content';
+
+const c = await getContent();
 
 // The anatomy Artiom liked on BPE Cleaning: menu on the LEFT, logo dead
 // centre, contact on the RIGHT, at every width. On phones the menu is a
@@ -111,8 +114,8 @@ const linkClass = 'nav-link text-[14px] xl:text-[14.5px] font-medium text-fg-mut
 
     <div class="grid shrink-0 grid-cols-2 gap-x-6 gap-y-4 px-6">
       <div class="flex flex-col items-start gap-4">
-        <a href={SITE.phoneHref} class="m-stag hdr-caps text-accent-on-dark" style="--i: 9">{SITE.phone}</a>
-        <a href="https://wa.me/19164251361" class="m-stag hdr-caps text-fg-on-dark/70" style="--i: 10" target="_blank" rel="noopener">WhatsApp</a>
+        <a href={c.site.phoneHref} class="m-stag hdr-caps text-accent-on-dark" style="--i: 9">{c.site.phone}</a>
+        <a href={c.site.whatsapp} class="m-stag hdr-caps text-fg-on-dark/70" style="--i: 10" target="_blank" rel="noopener">WhatsApp</a>
       </div>
       <div class="flex flex-col items-end gap-4">
         <a href="/contact/" class="m-stag hdr-caps text-accent-on-dark" style="--i: 11">Free estimate</a>

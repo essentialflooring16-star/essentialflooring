@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useT, useFormat, type Vars } from '../../lib/admin-i18n';
 
 /**
  * The site is static and this panel runs in the browser, so there is no filesystem to
@@ -22,11 +23,22 @@ const MIN_INTERNAL_LINKS = 3;
 
 type Severity = 'error' | 'warning';
 
+/** Separator intern pentru listele purtate prin vars. */
+const SEP = String.fromCharCode(31);
+
 type Finding = {
-  /** Short chip label, e.g. "Title". Keeps the long sentence readable. */
+  /** Cheia etichetei scurte, de pilda seo.check_title. */
   check: string;
   severity: Severity;
-  message: string;
+  /** Cheia propozitiei si valorile ei. Se traduce la afisare, nu aici:
+   *  verificarea ruleaza intr-o functie pura, fara acces la hook. */
+  key: string;
+  vars?: Vars;
+  /** A doua propozitie, cand constatarea are una (saritura de titluri). */
+  suffixKey?: string;
+  suffixVars?: Vars;
+  /** Saritura de nivel, compusa la afisare fiindca are text propriu inauntru. */
+  jump?: { from: number; to: number; text: string };
 };
 
 type PageResult = {
@@ -169,51 +181,30 @@ async function collectPaths(
 
 function auditDocument(doc: Document, path: string, siteOrigin: string | null): PageResult {
   const findings: Finding[] = [];
-  const add = (check: string, severity: Severity, message: string) =>
-    findings.push({ check, severity, message });
+  const add = (check: string, severity: Severity, key: string, vars?: Vars) =>
+    findings.push({ check, severity, key, vars });
 
   /* Title */
   const title = doc.querySelector('title')?.textContent?.trim() || null;
   if (!title) {
-    add(
-      'Title',
-      'error',
-      'This page has no title tag, so Google invents one from the page text. Add a title of 30 to 65 characters naming the service and the city.',
-    );
+    add('seo.check_title', 'error', 'seo.finding_title_missing');
   } else if (title.length > TITLE_MAX) {
-    add(
-      'Title',
-      'warning',
-      `Title is ${title.length} characters, so Google will cut it off in the results. Shorten it to under ${TITLE_MAX}.`,
-    );
+    add('seo.check_title', 'warning', 'seo.finding_title_long', { n: title.length, max: TITLE_MAX });
   } else if (title.length < TITLE_MIN) {
-    add(
-      'Title',
-      'warning',
-      `Title is only ${title.length} characters and wastes the space Google gives you. Expand it to at least ${TITLE_MIN} by adding the service and the city.`,
-    );
+    add('seo.check_title', 'warning', 'seo.finding_title_short', { n: title.length, min: TITLE_MIN });
   }
 
   /* Meta description */
   const description = metaContent(doc, 'meta[name="description"]');
   if (!description) {
     add(
-      'Meta description',
-      'error',
-      'There is no meta description, so Google picks a sentence off the page itself to show under the link. Write one of 70 to 160 characters saying what you do and where.',
-    );
+      'seo.check_meta_description', 'error', 'seo.finding_description_missing');
   } else if (description.length > DESC_MAX) {
     add(
-      'Meta description',
-      'warning',
-      `Meta description is ${description.length} characters, so the ending gets cut off in the results. Trim it to ${DESC_MAX} or fewer.`,
-    );
+      'seo.check_meta_description', 'warning', 'seo.finding_description_long', { n: description.length, max: DESC_MAX });
   } else if (description.length < DESC_MIN) {
     add(
-      'Meta description',
-      'warning',
-      `Meta description is only ${description.length} characters. Use the room you get, aim for ${DESC_MIN} to ${DESC_MAX}.`,
-    );
+      'seo.check_meta_description', 'warning', 'seo.finding_description_short', { n: description.length, min: DESC_MIN, max: DESC_MAX });
   }
 
   /* Headings */
@@ -221,35 +212,32 @@ function auditDocument(doc: Document, path: string, siteOrigin: string | null): 
   const h1s = headings.filter((h) => h.tagName === 'H1');
   if (h1s.length === 0) {
     add(
-      'Heading',
-      'error',
-      'This page has no H1 heading, so search engines cannot tell what it is about. Give it one H1 naming the service and the area.',
-    );
+      'seo.check_heading', 'error', 'seo.finding_h1_missing');
   } else if (h1s.length > 1) {
-    add(
-      'Heading',
-      'error',
-      `This page has ${h1s.length} H1 headings competing with each other. Keep one H1 and turn the others into H2s.`,
-    );
+    add('seo.check_heading', 'error', 'seo.finding_h1_multiple', { n: h1s.length });
   }
 
   let previousLevel = 0;
-  const jumps: string[] = [];
+  const jumps: { from: number; to: number; text: string }[] = [];
   for (const heading of headings) {
     const level = Number(heading.tagName.slice(1));
     if (previousLevel > 0 && level > previousLevel + 1) {
-      jumps.push(`H${previousLevel} straight to H${level} at "${shorten(heading.textContent ?? '')}"`);
+        jumps.push({ from: previousLevel, to: level, text: shorten(heading.textContent ?? '') });
     }
     previousLevel = level;
   }
   if (jumps.length > 0) {
-    add(
-      'Heading',
-      'warning',
-      `Heading levels skip a step: ${jumps[0]}. Step down one level at a time so the page structure reads correctly.${
-        jumps.length > 1 ? ` There ${plural(jumps.length - 1, 'is 1 more skip', `are ${jumps.length - 1} more skips`)} like this further down.` : ''
-      }`,
-    );
+    findings.push({
+      check: 'seo.check_heading',
+      severity: 'warning',
+      key: 'seo.finding_heading_skip',
+      vars: { jump: '' },
+      // Prima saritura se scrie in propozitia principala, iar cate mai sunt se
+      // spune intr-una separata: doua chei, ca ambele sa se acorde in romana.
+      jump: jumps[0],
+      suffixKey: jumps.length > 1 ? 'seo.finding_heading_skip_more' : undefined,
+      suffixVars: jumps.length > 1 ? { n: jumps.length - 1 } : undefined,
+    });
   }
 
   /* Image alt text */
@@ -266,27 +254,21 @@ function auditDocument(doc: Document, path: string, siteOrigin: string | null): 
     return !decorative;
   });
   if (missingAlt.length > 0) {
-    const examples = missingAlt
-      .slice(0, 3)
-      .map((img) => fileNameOf(img.getAttribute('src') || 'unnamed image'))
-      .join(', ');
-    add(
-      'Images',
-      'error',
-      `${missingAlt.length} ${plural(missingAlt.length, 'image has', 'images have')} no alt text (${examples}${
-        missingAlt.length > 3 ? ', and more' : ''
-      }). Describe each one in a few words, or if it is pure decoration set alt="" together with aria-hidden="true".`,
-    );
+    const examples = missingAlt.slice(0, 3).map((img) => img.getAttribute('src') ?? '');
+    add('seo.check_images', 'error', 'seo.finding_images_alt', {
+      n: missingAlt.length,
+      examples: '',
+      // Numele fisierelor se compun la afisare: unul dintre ele poate lipsi, iar
+      // textul de inlocuire e el insusi tradus.
+      files: examples.join(SEP),
+      more: missingAlt.length > 3 ? 1 : 0,
+    });
   }
 
   /* Canonical */
   const canonicalHref = doc.querySelector('link[rel="canonical"]')?.getAttribute('href')?.trim();
   if (!canonicalHref) {
-    add(
-      'Canonical',
-      'error',
-      'There is no canonical tag, so slightly different addresses for this page can split its ranking. Add one pointing at this page itself.',
-    );
+    add('seo.check_canonical', 'error', 'seo.finding_canonical_missing');
   } else {
     let canonicalPath: string | null = null;
     try {
@@ -297,28 +279,16 @@ function auditDocument(doc: Document, path: string, siteOrigin: string | null): 
     // Only the path is compared: the built pages carry the production domain even when
     // the admin is opened on a preview or local address, and that is not a real problem.
     if (!canonicalPath) {
-      add(
-        'Canonical',
-        'error',
-        `The canonical tag is not a valid address (${shorten(canonicalHref)}). Point it at this page's own full address.`,
-      );
+      add('seo.check_canonical', 'error', 'seo.finding_canonical_invalid', { href: shorten(canonicalHref) });
     } else if (canonicalPath !== path) {
-      add(
-        'Canonical',
-        'error',
-        `The canonical tag points at ${canonicalPath}, not at this page. Search engines usually follow that and index the other page instead. Point it at ${path}.`,
-      );
+      add('seo.check_canonical', 'error', 'seo.finding_canonical_mismatch', { canonical: canonicalPath, path });
     }
   }
 
   /* Structured data */
   const ldBlocks = Array.from(doc.querySelectorAll('script[type="application/ld+json"]'));
   if (ldBlocks.length === 0) {
-    add(
-      'Structured data',
-      'warning',
-      'No structured data on this page. Add a JSON-LD block (LocalBusiness, Service or FAQPage) so Google has the option of showing extra detail such as hours or answers next to the listing. Google decides whether to use it, but without the block it never can.',
-    );
+    add('seo.check_structured_data', 'warning', 'seo.finding_structured_data_missing');
   } else {
     const broken = ldBlocks.filter((block) => {
       try {
@@ -329,40 +299,37 @@ function auditDocument(doc: Document, path: string, siteOrigin: string | null): 
       }
     });
     if (broken.length > 0) {
-      const which =
-        ldBlocks.length === 1
-          ? 'The structured data block on this page is'
-          : `${broken.length} of the ${ldBlocks.length} structured data blocks ${plural(broken.length, 'is', 'are')}`;
-      add(
-        'Structured data',
-        'error',
-        `${which} not valid JSON, so Google throws ${plural(broken.length, 'it', 'them')} away and shows no rich result. Fix the JSON-LD markup on this page.`,
-      );
+      if (ldBlocks.length === 1) {
+        add('seo.check_structured_data', 'error', 'seo.finding_structured_data_broken_single');
+      } else {
+        add('seo.check_structured_data', 'error', 'seo.finding_structured_data_broken_many', {
+          n: broken.length,
+          total: ldBlocks.length,
+        });
+      }
     }
   }
 
   /* Open Graph */
   const missingOg: string[] = [];
-  if (!metaContent(doc, 'meta[property="og:title"]')) missingOg.push('title');
-  if (!metaContent(doc, 'meta[property="og:description"]')) missingOg.push('description');
-  if (!metaContent(doc, 'meta[property="og:image"]')) missingOg.push('image');
+  if (!metaContent(doc, 'meta[property="og:title"]')) missingOg.push('seo.og_title');
+  if (!metaContent(doc, 'meta[property="og:description"]')) missingOg.push('seo.og_description');
+  if (!metaContent(doc, 'meta[property="og:image"]')) missingOg.push('seo.og_image');
   if (missingOg.length > 0) {
-    add(
-      'Social preview',
-      'warning',
-      `The Open Graph ${listJoin(missingOg)} ${plural(missingOg.length, 'tag is', 'tags are')} missing, so this page looks bare when someone shares it on Facebook or by text message. Add og:title, og:description and og:image so the link shows a headline and a photo.`,
-    );
+    add('seo.check_social_preview', 'warning', 'seo.finding_og_missing', {
+      n: missingOg.length,
+      list: '',
+      // Numele etichetelor lipsa sunt ele insele traduse si legate cu "si", deci
+      // lista se compune la afisare.
+      tags: missingOg.join(SEP),
+    });
   }
 
   /* Word count */
   const scope = contentScope(doc);
   const words = countWords(scope);
   if (words < MIN_WORDS) {
-    add(
-      'Thin content',
-      'warning',
-      `Only ${words} words of real content. Thin pages rarely rank well. Aim for at least ${MIN_WORDS} words that answer the questions customers actually ask.`,
-    );
+    add('seo.check_thin_content', 'warning', 'seo.finding_thin_content', { n: words, min: MIN_WORDS });
   }
 
   /* Internal links */
@@ -384,9 +351,10 @@ function auditDocument(doc: Document, path: string, siteOrigin: string | null): 
   }
   if (internal.size < MIN_INTERNAL_LINKS) {
     add(
-      'Internal links',
+      'seo.check_internal_links',
       'warning',
-      `${internal.size === 0 ? 'No links' : `Only ${internal.size} ${plural(internal.size, 'link', 'links')}`} from the content here to other pages of the site. Add at least ${MIN_INTERNAL_LINKS} links to related services or nearby city pages so this page is not stranded.`,
+      internal.size === 0 ? 'seo.finding_internal_links_none' : 'seo.finding_internal_links_few',
+      { n: internal.size, min: MIN_INTERNAL_LINKS },
     );
   }
 
@@ -418,9 +386,10 @@ async function auditPath(
       loaded: false,
       findings: [
         {
-          check: 'Page',
+          check: 'seo.check_page',
           severity: 'error',
-          message: `This page did not load during the scan (server answered ${res.status}), so nothing on it could be checked. Open it yourself to see whether it is broken.`,
+          key: 'seo.finding_page_status',
+          vars: { status: res.status },
         },
       ],
     };
@@ -445,20 +414,17 @@ function addDuplicateFindings(results: PageResult[]): PageResult[] {
     }
   }
 
-  const others = (paths: string[], self: string) => {
-    const rest = paths.filter((p) => p !== self);
-    const shown = rest.slice(0, 2).join(' and ');
-    return rest.length > 2 ? `${shown} and ${rest.length - 2} more` : shown;
-  };
+  const others = (paths: string[], self: string) => paths.filter((p) => p !== self);
 
   return results.map((result) => {
     const extra: Finding[] = [];
     const titleGroup = result.title ? byTitle.get(result.title.trim().toLowerCase()) ?? [] : [];
     if (titleGroup.length > 1) {
       extra.push({
-        check: 'Duplicate title',
+        check: 'seo.check_duplicate_title',
         severity: 'error',
-        message: `This page has exactly the same title as ${others(titleGroup, result.path)}. Duplicate titles make your own pages compete with each other. Give each page a title of its own, usually by naming its city or service.`,
+        key: 'seo.finding_duplicate_title',
+        vars: { pages: '', others: others(titleGroup, result.path).join(SEP) },
       });
     }
     const descGroup = result.description
@@ -466,9 +432,10 @@ function addDuplicateFindings(results: PageResult[]): PageResult[] {
       : [];
     if (descGroup.length > 1) {
       extra.push({
-        check: 'Duplicate description',
+        check: 'seo.check_duplicate_description',
         severity: 'error',
-        message: `The meta description is identical to the one on ${others(descGroup, result.path)}. Rewrite each one so it describes that page in particular.`,
+        key: 'seo.finding_duplicate_description',
+        vars: { pages: '', others: others(descGroup, result.path).join(SEP) },
       });
     }
     return extra.length > 0 ? { ...result, findings: [...result.findings, ...extra] } : result;
@@ -485,6 +452,8 @@ function countBySeverity(results: PageResult[], severity: Severity): number {
 /* --------------------------------------------------------------- the view */
 
 export default function SeoHealth() {
+  const { t } = useT();
+  const fmt = useFormat();
   const [results, setResults] = useState<PageResult[] | null>(null);
   const [scanning, setScanning] = useState(false);
   const [progress, setProgress] = useState({ done: 0, total: 0 });
@@ -541,21 +510,19 @@ export default function SeoHealth() {
     setNote(null);
     setResults(null);
     setProgress({ done: 0, total: 0 });
-    setAnnouncement('Scan started. Reading the sitemap.');
+    setAnnouncement(t('seo.announce_started'));
 
     try {
       const { paths, siteOrigin, truncated } = await collectPaths(controller.signal);
       if (paths.length === 0) {
         setError(
-          'The sitemap could not be read, so there was nothing to scan. Check that /sitemap-index.xml opens in a browser tab, then try again.',
+          t('seo.error_sitemap'),
         );
-        setAnnouncement('The scan could not start because the sitemap could not be read.');
+        setAnnouncement(t('seo.announce_sitemap_failed'));
         return;
       }
       if (truncated) {
-        setNote(
-          `The sitemap lists more than ${MAX_PAGES} pages, so only the first ${MAX_PAGES} were checked. Everything below covers that part of the site, not all of it.`,
-        );
+        setNote(t('seo.note_truncated', { max: MAX_PAGES }));
       }
       setProgress({ done: 0, total: paths.length });
 
@@ -582,10 +549,9 @@ export default function SeoHealth() {
               loaded: false,
               findings: [
                 {
-                  check: 'Page',
+                  check: 'seo.check_page',
                   severity: 'error',
-                  message:
-                    'This page could not be reached during the scan, so nothing on it could be checked. Open it yourself to see whether it is broken.',
+                  key: 'seo.finding_page_unreachable',
                 },
               ],
             });
@@ -607,10 +573,10 @@ export default function SeoHealth() {
       if (controller.signal.aborted) {
         setNote(
           finished.length === 0
-            ? 'Scan stopped before any page was checked. Run it again when you are ready.'
-            : `Scan stopped early. These are the ${finished.length} of ${paths.length} pages that were checked before you cancelled.`,
+            ? t('seo.note_stopped_empty')
+            : t('seo.note_stopped_early', { n: finished.length, total: paths.length }),
         );
-        setAnnouncement(`Scan stopped. ${finished.length} of ${paths.length} pages were checked.`);
+        setAnnouncement(t('seo.announce_stopped', { n: finished.length, total: paths.length }));
         return;
       }
 
@@ -622,7 +588,11 @@ export default function SeoHealth() {
       };
       setLastScan(summary);
       setAnnouncement(
-        `Scan finished. ${summary.pages} ${plural(summary.pages, 'page', 'pages')} checked, ${summary.errors} ${plural(summary.errors, 'error', 'errors')}, ${summary.warnings} ${plural(summary.warnings, 'warning', 'warnings')}.`,
+        t('seo.announce_finished', {
+          pages: t('seo.count_pages_checked', { n: summary.pages }),
+          errors: t('seo.count_errors', { n: summary.errors }),
+          warnings: t('seo.count_warnings', { n: summary.warnings }),
+        }),
       );
 
       if (supabase) {
@@ -633,7 +603,7 @@ export default function SeoHealth() {
           console.error(saveErr);
           // Append: a truncation notice may already be sitting here and still matters.
           setNote((prev) =>
-            [prev, 'The results are on screen, but the scan date could not be saved for next time.']
+            [prev, t('seo.note_save_failed')]
               .filter(Boolean)
               .join(' '),
           );
@@ -642,15 +612,15 @@ export default function SeoHealth() {
     } catch (err) {
       // Cancelling makes the in-flight fetch throw, which is not something to report.
       if (controller.signal.aborted) {
-        setNote('Scan cancelled. Nothing was checked, so run it again when you are ready.');
-        setAnnouncement('Scan cancelled.');
+        setNote(t('seo.note_cancelled'));
+        setAnnouncement(t('seo.announce_cancelled'));
         return;
       }
       console.error(err);
       setError(
-        'The scan could not finish. Check that the website is online, then run it again.',
+        t('seo.error_failed'),
       );
-      setAnnouncement('The scan could not finish.');
+      setAnnouncement(t('seo.announce_failed'));
     } finally {
       setScanning(false);
       abortRef.current = null;
@@ -674,17 +644,18 @@ export default function SeoHealth() {
     if (errorCount === 0 && warningCount === 0) {
       verdict =
         results.length === 1
-          ? 'The page scanned passes every check on this list. Nothing to fix at the page level right now.'
-          : `All ${results.length} pages pass every check on this list. Nothing to fix at the page level right now.`;
+          ? t('seo.verdict_all_clean_single')
+          : t('seo.verdict_all_clean', { n: results.length });
     } else if (errorCount === 0) {
-      verdict = `Nothing is broken. ${warningPages.length} ${plural(warningPages.length, 'page has', 'pages have')} smaller issues that are worth tidying up when there is time.`;
+      verdict = t('seo.verdict_warnings_only', { n: warningPages.length });
     } else {
-      const needFixing = `${errorPages.length} ${plural(errorPages.length, 'page needs', 'pages need')} a fix before ${plural(errorPages.length, 'it', 'they')} can rank properly`;
-      // "and 0 more pages could be stronger" is not a sentence anyone should have to read.
+      const fixing = t('seo.verdict_needs_fixing', { n: errorPages.length });
+      // "si inca 0 pagini ar putea fi mai bune" nu e o propozitie pe care sa o
+      // citeasca cineva, deci a doua jumatate apare doar cand chiar exista.
       verdict =
         warningOnlyPages.length === 0
-          ? `${needFixing}.`
-          : `${needFixing}, and ${warningOnlyPages.length} more ${plural(warningOnlyPages.length, 'page could be', 'pages could be')} stronger.`;
+          ? `${fixing}.`
+          : t('seo.verdict_needs_fixing_and_more', { fixing, n: warningOnlyPages.length });
     }
   }
 
@@ -697,12 +668,8 @@ export default function SeoHealth() {
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-display font-semibold text-2xl text-fg">SEO health</h1>
-          <p className="text-[14.5px] text-fg-muted mt-1 max-w-2xl">
-            This downloads every page listed in the sitemap and checks the HTML a search engine
-            reads first: titles, descriptions, headings, alt text, canonical tags and structured
-            data. It looks at the pages themselves, not at your position in search results.
-          </p>
+          <h1 className="font-display font-semibold text-2xl text-fg">{t('seo.title')}</h1>
+          <p className="text-[14.5px] text-fg-muted mt-1 max-w-2xl">{t('seo.intro')}</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -712,30 +679,26 @@ export default function SeoHealth() {
             disabled={scanning}
             className="rounded-btn bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-5 py-2.5 text-[14.5px] transition-colors"
           >
-            {scanning ? 'Scanning...' : results ? 'Run the scan again' : 'Run the scan'}
+            {scanning ? t('seo.running') : results ? t('seo.run_again') : t('seo.run')}
           </button>
           {scanning && (
             <button
               type="button"
               onClick={() => abortRef.current?.abort()}
               className="rounded-btn border border-hairline bg-surface-raised px-5 py-2.5 text-[14.5px] font-semibold text-fg-body hover:border-accent transition-colors"
-            >
-              Cancel
-            </button>
+            >{t('seo.cancel')}</button>
           )}
         </div>
       </div>
 
       {lastScan && !scanning && (
         <p className="text-[13.5px] text-fg-muted">
-          Last scan{' '}
-          {new Date(lastScan.at).toLocaleString('en-US', {
-            dateStyle: 'medium',
-            timeStyle: 'short',
+          {t('seo.last_scan', {
+            date: fmt.dateTime(lastScan.at),
+            pages: t('seo.count_pages', { n: lastScan.pages }),
+            errors: t('seo.count_errors', { n: lastScan.errors }),
+            warnings: t('seo.count_warnings', { n: lastScan.warnings }),
           })}
-          : {lastScan.pages} {plural(lastScan.pages, 'page', 'pages')}, {lastScan.errors}{' '}
-          {plural(lastScan.errors, 'error', 'errors')}, {lastScan.warnings}{' '}
-          {plural(lastScan.warnings, 'warning', 'warnings')}.
         </p>
       )}
 
@@ -756,8 +719,11 @@ export default function SeoHealth() {
           {/* Deliberately not a live region: the sr-only one above carries the milestones. */}
           <p className="text-[14.5px] text-fg-body">
             {progress.total === 0
-              ? 'Reading the sitemap...'
-              : `Checking page ${Math.min(progress.done + 1, progress.total)} of ${progress.total}...`}
+              ? t('seo.progress_sitemap')
+              : t('seo.progress_page', {
+                  n: Math.min(progress.done + 1, progress.total),
+                  total: progress.total,
+                })}
           </p>
           <div
             className="mt-3 h-1.5 rounded-btn bg-surface-sunken overflow-hidden"
@@ -765,7 +731,7 @@ export default function SeoHealth() {
             aria-valuemin={0}
             aria-valuemax={progress.total || 1}
             aria-valuenow={progress.done}
-            aria-label="Scan progress"
+            aria-label={t('seo.progress_label')}
           >
             <div
               className="h-full rounded-btn bg-accent transition-[width] duration-300"
@@ -777,12 +743,8 @@ export default function SeoHealth() {
 
       {!results && !scanning && !error && (
         <div className="rounded-card border border-hairline bg-surface-raised p-8 shadow-card text-center">
-          <p className="text-[15px] text-fg-body">
-            No scan has run in this session yet.
-          </p>
-          <p className="text-[14px] text-fg-muted mt-1">
-            Press Run the scan. It loads every page in the sitemap, so give it a moment.
-          </p>
+          <p className="text-[15px] text-fg-body">{t('seo.empty_state')}</p>
+          <p className="text-[14px] text-fg-muted mt-1">{t('seo.empty_state_hint')}</p>
         </div>
       )}
 
@@ -791,15 +753,15 @@ export default function SeoHealth() {
       {results && results.length > 0 && (
         <>
           <div className="grid sm:grid-cols-4 gap-4">
-            <SummaryTile label="Pages scanned" value={results.length} />
-            <SummaryTile label="Errors" value={errorCount} tone={errorCount > 0 ? 'error' : 'ok'} />
+            <SummaryTile label={t('seo.tile_pages')} value={results.length} />
+            <SummaryTile label={t('seo.tile_errors')} value={errorCount} tone={errorCount > 0 ? 'error' : 'ok'} />
             <SummaryTile
-              label="Warnings"
+              label={t('seo.tile_warnings')}
               value={warningCount}
               tone={warningCount > 0 ? 'warning' : 'ok'}
             />
             <SummaryTile
-              label="Clean pages"
+              label={t('seo.tile_clean')}
               value={cleanPages.length}
               tone={cleanPages.length > 0 ? 'ok' : 'neutral'}
             />
@@ -811,8 +773,8 @@ export default function SeoHealth() {
 
           {errorPages.length > 0 && (
             <Section
-              title="Fix these first"
-              blurb="Each of these actively holds a page back in search. Start at the top."
+              title={t('seo.section_errors_title')}
+              blurb={t('seo.section_errors_blurb')}
               pages={errorPages}
               severity="error"
             />
@@ -820,8 +782,8 @@ export default function SeoHealth() {
 
           {warningPages.length > 0 && (
             <Section
-              title="Worth improving"
-              blurb="None of these stop a page from ranking, but each one is a small gain that is sitting there unused."
+              title={t('seo.section_warnings_title')}
+              blurb={t('seo.section_warnings_blurb')}
               pages={warningPages}
               severity="warning"
             />
@@ -829,12 +791,10 @@ export default function SeoHealth() {
 
           <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
             <h2 className="font-semibold text-[15px] text-fg-body">
-              Pages that passed every check ({cleanPages.length})
+              {t('seo.clean_list_title', { n: cleanPages.length })}
             </h2>
             {cleanPages.length === 0 ? (
-              <p className="text-[14px] text-fg-muted mt-2">
-                Every page has at least one thing to look at.
-              </p>
+              <p className="text-[14px] text-fg-muted mt-2">{t('seo.clean_list_empty')}</p>
             ) : (
               <ul className="mt-3 flex flex-wrap gap-2">
                 {cleanPages.map((page) => (
@@ -884,6 +844,7 @@ function Section({
   pages: PageResult[];
   severity: Severity;
 }) {
+  const { t } = useT();
   const visible = pages.filter((page) => page.findings.some((f) => f.severity === severity));
   if (visible.length === 0) return null;
 
@@ -907,16 +868,16 @@ function Section({
                 rel="noreferrer"
                 // Every card carries this link, so the bare text is useless out of context
                 // in a screen reader's link list. The label names the page and the new tab.
-                aria-label={`Open ${page.path} in a new tab`}
+                aria-label={t('seo.page_open_label', { path: page.path })}
                 className="text-[13px] font-semibold text-accent-on-light hover:underline"
-              >
-                Open this page
-              </a>
+              >{t('seo.page_open')}</a>
             </div>
             {page.loaded && (
               <p className="text-[12.5px] text-fg-muted mt-0.5">
-                {page.words} {plural(page.words, 'word', 'words')} of content,{' '}
-                {page.internalLinks} internal {plural(page.internalLinks, 'link', 'links')}
+                {t('seo.page_stats', {
+                  words: t('seo.page_words', { n: page.words }),
+                  links: t('seo.page_internal_links', { n: page.internalLinks }),
+                })}
               </p>
             )}
             <ul className="mt-3 grid gap-2.5">
@@ -934,9 +895,9 @@ function Section({
                           : 'bg-amber-50 border-amber-200 text-amber-800'
                       }`}
                     >
-                      {finding.check}
+                      {t(finding.check)}
                     </span>
-                    <span className="flex-1 min-w-[16rem]">{finding.message}</span>
+                    <span className="flex-1 min-w-[16rem]">{describe(finding, t)}</span>
                   </li>
                 ))}
             </ul>
@@ -945,4 +906,50 @@ function Section({
       </ul>
     </section>
   );
+}
+
+/**
+ * Compune propozitia unei constatari.
+ *
+ * Trei dintre ele poarta liste: numele fisierelor de imagine, etichetele Open
+ * Graph lipsa si paginile cu acelasi titlu. Listele nu se pot lipi in momentul
+ * verificarii, fiindca legatura dintre elemente ("si", "si inca 3") e ea insasi
+ * text tradus, iar verificarea ruleaza intr-o functie pura, fara acces la limba.
+ * Se compun aici, la afisare.
+ */
+function describe(finding: Finding, t: (key: string, vars?: Vars) => string): string {
+  const vars: Vars = { ...(finding.vars ?? {}) };
+  const parts = (raw: unknown) => String(raw ?? '').split(SEP).filter(Boolean);
+
+  if (finding.key === 'seo.finding_images_alt') {
+    const files = parts(vars.files).map((src) => fileNameOf(src || t('seo.unnamed_image')));
+    vars.examples = files.join(', ') + (vars.more ? t('seo.images_alt_more') : '');
+  }
+
+  if (finding.key === 'seo.finding_og_missing') {
+    vars.list = joinList(parts(vars.tags).map((key) => t(key)), t);
+  }
+
+  if (
+    finding.key === 'seo.finding_duplicate_title' ||
+    finding.key === 'seo.finding_duplicate_description'
+  ) {
+    const rest = parts(vars.others);
+    const shown = joinList(rest.slice(0, 2), t);
+    vars.pages = rest.length > 2 ? t('seo.others_more', { shown, n: rest.length - 2 }) : shown;
+  }
+
+  if (finding.jump) vars.jump = t('seo.heading_skip_item', finding.jump);
+
+  const main = t(finding.key, vars);
+  return finding.suffixKey ? `${main} ${t(finding.suffixKey, finding.suffixVars)}` : main;
+}
+
+/** "a, b si c", cu legatura in limba aleasa. */
+function joinList(items: string[], t: (key: string, vars?: Vars) => string): string {
+  if (items.length <= 1) return items[0] ?? '';
+  return t('seo.list_join', {
+    items: items.slice(0, -1).join(', '),
+    last: items[items.length - 1],
+  });
 }

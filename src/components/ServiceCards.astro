@@ -6,8 +6,15 @@
 // work instead of screenshots.
 import { Image } from 'astro:assets';
 import { SERVICES } from '../data/site';
+import { getContent } from '../lib/content';
 import { photoImage, photoById } from '../lib/photos';
 import Icon from './Icon.astro';
+
+const c = await getContent();
+
+// Cheia unui serviciu se compune din slug, dupa conventia din registru, deci
+// un serviciu nou nu cere nicio modificare aici.
+const cardKey = (slug: string) => `service_${slug.replace(/-/g, '_')}`;
 
 const icons: Record<string, 'refinish' | 'plank' | 'stairs' | 'layers' | 'carpet'> = {
   'hardwood-floor-refinishing': 'refinish',
@@ -58,10 +65,10 @@ const icons: Record<string, 'refinish' | 'plank' | 'stairs' | 'layers' | 'carpet
           <Icon name={icons[s.slug] ?? 'plank'} size={30} class="shrink-0 mt-0.5 text-fg" />
           <span class="min-w-0">
             <span class={`block font-display font-medium text-fg leading-snug ${big ? 'text-[22px] sm:text-[25px]' : 'text-[19px] sm:text-[21px]'}`}>
-              {s.name}
+              {c(`${cardKey(s.slug)}.card.name`)}
             </span>
             <span class={`mt-1.5 block text-fg-muted text-[13.5px] leading-relaxed ${big ? 'max-w-md' : 'hidden xl:block'}`}>
-              {s.short}
+              {c(`${cardKey(s.slug)}.card.short`)}
             </span>
           </span>
         </span>

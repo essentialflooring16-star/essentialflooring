@@ -84,14 +84,17 @@ export const ALL_SERVICES = [
 
 // The service area is split by how far out it sits, not by how much we want
 // the work. CORE is the inner Sacramento metro, where most jobs are and where
-// the internal linking is strongest. SURROUNDING is the ring in Placer, El
-// Dorado, Yolo and Sutter counties, still fully served.
+// the internal linking is strongest. EXTENDED is the ring in Placer, El
+// Dorado, Yolo and Sutter counties, still fully served, plus one region page
+// for the San Francisco Bay Area that is worked by arrangement, project by
+// project.
 //
-// The list used to end with San Francisco, the SF Bay Area, Orange County and
-// South Lake Tahoe. Those pages are gone. Orange County is about 400 miles
-// from Sacramento, and a location page a searcher would not believe is worse
-// for local ranking than no page at all. The eight cities added in their place
-// are all inside an hour's drive.
+// History: until 31 Aug the list ended with San Francisco, the SF Bay Area,
+// Orange County and South Lake Tahoe. All four were removed as too far away
+// for a location page a searcher would believe, and eight towns inside an
+// hour's drive took their place. On 2 Sep the client asked for the Bay Area
+// back, so it returns as a single region page whose copy also names San
+// Francisco. Orange County (about 400 miles) and South Lake Tahoe stay gone.
 export const CORE_CITIES = [
   { slug: 'sacramento', city: 'Sacramento' },
   { slug: 'arden-arcade', city: 'Arden-Arcade' },
@@ -110,8 +113,10 @@ export const CORE_CITIES = [
 ] as const;
 
 // `region: true` marks an area that is not a single city, so structured data
-// does not emit a malformed place name. Nothing in the current list needs it,
-// but the city page and the schema builder still honour the flag.
+// emits the bare name instead of a malformed "San Francisco Bay Area, CA".
+// The Bay Area entry is the one user of the flag today; the city page, the
+// service-areas index and AREA_SERVED below all honour it. It sits last so
+// the outer-ring index reads towns first, then the by-arrangement region.
 export const EXTENDED_CITIES = [
   { slug: 'rocklin', city: 'Rocklin' },
   { slug: 'granite-bay', city: 'Granite Bay' },
@@ -123,6 +128,7 @@ export const EXTENDED_CITIES = [
   { slug: 'woodland', city: 'Woodland' },
   { slug: 'galt', city: 'Galt' },
   { slug: 'yuba-city', city: 'Yuba City' },
+  { slug: 'san-francisco-bay-area', city: 'San Francisco Bay Area', region: true },
 ] as const;
 
 export const ALL_CITIES = [...CORE_CITIES, ...EXTENDED_CITIES];

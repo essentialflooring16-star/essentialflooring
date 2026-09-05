@@ -1,15 +1,20 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useT, type Vars } from '../../lib/admin-i18n';
 import { SITE } from '../../data/site';
 
 const HOOK_PREFIX = 'https://api.vercel.com/v1/integrations/deploy/';
 
 type HealthLevel = 'good' | 'warn' | 'bad';
 
+// Randurile de sanatate se nasc si in afara componentei, unde nu se poate chema
+// hook-ul, deci tin cheia de dictionar si valorile ei, iar traducerea se face la
+// randare. Asa se schimba si limba lor cand clientul comuta limba cabinetului.
 type HealthRow = {
   id: string;
   level: HealthLevel;
-  text: string;
+  key: string;
+  vars?: Vars;
 };
 
 type Notice = {
@@ -30,10 +35,10 @@ const MARK_CLASS: Record<HealthLevel, string> = {
   bad: 'bg-red-500',
 };
 
-const MARK_LABEL: Record<HealthLevel, string> = {
-  good: 'Working',
-  warn: 'Needs attention',
-  bad: 'Not working',
+const MARK_LABEL_KEYS: Record<HealthLevel, string> = {
+  good: 'settings.health_mark_good',
+  warn: 'settings.health_mark_warn',
+  bad: 'settings.health_mark_bad',
 };
 
 /**
@@ -43,7 +48,7 @@ const MARK_LABEL: Record<HealthLevel, string> = {
 const DB_DOWN: HealthRow = {
   id: 'database',
   level: 'bad',
-  text: 'The admin cabinet cannot reach its database right now, so nothing on this page can be checked. Sign out, sign back in, and if it keeps failing contact your developer.',
+  key: 'settings.health_database_down',
 };
 
 /**
@@ -61,7 +66,7 @@ function describeLastView(iso: string | null): HealthRow {
     return {
       id: 'analytics',
       level: 'warn',
-      text: 'No page views have been recorded yet, so there is nothing to report in the Traffic tab.',
+      key: 'settings.health_analytics_empty',
     };
   }
   const hours = Math.floor((Date.now() - new Date(iso).getTime()) / 3_600_000);
@@ -73,27 +78,31 @@ function describeLastView(iso: string | null): HealthRow {
     return {
       id: 'analytics',
       level: 'good',
-      text: `Visitor tracking is running. The last page view was recorded on ${stamp}.`,
+      key: 'settings.health_analytics_ok',
+      vars: { stamp },
     };
   }
   const days = Math.floor(hours / 24);
   return {
     id: 'analytics',
     level: 'warn',
-    text: `No page views for ${days} days. The last one was recorded on ${stamp}, so either the website is quiet or tracking stopped.`,
+    key: 'settings.health_analytics_stale',
+    vars: { n: days, stamp },
   };
 }
 
 // Read from the same file the public pages render from, so this panel cannot end up
-// showing a phone number the website no longer uses.
+// showing a phone number the website no longer uses. Se traduce doar eticheta, prin
+// cheia de dictionar; valoarea e datul firmei, acelasi pe site-ul public.
 const BUSINESS_DETAILS: [string, string][] = [
-  ['Phone', SITE.phone],
-  ['Email', SITE.email],
-  ['License', SITE.license],
-  ['Hours', SITE.hours],
+  ['settings.business_phone', SITE.phone],
+  ['settings.business_email', SITE.email],
+  ['settings.business_license', SITE.license],
+  ['settings.business_hours', SITE.hours],
 ];
 
 export default function SettingsPanel() {
+  const { t } = useT();
   const [hook, setHook] = useState('');
   const [draft, setDraft] = useState('');
   const [editing, setEditing] = useState(false);
@@ -128,7 +137,7 @@ export default function SettingsPanel() {
         {
           id: 'database',
           level: 'good',
-          text: 'The admin cabinet is connected to its database.',
+          key: 'settings.health_database_ok',
         },
       ];
 
@@ -139,12 +148,12 @@ export default function SettingsPanel() {
           ? {
               id: 'hook',
               level: 'good',
-              text: 'Publishing is wired up, so changes you make here can be pushed live from this page.',
+              key: 'settings.health_hook_ok',
             }
           : {
               id: 'hook',
               level: 'warn',
-              text: 'No publishing link is set, so blog and portfolio changes wait for the next developer deploy.',
+              key: 'settings.health_hook_missing',
             },
       );
 
@@ -164,17 +173,15 @@ export default function SettingsPanel() {
         rows.push({
           id: 'reviews',
           level: 'warn',
-          text: 'The customer reviews could not be checked. Contact your developer if this stays here.',
+          key: 'settings.health_reviews_failed',
         });
       } else {
         const count = reviews.count ?? 0;
         rows.push({
           id: 'reviews',
           level: count > 0 ? 'good' : 'warn',
-          text:
-            count > 0
-              ? `${count} customer ${count === 1 ? 'review is' : 'reviews are'} published on the website.`
-              : 'No customer reviews are published yet.',
+          key: count > 0 ? 'settings.health_reviews_count' : 'settings.health_reviews_empty',
+          vars: { n: count },
         });
       }
 
@@ -183,17 +190,15 @@ export default function SettingsPanel() {
         rows.push({
           id: 'posts',
           level: 'warn',
-          text: 'The blog posts could not be checked. Contact your developer if this stays here.',
+          key: 'settings.health_posts_failed',
         });
       } else {
         const count = posts.count ?? 0;
         rows.push({
           id: 'posts',
           level: count > 0 ? 'good' : 'warn',
-          text:
-            count > 0
-              ? `${count} blog ${count === 1 ? 'post is' : 'posts are'} published on the website.`
-              : 'No blog post is published yet, so the blog page shows nothing.',
+          key: count > 0 ? 'settings.health_posts_count' : 'settings.health_posts_empty',
+          vars: { n: count },
         });
       }
 
@@ -202,7 +207,7 @@ export default function SettingsPanel() {
         rows.push({
           id: 'analytics',
           level: 'warn',
-          text: 'Visitor tracking could not be checked. Contact your developer if this stays here.',
+          key: 'settings.health_analytics_failed',
         });
       } else {
         rows.push(describeLastView(views.data?.created_at ?? null));
@@ -238,7 +243,7 @@ export default function SettingsPanel() {
     if (!value.startsWith(HOOK_PREFIX) || value.length <= HOOK_PREFIX.length) {
       setNotice({
         tone: 'error',
-        text: `That does not look like a Vercel deploy hook. The full address has to start with ${HOOK_PREFIX} and carry the hook id after it.`,
+        text: t('settings.hook_invalid', { prefix: HOOK_PREFIX }),
       });
       return;
     }
@@ -254,14 +259,14 @@ export default function SettingsPanel() {
       setRevealed(false);
       setNotice({
         tone: 'ok',
-        text: 'Publishing link saved. You can now publish the website from this page.',
+        text: t('settings.hook_saved'),
       });
       await load();
     } catch (err) {
       console.error(err);
       setNotice({
         tone: 'error',
-        text: 'The publishing link could not be saved. Try again, and if it keeps failing contact your developer.',
+        text: t('settings.hook_save_failed'),
       });
     } finally {
       setSaving(false);
@@ -275,7 +280,7 @@ export default function SettingsPanel() {
     if (!hook.startsWith(HOOK_PREFIX)) {
       setNotice({
         tone: 'error',
-        text: 'The stored publishing link is not a Vercel deploy hook, so it was not called. Contact your developer.',
+        text: t('settings.publish_hook_invalid'),
       });
       return;
     }
@@ -286,13 +291,13 @@ export default function SettingsPanel() {
       await fetch(hook, { method: 'POST', mode: 'no-cors' });
       setNotice({
         tone: 'ok',
-        text: 'The rebuild request was sent. Vercel does not report back to this page, so give it a minute or two, then refresh the website to check your changes are there.',
+        text: t('settings.publish_sent'),
       });
     } catch (err) {
       console.error(err);
       setNotice({
         tone: 'error',
-        text: 'The rebuild request did not go through. Check your internet connection and try again.',
+        text: t('settings.publish_failed'),
       });
     } finally {
       setPublishing(false);
@@ -302,11 +307,8 @@ export default function SettingsPanel() {
   if (!supabase) {
     return (
       <div className="rounded-card border border-hairline bg-surface-raised p-8 shadow-card">
-        <h1 className="font-display font-semibold text-2xl text-fg">Settings</h1>
-        <p className="mt-3 text-[15px] text-fg-muted leading-relaxed">
-          The admin cabinet is not connected to its database, so there is nothing to show here yet.
-          Your developer needs to finish the setup.
-        </p>
+        <h1 className="font-display font-semibold text-2xl text-fg">{t('settings.title')}</h1>
+        <p className="mt-3 text-[15px] text-fg-muted leading-relaxed">{t('settings.no_database')}</p>
       </div>
     );
   }
@@ -314,38 +316,28 @@ export default function SettingsPanel() {
   return (
     <div className="grid gap-8">
       <div>
-        <h1 className="font-display font-semibold text-2xl text-fg mb-1">Settings</h1>
-        <p className="text-[14.5px] text-fg-muted">
-          Publishing, the health of the website, and the business details it shows.
-        </p>
+        <h1 className="font-display font-semibold text-2xl text-fg mb-1">{t('settings.title')}</h1>
+        <p className="text-[14.5px] text-fg-muted">{t('settings.subtitle')}</p>
       </div>
 
       {/* 1. Publishing */}
       <section className="rounded-card border border-hairline bg-surface-raised p-6 sm:p-8 shadow-card">
         <div className="grid gap-4">
           <div>
-            <h2 className="font-display font-semibold text-xl text-fg">Publishing</h2>
-            <p className="text-[14.5px] text-fg-muted mt-1">
-              The website is rebuilt from a private link so new blog posts and photos appear for
-              visitors. Your developer creates that link once in Vercel.
-            </p>
+            <h2 className="font-display font-semibold text-xl text-fg">{t('settings.publishing_heading')}</h2>
+            <p className="text-[14.5px] text-fg-muted mt-1">{t('settings.publishing_intro')}</p>
           </div>
 
-          {status === 'loading' && <p className="text-fg-muted text-[15px]">Loading settings...</p>}
+          {status === 'loading' && <p className="text-fg-muted text-[15px]">{t('settings.loading')}</p>}
 
           {status === 'failed' && (
-            <p className="rounded-card bg-surface-sunken border border-hairline px-4 py-3 text-[14.5px] text-fg-body">
-              The publishing link could not be read, so it cannot be used or changed right now.
-              Refresh the page to try again.
-            </p>
+            <p className="rounded-card bg-surface-sunken border border-hairline px-4 py-3 text-[14.5px] text-fg-body">{t('settings.load_failed')}</p>
           )}
 
           {status === 'ready' && (
             <>
               <div className="rounded-card bg-surface-sunken border border-hairline px-4 py-3">
-                <p className="text-[13px] uppercase tracking-[0.14em] text-fg-muted">
-                  Publishing link
-                </p>
+                <p className="text-[13px] uppercase tracking-[0.14em] text-fg-muted">{t('settings.hook_label')}</p>
                 {hook ? (
                   <div className="mt-2 flex flex-wrap items-center gap-3">
                     <code className="text-[13.5px] text-fg-body break-all">
@@ -357,14 +349,11 @@ export default function SettingsPanel() {
                       aria-pressed={revealed}
                       className="rounded-btn border border-hairline bg-field px-3 py-1 text-[12px] font-semibold text-fg-body hover:border-accent transition-colors"
                     >
-                      {revealed ? 'Hide' : 'Show'}
+                      {revealed ? t('settings.hook_hide') : t('settings.hook_reveal')}
                     </button>
                   </div>
                 ) : (
-                  <p className="mt-2 text-[14.5px] text-fg-body">
-                    Not set yet. Until it is, everything you save stays in the cabinet and goes live
-                    only at the next developer deploy.
-                  </p>
+                  <p className="mt-2 text-[14.5px] text-fg-body">{t('settings.hook_missing')}</p>
                 )}
               </div>
 
@@ -375,7 +364,7 @@ export default function SettingsPanel() {
                   disabled={!hook || publishing}
                   className="rounded-btn bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-6 py-3 text-[14.5px] transition-colors"
                 >
-                  {publishing ? 'Sending...' : 'Publish the website now'}
+                  {publishing ? t('settings.publish_pending') : t('settings.publish_action')}
                 </button>
                 <button
                   type="button"
@@ -387,16 +376,14 @@ export default function SettingsPanel() {
                   aria-expanded={editing}
                   className="rounded-btn border border-hairline px-6 py-3 text-[14.5px] font-semibold text-fg-body hover:border-accent transition-colors"
                 >
-                  {editing ? 'Cancel' : hook ? 'Replace the link' : 'Add the link'}
+                  {editing ? t('settings.hook_edit_cancel') : hook ? t('settings.hook_replace') : t('settings.hook_add')}
                 </button>
               </div>
 
               {editing && (
                 <form onSubmit={onSaveHook} className="grid gap-3">
                   <label className="grid gap-1.5" htmlFor="deploy-hook-url">
-                    <span className="text-[14px] font-semibold text-fg-body">
-                      Paste the deploy hook from Vercel
-                    </span>
+                    <span className="text-[14px] font-semibold text-fg-body">{t('settings.hook_input_label')}</span>
                     <input
                       id="deploy-hook-url"
                       name="deploy-hook-url"
@@ -412,16 +399,14 @@ export default function SettingsPanel() {
                     />
                   </label>
                   <p id="deploy-hook-help" className="text-[13px] text-fg-subtle -mt-1">
-                    It has to start with{' '}
-                    <code className="break-all">{HOOK_PREFIX}</code>. Treat it like a password and
-                    do not share it.
+                    {t('settings.hook_input_help', { prefix: HOOK_PREFIX })}
                   </p>
                   <button
                     type="submit"
                     disabled={saving}
                     className="justify-self-start rounded-btn bg-control-dark hover:bg-control-dark-hover disabled:opacity-60 text-fg-on-dark font-semibold px-6 py-2.5 text-[14px] transition-colors"
                   >
-                    {saving ? 'Saving...' : 'Save link'}
+                    {saving ? t('settings.hook_saving') : t('settings.hook_save')}
                   </button>
                 </form>
               )}
@@ -448,16 +433,14 @@ export default function SettingsPanel() {
 
       {/* 2. Connection status */}
       <section className="rounded-card border border-hairline bg-surface-raised p-6 sm:p-8 shadow-card">
-        <h2 className="font-display font-semibold text-xl text-fg">Website health</h2>
-        <p className="text-[14.5px] text-fg-muted mt-1 mb-5">
-          A quick check of the parts that run behind the website.
-        </p>
+        <h2 className="font-display font-semibold text-xl text-fg">{t('settings.health_heading')}</h2>
+        <p className="text-[14.5px] text-fg-muted mt-1 mb-5">{t('settings.health_intro')}</p>
 
         {/* aria-busy rather than aria-live: this list loads on arrival, and reading five
             full sentences aloud unprompted would bury the rest of the page. */}
         <div aria-busy={status === 'loading'}>
           {status === 'loading' ? (
-            <p className="text-fg-muted text-[15px]">Checking...</p>
+            <p className="text-fg-muted text-[15px]">{t('settings.health_checking')}</p>
           ) : (
             <ul className="grid gap-3">
               {health.map((row) => (
@@ -466,8 +449,8 @@ export default function SettingsPanel() {
                     aria-hidden="true"
                     className={`mt-[7px] h-2.5 w-2.5 shrink-0 rounded-btn ${MARK_CLASS[row.level]}`}
                   />
-                  <span className="sr-only">{MARK_LABEL[row.level]}: </span>
-                  <span className="leading-relaxed">{row.text}</span>
+                  <span className="sr-only">{t(MARK_LABEL_KEYS[row.level])}: </span>
+                  <span className="leading-relaxed">{t(row.key, row.vars)}</span>
                 </li>
               ))}
             </ul>
@@ -477,18 +460,15 @@ export default function SettingsPanel() {
 
       {/* 3. Business details, read only on purpose */}
       <section className="rounded-card border border-hairline bg-surface-raised p-6 sm:p-8 shadow-card">
-        <h2 className="font-display font-semibold text-xl text-fg">Business details</h2>
-        <p className="text-[14.5px] text-fg-muted mt-1 mb-5">
-          These are built into every page of the website, so changing them is a developer job. Send
-          your developer the new details and they go out with the next update.
-        </p>
+        <h2 className="font-display font-semibold text-xl text-fg">{t('settings.business_heading')}</h2>
+        <p className="text-[14.5px] text-fg-muted mt-1 mb-5">{t('settings.business_intro')}</p>
         <dl className="grid sm:grid-cols-2 gap-4">
-          {BUSINESS_DETAILS.map(([label, value]) => (
+          {BUSINESS_DETAILS.map(([labelKey, value]) => (
             <div
-              key={label}
+              key={labelKey}
               className="rounded-card bg-surface-sunken border border-hairline px-4 py-3"
             >
-              <dt className="text-[13px] uppercase tracking-[0.14em] text-fg-muted">{label}</dt>
+              <dt className="text-[13px] uppercase tracking-[0.14em] text-fg-muted">{t(labelKey)}</dt>
               <dd className="mt-1 text-[15px] text-fg break-words">{value}</dd>
             </div>
           ))}

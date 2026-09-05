@@ -4,15 +4,16 @@ import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
 import CtaBand from '../../components/CtaBand.astro';
-import { SERVICES, ALL_SERVICES } from '../../data/site';
+import { SERVICES } from '../../data/site';
 import { photoImage, photoById } from '../../lib/photos';
+import { getContent } from '../../lib/content';
+import { parsePairs } from '../../data/content/types';
 
-const extras = [
-  { t: 'Tile & linoleum', d: 'Tile and linoleum installation for kitchens, bathrooms and laundry rooms.' },
-  { t: 'Floor removal', d: 'We tear out old carpet, laminate or damaged wood and haul it away.' },
-  { t: 'Leveling & grinding', d: 'Surface preparation so the new floor sits flat and lasts.' },
-  { t: 'Baseboards & transitions', d: 'Clean transitions and finished edges in every room.' },
-];
+const c = await getContent();
+const cardKey = (slug: string) => `service_${slug.replace(/-/g, '_')}`;
+const allServices = c.list('services.full_list.items');
+
+const extras = parsePairs(c('services.extras.items')).map((p) => ({ t: p.title, d: p.text }));
 ---
 
 <Base
@@ -24,12 +25,10 @@ const extras = [
       <Breadcrumbs crumbs={[{ label: 'Services' }]} />
       <div class="mt-8 max-w-2xl">
         <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-fg">
-          Flooring services, done right
+          {c('services.hero.title')}
         </h1>
         <p class="mt-5 text-[17px] leading-relaxed text-fg-muted">
-          From reviving original hardwood to installing waterproof LVP in a busy family
-          kitchen, we handle the whole project with one licensed contractor. Every job starts
-          with a free estimate and a transparent written quote.
+          {c('services.hero.text')}
         </p>
       </div>
 
@@ -52,9 +51,9 @@ const extras = [
             </div>
             <div class="p-8 sm:p-10 flex flex-col justify-center">
               <h2 class="font-display font-semibold text-2xl sm:text-3xl text-fg group-hover:text-accent-on-light transition-colors">
-                {s.name}
+                {c(`${cardKey(s.slug)}.card.name`)}
               </h2>
-              <p class="mt-3 text-[16px] leading-relaxed text-fg-muted max-w-md">{s.short}</p>
+              <p class="mt-3 text-[16px] leading-relaxed text-fg-muted max-w-md">{c(`${cardKey(s.slug)}.card.short`)}</p>
               <span class="mt-6 inline-flex items-center gap-2 font-semibold text-accent-on-light">
                 Explore this service
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
@@ -89,7 +88,7 @@ const extras = [
           The complete list, all under one roof
         </h3>
         <ul class="flex flex-wrap gap-2">
-          {ALL_SERVICES.map((s) => (
+          {allServices.map((s) => (
             <li class="rounded-btn bg-surface-raised border border-hairline px-3.5 py-1.5 text-[13.5px] font-medium text-fg-body">
               {s}
             </li>

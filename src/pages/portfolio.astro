@@ -7,6 +7,9 @@ import CtaBand from '../components/CtaBand.astro';
 import Gallery from '../components/Gallery.tsx';
 import { galleryPhotos, photoImage, CATEGORY_LABELS } from '../lib/photos';
 import pairsData from '../data/before-after.json';
+import { getContent } from '../lib/content';
+
+const c = await getContent();
 
 const items = await Promise.all(
   galleryPhotos.map(async (p) => {
@@ -58,12 +61,10 @@ const pairs = await Promise.all(
       <Breadcrumbs crumbs={[{ label: 'Our Work' }]} />
       <div class="mt-8 mb-12 max-w-2xl">
         <h1 class="font-display font-semibold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-fg">
-          Our work, room by room
+          {c('portfolio.hero.title')}
         </h1>
         <p class="mt-5 text-[17px] leading-relaxed text-fg-muted">
-          Every photo here is a real Essential Flooring project from the Sacramento area.
-          Hardwood brought back to life, waterproof LVP for busy families, and staircases
-          rebuilt tread by tread.
+          {c('portfolio.hero.intro')}
         </p>
       </div>
 
@@ -78,11 +79,10 @@ const pairs = await Promise.all(
           Before and after
         </p>
         <h2 class="font-display font-semibold text-3xl sm:text-4xl text-fg tracking-tight">
-          The part that actually shows
+          {c('portfolio.before_after.title')}
         </h2>
         <p class="mt-4 text-[16px] leading-relaxed text-fg-muted">
-          Every pair below is one job, photographed before we started and after we
-          finished. Nothing here is a stock photo or a showroom.
+          {c('portfolio.before_after.text')}
         </p>
       </div>
 
@@ -135,7 +135,7 @@ const pairs = await Promise.all(
   </section>
 
   <CtaBand
-    title="Want your floor in this gallery?"
-    text="Send us a few details about your project and we will come out for a free measurement and estimate."
+    title={c('portfolio.cta.title')}
+    text={c('portfolio.cta.text')}
   />
 </Base>

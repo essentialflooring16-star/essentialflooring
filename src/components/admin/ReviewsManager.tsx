@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useT } from '../../lib/admin-i18n';
 
 type Review = {
   id: string;
@@ -27,11 +28,14 @@ const MAX_TEXT = 1200;
 const LIST_LIMIT = 300;
 const RATING_OPTIONS = [5, 4, 3, 2, 1];
 
-const SOURCES = [
-  ['google', 'Google'],
-  ['yelp', 'Yelp'],
-  ['facebook', 'Facebook'],
-  ['direct', 'Sent to us directly'],
+// Codul din stanga ('google', 'direct') e valoarea scrisa in coloana source si
+// ramane neatins; eticheta traieste doar in cabinet, deci constanta tine chei de
+// dictionar, iar traducerea se face la randare.
+const SOURCE_KEYS = [
+  ['google', 'reviews.source_google'],
+  ['yelp', 'reviews.source_yelp'],
+  ['facebook', 'reviews.source_facebook'],
+  ['direct', 'reviews.source_direct'],
 ] as const;
 
 const EMPTY_DRAFT: Draft = {
@@ -48,9 +52,8 @@ const EMPTY_DRAFT: Draft = {
 // Same deploy hook and same host check the blog and settings panels use.
 const HOOK_PREFIX = 'https://api.vercel.com/v1/integrations/deploy/';
 
-const SAVED_NOTE = 'Saved here. Press "Publish the website now" above to put it online.';
-
 export default function ReviewsManager() {
+  const { t } = useT();
   const [rows, setRows] = useState<Review[] | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
@@ -81,7 +84,7 @@ export default function ReviewsManager() {
       console.error(loadError);
       setLoadFailed(true);
       setRows(null);
-      setError('Could not load the reviews. Refresh the page, and if it keeps failing contact your developer.');
+      setError(t('reviews.error_load'));
       return;
     }
     setLoadFailed(false);
@@ -121,24 +124,24 @@ export default function ReviewsManager() {
 
       const hook = data?.value as string | undefined;
       if (!hook) {
-        setError('The publishing link is not set yet, so the website cannot rebuild. Add it on the Settings page, or ask your developer.');
+        setError(t('reviews.error_hook_missing'));
         return;
       }
       // The stored value is a credential this browser sends a request to. The database
       // constrains it too, but the host is checked again at the moment it is used: a
       // tampered row must never turn the admin into a client for somebody else's server.
       if (!hook.startsWith(HOOK_PREFIX)) {
-        setError('The stored publishing link is not a Vercel deploy hook, so it was not used. Contact your developer.');
+        setError(t('reviews.error_hook_invalid'));
         return;
       }
       // no-cors because a deploy hook answers without CORS headers. The response is
       // opaque, so a request that resolves is the only confirmation available.
       await fetch(hook, { method: 'POST', mode: 'no-cors' });
       setPending(false);
-      setNotice('The website is rebuilding now. The reviews are online in a minute or two, then refresh the site to see them.');
+      setNotice(t('reviews.notice_rebuilding'));
     } catch (err) {
       console.error(err);
-      setError('The publish request did not go through. Check your internet connection and try again.');
+      setError(t('reviews.error_publish'));
     } finally {
       setPublishing(false);
     }
@@ -152,7 +155,7 @@ export default function ReviewsManager() {
     const text = draft.text.trim();
     if (!author || !text) {
       setNotice(null);
-      setError('Add the customer name and the review text before saving.');
+      setError(t('reviews.error_missing_fields'));
       return;
     }
 
@@ -172,12 +175,12 @@ export default function ReviewsManager() {
 
     if (insertError) {
       console.error(insertError);
-      setError('Could not save this review. Check your internet connection and try again.');
+      setError(t('reviews.error_save'));
       return;
     }
     setDraft(EMPTY_DRAFT);
     setPending(true);
-    setNotice(SAVED_NOTE);
+    setNotice(t('reviews.saved_note'));
     await load();
   }
 
@@ -193,14 +196,14 @@ export default function ReviewsManager() {
 
     if (updateError) {
       console.error(updateError);
-      setError('Could not change that review. Try again in a moment.');
+      setError(t('reviews.error_toggle'));
       return;
     }
     setPending(true);
     setNotice(
       next
-        ? `Review from ${review.author} will go back on the website. ${SAVED_NOTE}`
-        : `Review from ${review.author} will come off the website. ${SAVED_NOTE}`
+        ? t('reviews.notice_shown', { author: review.author, note: t('reviews.saved_note') })
+        : t('reviews.notice_hidden', { author: review.author, note: t('reviews.saved_note') })
     );
     setRows((current) =>
       (current ?? []).map((r) => (r.id === review.id ? { ...r, published: next } : r))
@@ -215,19 +218,19 @@ export default function ReviewsManager() {
 
     if (deleteError) {
       console.error(deleteError);
-      setError('Could not delete that review. Try again in a moment.');
+      setError(t('reviews.error_delete'));
       return;
     }
     setConfirmId(null);
     setPending(true);
-    setNotice(`Review from ${review.author} was deleted. ${SAVED_NOTE}`);
+    setNotice(t('reviews.notice_deleted', { author: review.author, note: t('reviews.saved_note') }));
     setRows((current) => (current ?? []).filter((r) => r.id !== review.id));
   }
 
   if (!supabase) {
     return (
       <div className="rounded-card border border-hairline bg-surface-raised p-8 shadow-card text-center text-fg-muted">
-        Reviews cannot load because the admin is not connected to the database yet.
+        {t('reviews.not_connected')}
       </div>
     );
   }
@@ -237,20 +240,15 @@ export default function ReviewsManager() {
   return (
     <div className="grid gap-8">
       <div>
-        <h1 className="font-display font-semibold text-2xl text-fg mb-1">Customer reviews</h1>
-        <p className="text-[14.5px] text-fg-muted">
-          Copy each review from your Google profile exactly as the customer wrote it. Published
-          reviews appear on the home page and on the reviews page, together with the star rating.
-        </p>
+        <h1 className="font-display font-semibold text-2xl text-fg mb-1">{t('reviews.heading')}</h1>
+        <p className="text-[14.5px] text-fg-muted">{t('reviews.intro')}</p>
       </div>
 
       {/* The site is rebuilt from this table, so saving and publishing are two steps.
           Saying otherwise would promise the client something that does not happen. */}
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-card border border-hairline bg-surface-raised px-5 py-4 shadow-card">
         <p className="text-[14px] text-fg-body max-w-md leading-relaxed">
-          {pending
-            ? 'You have review changes that are not on the website yet.'
-            : 'Reviews are saved here first. Publishing rebuilds the website with them.'}
+          {pending ? t('reviews.publish_pending') : t('reviews.publish_idle')}
         </p>
         <button
           type="button"
@@ -258,7 +256,7 @@ export default function ReviewsManager() {
           disabled={publishing}
           className="rounded-btn bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-6 py-3 text-[14.5px] transition-colors"
         >
-          {publishing ? 'Sending...' : 'Publish the website now'}
+          {publishing ? t('reviews.publish_busy') : t('reviews.publish_button')}
         </button>
       </div>
 
@@ -285,21 +283,27 @@ export default function ReviewsManager() {
       {rows && (
         <div className="grid sm:grid-cols-3 gap-4">
           <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
-            <p className="text-[13px] uppercase tracking-[0.14em] text-fg-muted">Published</p>
-            <p className="mt-2 font-display font-semibold text-4xl text-fg">{summary.published}</p>
-            <p className="mt-1 text-[13px] text-fg-muted">Live after the next publish</p>
-          </div>
-          <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
-            <p className="text-[13px] uppercase tracking-[0.14em] text-fg-muted">Average rating</p>
-            <p className="mt-2 font-display font-semibold text-4xl text-fg">
-              {summary.published ? summary.average.toFixed(1) : 'None'}
+            <p className="text-[13px] uppercase tracking-[0.14em] text-fg-muted">
+              {t('reviews.stat_published')}
             </p>
-            <p className="mt-1 text-[13px] text-fg-muted">Shown on the home page and reviews page</p>
+            <p className="mt-2 font-display font-semibold text-4xl text-fg">{summary.published}</p>
+            <p className="mt-1 text-[13px] text-fg-muted">{t('reviews.stat_published_hint')}</p>
           </div>
           <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
-            <p className="text-[13px] uppercase tracking-[0.14em] text-fg-muted">Hidden</p>
+            <p className="text-[13px] uppercase tracking-[0.14em] text-fg-muted">
+              {t('reviews.stat_average')}
+            </p>
+            <p className="mt-2 font-display font-semibold text-4xl text-fg">
+              {summary.published ? summary.average.toFixed(1) : t('reviews.stat_average_none')}
+            </p>
+            <p className="mt-1 text-[13px] text-fg-muted">{t('reviews.stat_average_hint')}</p>
+          </div>
+          <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
+            <p className="text-[13px] uppercase tracking-[0.14em] text-fg-muted">
+              {t('reviews.stat_hidden')}
+            </p>
             <p className="mt-2 font-display font-semibold text-4xl text-fg">{summary.hidden}</p>
-            <p className="mt-1 text-[13px] text-fg-muted">Saved here, not on the website</p>
+            <p className="mt-1 text-[13px] text-fg-muted">{t('reviews.stat_hidden_hint')}</p>
           </div>
         </div>
       )}
@@ -308,11 +312,13 @@ export default function ReviewsManager() {
         onSubmit={onSubmit}
         className="rounded-card border border-hairline bg-surface-raised p-6 sm:p-8 shadow-card grid gap-5"
       >
-        <h2 className="font-display font-semibold text-xl text-fg">Add a review</h2>
+        <h2 className="font-display font-semibold text-xl text-fg">{t('reviews.form_heading')}</h2>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <label className="grid gap-1.5">
-            <span className="text-[14px] font-semibold text-fg-body">Customer name</span>
+            <span className="text-[14px] font-semibold text-fg-body">
+              {t('reviews.author_label')}
+            </span>
             <input
               value={draft.author}
               onChange={(e) => setDraft({ ...draft, author: e.target.value })}
@@ -323,12 +329,12 @@ export default function ReviewsManager() {
             />
           </label>
           <label className="grid gap-1.5">
-            <span className="text-[14px] font-semibold text-fg-body">City (optional)</span>
+            <span className="text-[14px] font-semibold text-fg-body">{t('reviews.city_label')}</span>
             <input
               value={draft.city}
               onChange={(e) => setDraft({ ...draft, city: e.target.value })}
               maxLength={60}
-              placeholder="Roseville"
+              placeholder={t('reviews.city_placeholder')}
               autoComplete="off"
               className="rounded-card border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent focus:ring-2 focus:ring-accent/25 transition"
             />
@@ -336,7 +342,9 @@ export default function ReviewsManager() {
         </div>
 
         <fieldset>
-          <legend className="text-[14px] font-semibold text-fg-body mb-2">Star rating</legend>
+          <legend className="text-[14px] font-semibold text-fg-body mb-2">
+            {t('reviews.rating_label')}
+          </legend>
           <div className="flex flex-wrap gap-2">
             {RATING_OPTIONS.map((value) => (
               <label
@@ -362,7 +370,7 @@ export default function ReviewsManager() {
                 <Stars rating={value} decorative />
                 <span>
                   {value}
-                  <span className="sr-only"> {value === 1 ? 'star' : 'stars'}</span>
+                  <span className="sr-only"> {t('reviews.rating_star_unit', { n: value })}</span>
                 </span>
               </label>
             ))}
@@ -370,7 +378,7 @@ export default function ReviewsManager() {
         </fieldset>
 
         <label className="grid gap-1.5">
-          <span className="text-[14px] font-semibold text-fg-body">Review text</span>
+          <span className="text-[14px] font-semibold text-fg-body">{t('reviews.text_label')}</span>
           <textarea
             value={draft.text}
             onChange={(e) => setDraft({ ...draft, text: e.target.value })}
@@ -386,13 +394,13 @@ export default function ReviewsManager() {
               remaining <= 100 ? 'text-amber-600 font-semibold' : 'text-fg-muted'
             }`}
           >
-            {draft.text.length} of {MAX_TEXT} characters
+            {t('reviews.text_counter', { n: draft.text.length, max: MAX_TEXT })}
           </span>
         </label>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <label className="grid gap-1.5">
-            <span className="text-[14px] font-semibold text-fg-body">Review date (optional)</span>
+            <span className="text-[14px] font-semibold text-fg-body">{t('reviews.date_label')}</span>
             <input
               type="date"
               value={draft.review_date}
@@ -402,15 +410,15 @@ export default function ReviewsManager() {
             />
           </label>
           <label className="grid gap-1.5">
-            <span className="text-[14px] font-semibold text-fg-body">Where it was left</span>
+            <span className="text-[14px] font-semibold text-fg-body">{t('reviews.source_label')}</span>
             <select
               value={draft.source}
               onChange={(e) => setDraft({ ...draft, source: e.target.value })}
               className="rounded-card border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent"
             >
-              {SOURCES.map(([value, label]) => (
+              {SOURCE_KEYS.map(([value, labelKey]) => (
                 <option key={value} value={value}>
-                  {label}
+                  {t(labelKey)}
                 </option>
               ))}
             </select>
@@ -422,31 +430,25 @@ export default function ReviewsManager() {
           disabled={saving}
           className="justify-self-start rounded-btn bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-6 py-3 transition-colors"
         >
-          {saving ? 'Saving...' : 'Save review'}
+          {saving ? t('reviews.submit_busy') : t('reviews.submit')}
         </button>
       </form>
 
       <div>
         <h2 className="font-display font-semibold text-xl text-fg mb-4">
           {rows && rows.length === LIST_LIMIT
-            ? `Reviews (newest ${LIST_LIMIT})`
-            : `All reviews${rows ? ` (${rows.length})` : ''}`}
+            ? t('reviews.list_heading_capped', { n: LIST_LIMIT })
+            : rows
+              ? t('reviews.list_heading_count', { n: rows.length })
+              : t('reviews.list_heading')}
         </h2>
 
         {loadFailed ? (
-          <div className="rounded-card border border-hairline bg-surface-raised p-8 shadow-card text-center text-fg-muted">
-            The reviews could not be read just now, so this list is incomplete. Refresh the page to
-            try again.
-          </div>
+          <div className="rounded-card border border-hairline bg-surface-raised p-8 shadow-card text-center text-fg-muted">{t('reviews.list_error')}</div>
         ) : rows === null ? (
-          <p role="status" className="text-fg-muted">
-            Loading reviews...
-          </p>
+          <p role="status" className="text-fg-muted">{t('reviews.loading')}</p>
         ) : rows.length === 0 ? (
-          <div className="rounded-card border border-hairline bg-surface-raised p-8 shadow-card text-center text-fg-muted">
-            No reviews yet. Until you add some, the reviews page invites visitors to read your
-            Google profile instead.
-          </div>
+          <div className="rounded-card border border-hairline bg-surface-raised p-8 shadow-card text-center text-fg-muted">{t('reviews.empty_state')}</div>
         ) : (
           <ul className="grid gap-4">
             {rows.map((review) => (
@@ -467,7 +469,7 @@ export default function ReviewsManager() {
                     <p className="mt-1 flex flex-wrap items-center gap-2 text-[13px] text-fg-muted">
                       <Stars rating={review.rating} />
                       {review.review_date && <span>{formatReviewDate(review.review_date)}</span>}
-                      {review.source && <span>&middot; {sourceLabel(review.source)}</span>}
+                      {review.source && <span>&middot; {sourceLabel(review.source, t)}</span>}
                     </p>
                   </div>
 
@@ -482,11 +484,11 @@ export default function ReviewsManager() {
                           : 'bg-surface-raised text-fg-muted border border-hairline'
                       }`}
                     >
-                      {review.published ? 'Published' : 'Hidden'}
+                      {review.published ? t('reviews.status_published') : t('reviews.status_hidden')}
                       {/* Thirty rows of buttons named only "Published" tell a screen reader
                           user nothing. The visible word stays first so voice control still
                           matches what is on screen. */}
-                      <span className="sr-only"> review from {review.author}</span>
+                      <span className="sr-only">{t('reviews.sr_review_from', { author: review.author })}</span>
                     </button>
 
                     {/* One button that changes what it does, not two that swap places: the
@@ -502,7 +504,7 @@ export default function ReviewsManager() {
                           : 'rounded-btn px-3 py-1 text-[12px] font-semibold text-red-600 hover:text-red-700 transition-colors'
                       }
                     >
-                      {confirmId === review.id ? 'Delete for good' : 'Delete'}
+                      {confirmId === review.id ? t('reviews.action_delete_confirm') : t('reviews.action_delete')}
                       <span className="sr-only"> review from {review.author}</span>
                     </button>
 
@@ -531,13 +533,14 @@ export default function ReviewsManager() {
 }
 
 function Stars({ rating, decorative = false }: { rating: number; decorative?: boolean }) {
+  const { t } = useT();
   // Clamp so a stray value coming back from the database cannot break String.repeat.
   const filled = Math.max(0, Math.min(5, Math.round(rating)));
   return (
     <span
       role={decorative ? undefined : 'img'}
       aria-hidden={decorative || undefined}
-      aria-label={decorative ? undefined : `${filled} out of 5 stars`}
+      aria-label={decorative ? undefined : t('reviews.stars_label', { n: filled })}
       className="text-[14px] tracking-[0.06em]"
     >
       <span className="text-accent-on-light">{'★'.repeat(filled)}</span>
@@ -546,8 +549,9 @@ function Stars({ rating, decorative = false }: { rating: number; decorative?: bo
   );
 }
 
-function sourceLabel(value: string): string {
-  return SOURCES.find(([key]) => key === value)?.[1] ?? value;
+function sourceLabel(value: string, t: (key: string) => string): string {
+  const found = SOURCE_KEYS.find(([key]) => key === value);
+  return found ? t(found[1]) : value;
 }
 
 function todayISO(): string {

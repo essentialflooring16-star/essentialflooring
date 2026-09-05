@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase, isConfigured } from '../../lib/supabase';
+import { useT, useLang, LANGS, translate } from '../../lib/admin-i18n';
 import Dashboard from './Dashboard';
 import PortfolioManager from './PortfolioManager';
 import LeadsInbox from './LeadsInbox';
@@ -9,10 +10,21 @@ import ReviewsManager from './ReviewsManager';
 import VitalsPanel from './VitalsPanel';
 import SettingsPanel from './SettingsPanel';
 import SeoHealth from './SeoHealth';
+import ContentManager from './ContentManager';
 
-type Tab = 'dashboard' | 'leads' | 'portfolio' | 'reviews' | 'blog' | 'vitals' | 'seo' | 'settings';
+type Tab =
+  | 'dashboard'
+  | 'leads'
+  | 'content'
+  | 'portfolio'
+  | 'reviews'
+  | 'blog'
+  | 'vitals'
+  | 'seo'
+  | 'settings';
 
 export default function AdminApp() {
+  const { t } = useT();
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
   const [tab, setTab] = useState<Tab>('dashboard');
@@ -34,11 +46,8 @@ export default function AdminApp() {
     return (
       <Shell>
         <div className="mx-auto max-w-lg mt-24 rounded-card border border-hairline bg-surface-raised p-8 shadow-card text-center">
-          <h1 className="font-display font-semibold text-2xl text-fg">Admin is not connected yet</h1>
-          <p className="mt-3 text-[15px] text-fg-muted leading-relaxed">
-            Supabase environment variables are missing. Add PUBLIC_SUPABASE_URL and
-            PUBLIC_SUPABASE_ANON_KEY, then redeploy. See docs/SETUP-RO.md in the project.
-          </p>
+          <h1 className="font-display font-semibold text-2xl text-fg">{t('app.not_connected_title')}</h1>
+          <p className="mt-3 text-[15px] text-fg-muted leading-relaxed">{t('app.not_connected_body')}</p>
         </div>
       </Shell>
     );
@@ -47,7 +56,7 @@ export default function AdminApp() {
   if (!ready) {
     return (
       <Shell>
-        <p className="text-center mt-24 text-fg-muted">Loading...</p>
+        <p className="text-center mt-24 text-fg-muted">{t('app.loading')}</p>
       </Shell>
     );
   }
@@ -58,39 +67,41 @@ export default function AdminApp() {
     <Shell>
       <header className="flex flex-wrap items-center justify-between gap-4 py-6 border-b border-hairline">
         <div>
-          <p className="font-display font-semibold text-2xl text-fg">Essential Flooring</p>
-          <p className="text-[13px] uppercase tracking-[0.16em] text-fg-muted mt-0.5">Admin cabinet</p>
+          <p className="font-display font-semibold text-2xl text-fg">{t('app.brand')}</p>
+          <p className="text-[13px] uppercase tracking-[0.16em] text-fg-muted mt-0.5">{t('app.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
+          <LangSwitch />
           <a
             href="/"
             className="rounded-btn border border-hairline px-4 py-2 text-[14px] font-medium text-fg-body hover:border-accent transition-colors"
           >
-            View website
+            {t('app.view_site')}
           </a>
           <button
             type="button"
             onClick={() => supabase!.auth.signOut()}
             className="rounded-btn bg-control-dark text-fg-on-dark px-4 py-2 text-[14px] font-medium hover:bg-control-dark-hover transition-colors"
           >
-            Sign out
+            {t('app.sign_out')}
           </button>
         </div>
       </header>
 
-      <nav className="flex flex-wrap gap-2 mt-6 mb-8" aria-label="Admin sections">
+      <nav className="flex flex-wrap gap-2 mt-6 mb-8" aria-label={t('app.nav_label')}>
         {(
           [
-            ['dashboard', 'Traffic'],
-            ['leads', 'Leads'],
-            ['portfolio', 'Portfolio'],
-            ['reviews', 'Reviews'],
-            ['blog', 'Blog'],
-            ['vitals', 'Speed'],
-            ['seo', 'SEO'],
-            ['settings', 'Settings'],
-          ] as [Tab, string][]
-        ).map(([key, label]) => (
+            'dashboard',
+            'leads',
+            'content',
+            'portfolio',
+            'reviews',
+            'blog',
+            'vitals',
+            'seo',
+            'settings',
+          ] as Tab[]
+        ).map((key) => (
           <button
             key={key}
             type="button"
@@ -100,13 +111,14 @@ export default function AdminApp() {
               tab === key ? 'bg-accent text-fg-on-accent' : 'bg-surface-raised border border-hairline text-fg-body hover:border-accent'
             }`}
           >
-            {label}
+            {t(`app.tab_${key}`)}
           </button>
         ))}
       </nav>
 
       {tab === 'dashboard' && <Dashboard />}
       {tab === 'leads' && <LeadsInbox />}
+      {tab === 'content' && <ContentManager />}
       {tab === 'portfolio' && <PortfolioManager />}
       {tab === 'reviews' && <ReviewsManager />}
       {tab === 'blog' && <BlogManager />}
@@ -122,6 +134,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 }
 
 function Login() {
+  const { t } = useT();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -134,7 +147,7 @@ function Login() {
       email: String(data.get('email')),
       password: String(data.get('password')),
     });
-    if (error) setError('Wrong email or password.');
+    if (error) setError(t('app.login_error'));
     setBusy(false);
   }
 
@@ -144,12 +157,15 @@ function Login() {
         onSubmit={onSubmit}
         className="w-full max-w-sm rounded-card border border-hairline bg-surface-raised p-8 shadow-lift"
       >
-        <p className="font-display font-semibold text-2xl text-fg text-center">Essential Flooring</p>
+        <div className="flex justify-center mb-5">
+          <LangSwitch />
+        </div>
+        <p className="font-display font-semibold text-2xl text-fg text-center">{t('app.brand')}</p>
         <p className="text-[13px] uppercase tracking-[0.16em] text-fg-muted text-center mt-1 mb-7">
-          Admin sign in
+          {t('app.login_subtitle')}
         </p>
         <label className="grid gap-1.5 mb-4">
-          <span className="text-[14px] font-semibold text-fg-body">Email</span>
+          <span className="text-[14px] font-semibold text-fg-body">{t('app.email_label')}</span>
           <input
             name="email"
             type="email"
@@ -159,7 +175,7 @@ function Login() {
           />
         </label>
         <label className="grid gap-1.5 mb-6">
-          <span className="text-[14px] font-semibold text-fg-body">Password</span>
+          <span className="text-[14px] font-semibold text-fg-body">{t('app.password_label')}</span>
           <input
             name="password"
             type="password"
@@ -178,9 +194,41 @@ function Login() {
           disabled={busy}
           className="w-full rounded-btn bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold py-3 transition-colors"
         >
-          {busy ? 'Signing in...' : 'Sign in'}
+          {busy ? t('app.signing_in') : t('app.sign_in')}
         </button>
       </form>
+    </div>
+  );
+}
+
+/**
+ * Comutatorul de limba. Sta si in antet, si pe ecranul de autentificare: cine
+ * deschide cabinetul si nu stie romana trebuie sa poata trece pe engleza
+ * inainte sa se poata autentifica, nu dupa.
+ */
+function LangSwitch() {
+  const [lang, setLang] = useLang();
+  return (
+    <div
+      className="inline-flex rounded-btn border border-hairline overflow-hidden"
+      role="group"
+      aria-label={translate(lang, 'app.lang_label')}
+    >
+      {LANGS.map((option) => (
+        <button
+          key={option.code}
+          type="button"
+          onClick={() => setLang(option.code)}
+          aria-pressed={lang === option.code}
+          className={`px-3 py-2 text-[13px] font-semibold transition-colors ${
+            lang === option.code
+              ? 'bg-control-dark text-fg-on-dark'
+              : 'bg-surface-raised text-fg-muted hover:text-fg-body'
+          }`}
+        >
+          {option.code.toUpperCase()}
+        </button>
+      ))}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useT } from '../../lib/admin-i18n';
 
 type Item = {
   id: string;
@@ -11,16 +12,20 @@ type Item = {
   created_at: string;
 };
 
+// Prima valoare e codul salvat in coloana category din Supabase si nu se
+// traduce niciodata; a doua e cheia de dictionar pentru eticheta care apare in
+// lista derulanta din cabinet.
 const CATEGORIES = [
-  ['hardwood-refinishing', 'Hardwood Refinishing'],
-  ['lvp-vinyl', 'LVP & Vinyl Plank'],
-  ['laminate', 'Laminate'],
-  ['carpet', 'Carpet'],
-  ['stairs', 'Stairs'],
-  ['other', 'Other'],
+  ['hardwood-refinishing', 'portfolio.category_hardwood'],
+  ['lvp-vinyl', 'portfolio.category_lvp'],
+  ['laminate', 'portfolio.category_laminate'],
+  ['carpet', 'portfolio.category_carpet'],
+  ['stairs', 'portfolio.category_stairs'],
+  ['other', 'portfolio.category_other'],
 ] as const;
 
 export default function PortfolioManager() {
+  const { t } = useT();
   const [items, setItems] = useState<Item[]>([]);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
@@ -42,11 +47,11 @@ export default function PortfolioManager() {
     const fd = new FormData(form);
     const file = fd.get('photo') as File | null;
     if (!file || file.size === 0) {
-      setMsg('Choose a photo first.');
+      setMsg(t('portfolio.error_no_file'));
       return;
     }
     if (file.size > 8 * 1024 * 1024) {
-      setMsg('Photo is too large. Keep it under 8 MB.');
+      setMsg(t('portfolio.error_too_large'));
       return;
     }
     setBusy(true);
@@ -65,17 +70,20 @@ export default function PortfolioManager() {
       const { error: insErr } = await supabase!.from('portfolio_items').insert({
         image_url: pub.publicUrl,
         caption,
+        // Textul alternativ se salveaza in baza de date si se randeaza pe
+        // paginile publice, care raman integral in engleza. Nu trece prin t():
+        // limba cabinetului nu are ce cauta pe site.
         alt: caption || 'Flooring project by Essential Flooring',
         category: String(fd.get('category') || 'other'),
         published: true,
       });
       if (insErr) throw insErr;
       form.reset();
-      setMsg('Photo published. It is already visible on the website portfolio.');
+      setMsg(t('portfolio.upload_success'));
       await load();
     } catch (err) {
       console.error(err);
-      setMsg("Upload failed. Check the file is a JPG, PNG or WebP under 8MB, then try again.");
+      setMsg(t('portfolio.upload_error'));
     } finally {
       setBusy(false);
     }
@@ -90,7 +98,7 @@ export default function PortfolioManager() {
   }
 
   async function remove(item: Item) {
-    if (!confirm('Delete this photo from the website portfolio?')) return;
+    if (!confirm(t('portfolio.delete_confirm'))) return;
     // Remove the storage object too (path is the last URL segment).
     const path = item.image_url.split('/portfolio/').pop();
     if (path) await supabase!.storage.from('portfolio').remove([path]);
@@ -104,14 +112,12 @@ export default function PortfolioManager() {
         onSubmit={onUpload}
         className="rounded-card border border-hairline bg-surface-raised p-6 sm:p-8 shadow-card grid gap-4"
       >
-        <h1 className="font-display font-semibold text-2xl text-fg">Add a project photo</h1>
-        <p className="text-[14.5px] text-fg-muted -mt-2">
-          Photos you publish here appear instantly in the website portfolio, no developer needed.
-        </p>
+        <h1 className="font-display font-semibold text-2xl text-fg">{t('portfolio.heading')}</h1>
+        <p className="text-[14.5px] text-fg-muted -mt-2">{t('portfolio.intro')}</p>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <label className="grid gap-1.5">
-            <span className="text-[14px] font-semibold text-fg-body">Photo (JPG/PNG, max 8 MB)</span>
+            <span className="text-[14px] font-semibold text-fg-body">{t('portfolio.photo_label')}</span>
             <input
               type="file"
               name="photo"
@@ -121,15 +127,15 @@ export default function PortfolioManager() {
             />
           </label>
           <label className="grid gap-1.5">
-            <span className="text-[14px] font-semibold text-fg-body">Category</span>
+            <span className="text-[14px] font-semibold text-fg-body">{t('portfolio.category_label')}</span>
             <select
               name="category"
               className="rounded-card border border-hairline bg-field px-4 py-3 text-[15px] outline-none focus:border-accent"
               defaultValue="lvp-vinyl"
             >
-              {CATEGORIES.map(([value, label]) => (
+              {CATEGORIES.map(([value, labelKey]) => (
                 <option key={value} value={value}>
-                  {label}
+                  {t(labelKey)}
                 </option>
               ))}
             </select>
@@ -138,7 +144,7 @@ export default function PortfolioManager() {
 
         <label className="grid gap-1.5">
           <span className="text-[14px] font-semibold text-fg-body">
-            Caption (shown in the gallery, e.g. "LVP installation in Roseville")
+            {t('portfolio.caption_label')}
           </span>
           <input
             name="caption"
@@ -157,18 +163,16 @@ export default function PortfolioManager() {
           disabled={busy}
           className="justify-self-start rounded-btn bg-accent hover:bg-accent-hover disabled:opacity-60 text-fg-on-accent font-semibold px-6 py-3 transition-colors"
         >
-          {busy ? 'Uploading...' : 'Publish photo'}
+          {busy ? t('portfolio.submit_busy') : t('portfolio.submit')}
         </button>
       </form>
 
       <div>
         <h2 className="font-display font-semibold text-xl text-fg mb-4">
-          Uploaded photos ({items.length})
+          {t('portfolio.list_heading', { n: items.length })}
         </h2>
         {items.length === 0 ? (
-          <p className="text-fg-muted text-[15px]">
-            Nothing uploaded yet. The website still shows the built-in project gallery.
-          </p>
+          <p className="text-fg-muted text-[15px]">{t('portfolio.empty_state')}</p>
         ) : (
           <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {items.map((item) => (
@@ -191,14 +195,14 @@ export default function PortfolioManager() {
                           : 'bg-surface-sunken text-fg-muted'
                       }`}
                     >
-                      {item.published ? 'Published' : 'Hidden'}
+                      {item.published ? t('portfolio.status_published') : t('portfolio.status_hidden')}
                     </button>
                     <button
                       type="button"
                       onClick={() => remove(item)}
                       className="text-[12px] font-semibold text-red-600 hover:text-red-700"
                     >
-                      Delete
+                      {t('portfolio.action_delete')}
                     </button>
                   </div>
                 </div>
