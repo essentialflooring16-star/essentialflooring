@@ -15,6 +15,10 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
   build: {
-    inlineStylesheets: 'auto',
+    // One stylesheet, about 14 KB compressed, inlined into each page. On a
+    // phone that removes a whole round trip from the critical path, which is
+    // worth more than caching it across pages on a site people read one or
+    // two pages of.
+    inlineStylesheets: 'always',
   },
 });

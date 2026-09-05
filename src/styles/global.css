@@ -45,7 +45,7 @@
   /* GREEN family: ink end (green-cast, not neutral) */
   --ef-ink-900:           #1b2a22; /* strongest text on light                */
   --ef-ink-700:           #35473c; /* body copy on light                     */
-  --ef-ink-500:           #5f6f65; /* muted text on light                    */
+  --ef-ink-500:           #586759; /* muted text on light, 5.6:1 on the cream */
 
   /* GREEN family: the dark region */
   --ef-dark-900:          #1c4632; /* dark band ground                       */
@@ -58,7 +58,7 @@
   --ef-accent-hi:         #c5922f; /* its hover                              */
   --ef-accent-light:      #2c5a41; /* accent TEXT on light = the GREEN role  */
   --ef-accent-dark:       #e3b154; /* gold text or fill on the green         */
-  --ef-accent-display:    #a8781f; /* deep gold for big numerals on light    */
+  --ef-accent-display:    #916619; /* deep gold, 4.8:1 so it holds as text   */
   --ef-accent-wash-pct:   14%;
   --ef-on-accent:         #1b2a22; /* dark label on the gold button, 6.3:1   */
 

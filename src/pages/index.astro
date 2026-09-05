@@ -39,13 +39,19 @@ const showcasePairs = await Promise.all(
     .filter((p) => p.sameSpot)
     .slice(0, 6)
     .map(async (p) => {
-      const before = await getImage({ src: baImage(p.before), width: 1400, format: 'webp', quality: 74 });
-      const after = await getImage({ src: baImage(p.after), width: 1400, format: 'webp', quality: 74 });
+      // The slider column is about 680px wide on a desktop and the full width
+      // of a phone, so a single 1400px file made a phone download roughly four
+      // times the pixels it could show. These widths let it pick.
+      const SHOWCASE_WIDTHS = [420, 680, 900, 1360];
+      const before = await getImage({ src: baImage(p.before), widths: SHOWCASE_WIDTHS, format: 'webp', quality: 74 });
+      const after = await getImage({ src: baImage(p.after), widths: SHOWCASE_WIDTHS, format: 'webp', quality: 74 });
       const thumb = await getImage({ src: baImage(p.after), width: 200, format: 'webp', quality: 60 });
       return {
         id: p.id,
         beforeSrc: before.src,
+        beforeSrcset: before.srcSet.attribute,
         afterSrc: after.src,
+        afterSrcset: after.srcSet.attribute,
         thumbSrc: thumb.src,
         label: p.label,
         city: p.city,
@@ -172,7 +178,11 @@ const steps = [
     </div>
 
     <div class="mx-auto max-w-[1400px] px-3 sm:px-5 mt-10 sm:mt-14">
-      <figure class="m-media parallax relative overflow-hidden rounded-card shadow-lift">
+      <!-- No entrance animation on this one on purpose: it is the largest paint
+           on the page, and .m-media fades in on a view() timeline, so above the
+           fold the browser held it at partial opacity and the measured paint
+           landed 2.5s late. The parallax drift stays, it moves no opacity. -->
+      <figure class="parallax relative overflow-hidden rounded-card shadow-lift">
         <Image
           src={photoImage(heroPhoto.file)}
           alt={heroPhoto.alt}
@@ -362,7 +372,7 @@ const steps = [
                 <Image
                   src={photoImage(p.id)}
                   alt={p.alt}
-                  widths={[400, 640, 900]}
+                  widths={[320, 480, 640, 900]}
                   sizes="(min-width:1024px) 25vw, 50vw"
                   class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
                   format="webp"
@@ -442,7 +452,7 @@ const steps = [
             </li>
           ))}
         </ul>
-        <p class="mt-5 text-[13.5px] text-fg-muted/85 leading-relaxed">
+        <p class="mt-5 text-[13.5px] text-fg-muted leading-relaxed">
           {alsoServing}
         </p>
         <a href="/service-areas/" class="mt-4 inline-flex items-center gap-1.5 font-semibold text-accent-on-light hover:text-fg transition-colors text-[15px]">

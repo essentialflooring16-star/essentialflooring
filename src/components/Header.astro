@@ -56,14 +56,14 @@ const linkClass = 'nav-link text-[14px] xl:text-[14.5px] font-medium text-fg-mut
       aria-controls="menu-overlay"
       aria-label="Open menu"
     >
-      <span class="cube-box">
+      <span class="cube-box" aria-hidden="true">
         <span class="cube-face">Menu</span>
         <span class="cube-face">Close</span>
       </span>
     </button>
 
     <!-- CENTRE: the client's lockup, same place at every width -->
-    <a href="/" class="justify-self-center block" aria-label="Essential Flooring, home">
+    <a href="/" class="justify-self-center block">
       <BrandLogo variant="header" tone="light" />
     </a>
 
@@ -96,7 +96,7 @@ const linkClass = 'nav-link text-[14px] xl:text-[14.5px] font-medium text-fg-mut
 <div
   id="menu-overlay"
   class="lg:hidden pointer-events-none fixed inset-0 z-[60] -translate-y-full overflow-y-auto overscroll-contain bg-surface-dark text-fg-on-dark transition-transform duration-700 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] data-[open]:pointer-events-auto data-[open]:translate-y-0"
-  aria-hidden="true"
+  inert
 >
   <div class="flex min-h-full flex-col pt-[72px] pb-28">
     <nav class="my-auto flex flex-col items-center gap-2 px-6 py-10 text-center" aria-label="Menu">
@@ -149,7 +149,10 @@ const linkClass = 'nav-link text-[14px] xl:text-[14.5px] font-medium text-fg-mut
   const setOpen = (open: boolean) => {
     if (!overlay || !toggle) return;
     overlay.toggleAttribute('data-open', open);
-    overlay.setAttribute('aria-hidden', String(!open));
+    // `inert` in loc de aria-hidden: acesta chiar scoate linkurile din ordinea
+    // de tabulare, pe cand aria-hidden doar le ascundea de cititorul de ecran
+    // si le lasa focusabile, ceea ce Lighthouse semnala pe drept.
+    overlay.toggleAttribute('inert', !open);
     toggle.setAttribute('aria-expanded', String(open));
     toggle.classList.toggle('cube-turned', open);
     toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');

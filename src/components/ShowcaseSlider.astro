@@ -8,7 +8,9 @@
 export type ShowcasePair = {
   id: string;
   beforeSrc: string;
+  beforeSrcset: string;
   afterSrc: string;
+  afterSrcset: string;
   thumbSrc: string;
   label: string;
   city: string;
@@ -22,6 +24,8 @@ interface Props {
 const { pairs } = Astro.props;
 const first = pairs[0];
 const START = 56;
+// The frame is roughly 680px on a desktop and the full width of a phone.
+const SIZES = '(min-width: 1024px) 680px, calc(100vw - 32px)';
 ---
 
 {first && (
@@ -33,16 +37,22 @@ const START = 56;
       <img
         data-after
         src={first.afterSrc}
+        srcset={first.afterSrcset}
+        sizes={SIZES}
         alt={`After: ${first.caption}`}
         class="absolute inset-0 h-full w-full object-cover"
+        loading="lazy"
         decoding="async"
       />
       <div data-clip class="absolute inset-0 overflow-hidden" style={`clip-path: inset(0 ${100 - START}% 0 0)`}>
         <img
           data-before
           src={first.beforeSrc}
+          srcset={first.beforeSrcset}
+          sizes={SIZES}
           alt={`Before: ${first.caption}`}
           class="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
           decoding="async"
         />
       </div>
@@ -169,8 +179,10 @@ const START = 56;
       btn.addEventListener('click', () => {
         const p = pairs[i];
         if (!p) return;
+        beforeImg.srcset = p.beforeSrcset;
         beforeImg.src = p.beforeSrc;
         beforeImg.alt = `Before: ${p.caption}`;
+        afterImg.srcset = p.afterSrcset;
         afterImg.src = p.afterSrc;
         afterImg.alt = `After: ${p.caption}`;
         caption.textContent = p.caption;
