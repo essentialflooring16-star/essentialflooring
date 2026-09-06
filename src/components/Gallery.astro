@@ -87,7 +87,7 @@ const IDLE = 'bg-surface-raised border border-hairline text-fg-body hover:border
     aria-label="Photo viewer"
   >
     <figure data-figure class="max-w-5xl w-full">
-      <img data-full src="" alt="" class="w-full max-h-[78vh] object-contain rounded-card" />
+      <img data-full src="" alt="" aria-hidden="true" class="w-full max-h-[78vh] object-contain rounded-card" />
       <figcaption data-figcaption class="mt-3 text-center text-fg-on-media/85 text-[15px]"></figcaption>
     </figure>
 
@@ -174,7 +174,10 @@ const IDLE = 'bg-surface-raised border border-hairline text-fg-body hover:border
       openIdx = ((idx % list.length) + list.length) % list.length;
       const btn = list[openIdx].querySelector('[data-open]') as HTMLElement;
       full.src = btn.dataset.src || '';
+      // Goala, poza nu spune nimic si sta marcata decorativa in HTML-ul livrat.
+      // Din clipa in care primeste o fotografie adevarata poarta si numele ei.
       full.alt = btn.dataset.alt || '';
+      full.removeAttribute('aria-hidden');
       figcap.textContent = btn.dataset.caption || '';
       live.textContent = `Photo ${openIdx + 1} of ${list.length}. ${btn.dataset.alt || ''}`;
     }
