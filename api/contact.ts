@@ -23,6 +23,10 @@ const CONTACT = {
   // Aceeasi adresa ca SITE.email din src/data/site.ts. Nu e un secret, sta pe
   // fiecare pagina a site-ului; daca se schimba, se schimba in ambele locuri.
   email: 'essentialflooring16@gmail.com',
+  // Expeditorul. Domeniul e verificat in Resend, deci lead-ul vine de la firma,
+  // nu de la un strain. Nu primeste raspunsuri: emailul pune reply_to pe adresa
+  // clientului care a completat formularul.
+  sender: 'estimates@essentialflooringinc.com',
 } as const;
 
 // Paleta E2 a site-ului, aceleasi valori ca LAYER 1 din global.css.
@@ -457,7 +461,7 @@ export default async function handler(req: Req, res: Res): Promise<void> {
   // 2) Trimitem emailul.
   const apiKey = process.env.RESEND_API_KEY;
   const to = process.env.CONTACT_TO_EMAIL || CONTACT.email;
-  const from = process.env.CONTACT_FROM_EMAIL || `${CONTACT.name} <onboarding@resend.dev>`;
+  const from = process.env.CONTACT_FROM_EMAIL || `${CONTACT.name} <${CONTACT.sender}>`;
 
   if (!apiKey) {
     console.error('RESEND_API_KEY lipseste de pe Vercel');
@@ -484,7 +488,10 @@ export default async function handler(req: Req, res: Res): Promise<void> {
   const text = leadEmailText(lead);
 
   try {
-    const SANDBOX_FROM = 'Essential Flooring <onboarding@resend.dev>';
+    // Plasa: cat timp domeniul nu e inca verificat in Resend, expeditorul de pe
+    // domeniu e refuzat cu 403 si trimitem de pe adresa de proba a Resend. Cand
+    // verificarea trece, prima incercare reuseste si ramura asta nu se atinge.
+    const SANDBOX_FROM = `${CONTACT.name} <onboarding@resend.dev>`;
     const deliver = (sender: string) =>
       fetch('https://api.resend.com/emails', {
         method: 'POST',
