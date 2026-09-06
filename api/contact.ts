@@ -2,12 +2,19 @@
 // in Supabase si trimite email prin Resend.
 //
 // Env pe Vercel:
-//   RESEND_API_KEY, CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL
-//   PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY   (optionale, dar recomandate)
+//   RESEND_API_KEY                                   (singura obligatorie)
+//   PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY   (optionale, pentru copia din baza)
+//   CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL             (optionale, doar ca sa redirectezi
+//                                                     emailul fara un deploy nou)
+//
+// Adresele de email NU sunt secrete: adresa clientului sta pe fiecare pagina a
+// site-ului. Locul lor este src/data/site.ts, ca sa existe intr-un singur loc.
 //
 // Ordinea conteaza: intai salvam cererea, abia apoi trimitem emailul. Daca Resend
 // pica, cererea tot exista in baza de date si raspundem 200, ca sa nu piarda
 // clientul un lead din cauza unui provider de email.
+
+import { SITE } from '../src/data/site';
 
 // Paleta E2 a site-ului, aceleasi valori ca LAYER 1 din global.css.
 const C = {
@@ -428,12 +435,11 @@ export default async function handler(req: Req, res: Res): Promise<void> {
 
   // 2) Trimitem emailul.
   const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.CONTACT_TO_EMAIL;
-  const from = process.env.CONTACT_FROM_EMAIL || 'Essential Flooring <onboarding@resend.dev>';
+  const to = process.env.CONTACT_TO_EMAIL || SITE.email;
+  const from = process.env.CONTACT_FROM_EMAIL || `${SITE.name} <onboarding@resend.dev>`;
 
-  if (!apiKey || !to) {
-    diag.resendKey = apiKey ? 'prezenta' : 'lipseste';
-    diag.contactTo = to ? 'prezent' : 'lipseste';
+  if (!apiKey) {
+    diag.resendKey = 'lipseste';
     return stored
       ? send(res, { ok: true, emailed: false }, 200)
       : send(res, { error: 'Email not configured', diag }, 503);
