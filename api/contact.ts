@@ -316,27 +316,46 @@ async function hashIp(ip: string): Promise<string> {
     .join('');
 }
 
-type Supa = { url: string; key: string };
+type Supa = { url: string; keys: string[] };
 function supabase(): Supa | null {
   const url = process.env.PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  return url && key ? { url: url.replace(/\/$/, ''), key } : null;
+  // Cheia de service e prima, fiindca trece peste RLS. Cheia publica e a doua
+  // fiindca tabelul leads are politica "anon insert leads": un vizitator poate
+  // deja sa scrie in el din browserul lui, deci plasa asta nu da nimanui
+  // drepturi in plus. Exista pentru ca o cheie gresita pusa pe Vercel sa nu
+  // coste clientul o cerere, si greseala aia nu se vede pana nu lipseste una.
+  const keys = [process.env.SUPABASE_SERVICE_ROLE_KEY, process.env.PUBLIC_SUPABASE_ANON_KEY]
+    .map((k) => (k ?? '').trim())
+    .filter((k) => k.length > 0);
+  return url && keys.length > 0 ? { url: url.replace(/\/$/, ''), keys } : null;
 }
 
 async function supaFetch(s: Supa, path: string, init: RequestInit): Promise<Response> {
-  // Cheile vechi sunt JWT-uri si merg si ca Bearer. Cheile noi (sb_secret_...)
-  // nu sunt JWT-uri: puse in Authorization, PostgREST raspunde 401 si lead-ul
-  // nu se mai salveaza. Pentru ele ajunge antetul apikey.
-  const auth: Record<string, string> = s.key.startsWith('eyJ') ? { Authorization: `Bearer ${s.key}` } : {};
-  return fetch(`${s.url}/rest/v1/${path}`, {
-    ...init,
-    headers: {
-      apikey: s.key,
-      ...auth,
-      'Content-Type': 'application/json',
-      ...(init.headers ?? {}),
-    },
-  });
+  let refused: Response | null = null;
+
+  for (const key of s.keys) {
+    // Cheile vechi sunt JWT-uri si merg si ca Bearer. Cheile noi (sb_secret_...)
+    // nu sunt JWT-uri: puse in Authorization, PostgREST raspunde 401 si lead-ul
+    // nu se mai salveaza. Pentru ele ajunge antetul apikey.
+    const auth: Record<string, string> = key.startsWith('eyJ') ? { Authorization: `Bearer ${key}` } : {};
+    const res = await fetch(`${s.url}/rest/v1/${path}`, {
+      ...init,
+      headers: {
+        apikey: key,
+        ...auth,
+        'Content-Type': 'application/json',
+        ...(init.headers ?? {}),
+      },
+    });
+
+    // 401/403 inseamna ca cheia asta nu e buna, nu ca cererea e gresita, deci
+    // mai incercam cu urmatoarea. Orice alt raspuns e raspunsul adevarat.
+    if (res.status !== 401 && res.status !== 403) return res;
+    console.error('supabase refused a key', res.status, path);
+    refused = res;
+  }
+
+  return refused ?? new Response(null, { status: 401 });
 }
 
 // Returneaza true daca IP-ul a depasit limita. Daca Supabase nu e configurat sau
@@ -393,13 +412,7 @@ export default async function handler(req: Req, res: Res): Promise<void> {
   // Un email invalid ar rupe reply_to, deci il ignoram in loc sa respingem cererea.
   const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ? email : '';
 
-  // Diagnostic temporar: fara acces la logurile Vercel, singurul mod de a afla
-  // de ce refuza Supabase sau Resend e sa spunem motivul in raspuns. De scos
-  // imediat ce formularul trimite.
-  const diag: Record<string, string> = {};
-
   const s = supabase();
-  diag.supabaseConfigured = s ? 'da' : 'nu';
   const ipHash = await hashIp(clientIp(req));
 
   if (await isRateLimited(s, ipHash)) {
@@ -425,7 +438,6 @@ export default async function handler(req: Req, res: Res): Promise<void> {
       stored = res.ok;
       if (!res.ok) {
         const body = await res.text();
-        diag.supabase = `${res.status} ${body.slice(0, 160)}`;
         console.error('lead insert failed', res.status, body);
       }
     } catch (err) {
@@ -448,10 +460,10 @@ export default async function handler(req: Req, res: Res): Promise<void> {
   const from = process.env.CONTACT_FROM_EMAIL || `${CONTACT.name} <onboarding@resend.dev>`;
 
   if (!apiKey) {
-    diag.resendKey = 'lipseste';
+    console.error('RESEND_API_KEY lipseste de pe Vercel');
     return stored
       ? send(res, { ok: true, emailed: false }, 200)
-      : send(res, { error: 'Email not configured', diag }, 503);
+      : send(res, { error: 'Email not configured' }, 503);
   }
 
   // Ora locala a clientului, nu UTC. El citeste emailul in Sacramento.
@@ -497,24 +509,21 @@ export default async function handler(req: Req, res: Res): Promise<void> {
     // incercare reuseste si ramura asta nu se mai atinge.
     if (!sent.ok && from !== SANDBOX_FROM) {
       const body = await sent.text();
-      diag.resendFirst = `${sent.status} ${body.slice(0, 160)}`;
       console.error('resend refused sender', from, sent.status, body);
       sent = await deliver(SANDBOX_FROM);
     }
 
     if (!sent.ok) {
       const body = await sent.text();
-      diag.resend = `${sent.status} ${body.slice(0, 200)}`;
       console.error('resend failed', sent.status, body);
       // Cererea e deja salvata, deci pentru vizitator trimiterea a reusit.
       return stored
         ? send(res, { ok: true, emailed: false }, 200)
-        : send(res, { error: 'Email delivery failed', diag }, 502);
+        : send(res, { error: 'Email delivery failed' }, 502);
     }
   } catch (err) {
     console.error('resend threw', err);
-    diag.resendThrew = String(err).slice(0, 160);
-    return stored ? send(res, { ok: true, emailed: false }, 200) : send(res, { error: 'Email delivery failed', diag }, 502);
+    return stored ? send(res, { ok: true, emailed: false }, 200) : send(res, { error: 'Email delivery failed' }, 502);
   }
 
   return send(res, { ok: true, emailed: true }, 200);
