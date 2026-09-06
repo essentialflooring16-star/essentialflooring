@@ -42,15 +42,37 @@ const icons: Record<string, 'refinish' | 'plank' | 'stairs' | 'layers' | 'carpet
         style={`--i:${i}`}
       >
         <span class={`relative block overflow-hidden rounded-media ${big ? 'aspect-[4/4.4] sm:aspect-[16/12] lg:aspect-auto lg:flex-1 lg:min-h-0' : 'aspect-[16/9]'}`}>
-          <Image
-            src={photoImage(s.image)}
-            alt={'imageAlt' in s ? s.imageAlt : photoById(s.image).alt}
-            widths={[480, 760, 1100]}
-            sizes={big ? '(min-width:1024px) 50vw, 100vw' : '(min-width:1024px) 50vw, (min-width:640px) 50vw, 100vw'}
-            class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
-            format="webp"
-            quality={68}
-          />
+          {/* Cardurile mici au raport fix 16:9, dar pozele clientului sunt
+              verticale, 1200x1600, facute cu telefonul. Servite intregi,
+              browserul descarca un dreptunghi inalt din care taie apoi o fasie
+              lata, si peste 70% din pixeli se arunca. Aici sunt DECUPATE la
+              build, deci pe drum pleaca doar ce se si vede. Cardul mare pastreaza
+              srcset-ul obisnuit: pe ecran lat el creste in inaltime (lg:aspect-auto),
+              deci nu are un raport fix la care sa fie taiat. */}
+          {big ? (
+            <Image
+              src={photoImage(s.image)}
+              alt={'imageAlt' in s ? s.imageAlt : photoById(s.image).alt}
+              widths={[480, 760, 1100]}
+              sizes="(min-width:1024px) 50vw, 100vw"
+              class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
+              format="webp"
+              quality={68}
+            />
+          ) : (
+            <Image
+              src={photoImage(s.image)}
+              alt={'imageAlt' in s ? s.imageAlt : photoById(s.image).alt}
+              width={700}
+              height={394}
+              fit="cover"
+              position="center"
+              densities={[1, 1.6]}
+              class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
+              format="webp"
+              quality={68}
+            />
+          )}
           <span
             class="absolute top-3 right-3 grid place-items-center size-9 rounded-btn bg-scrim-media/40 backdrop-blur-[2px] text-fg-on-media opacity-0 -translate-y-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0"
             aria-hidden="true"
