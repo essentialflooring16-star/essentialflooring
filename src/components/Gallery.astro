@@ -233,7 +233,7 @@ const IDLE = 'bg-surface-raised border border-hairline text-fg-body hover:border
     if (supaUrl && supaKey) {
       fetch(
         `${supaUrl}/rest/v1/portfolio_items?select=image_url,caption,alt,category&published=eq.true&order=created_at.desc`,
-        { headers: { apikey: supaKey, Authorization: `Bearer ${supaKey}` } },
+        { headers: { apikey: supaKey, ...(supaKey.startsWith('eyJ') ? { Authorization: `Bearer ${supaKey}` } : {}) } },
       )
         .then((r) => (r.ok ? r.json() : []))
         .then((rows) => {

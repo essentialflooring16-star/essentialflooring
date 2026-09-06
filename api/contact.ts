@@ -308,11 +308,15 @@ function supabase(): Supa | null {
 }
 
 async function supaFetch(s: Supa, path: string, init: RequestInit): Promise<Response> {
+  // Cheile vechi sunt JWT-uri si merg si ca Bearer. Cheile noi (sb_secret_...)
+  // nu sunt JWT-uri: puse in Authorization, PostgREST raspunde 401 si lead-ul
+  // nu se mai salveaza. Pentru ele ajunge antetul apikey.
+  const auth: Record<string, string> = s.key.startsWith('eyJ') ? { Authorization: `Bearer ${s.key}` } : {};
   return fetch(`${s.url}/rest/v1/${path}`, {
     ...init,
     headers: {
       apikey: s.key,
-      Authorization: `Bearer ${s.key}`,
+      ...auth,
       'Content-Type': 'application/json',
       ...(init.headers ?? {}),
     },
@@ -441,20 +445,33 @@ export default async function handler(req: Req, res: Res): Promise<void> {
   const text = leadEmailText(lead);
 
   try {
+    const SANDBOX_FROM = 'Essential Flooring <onboarding@resend.dev>';
+    const deliver = (sender: string) =>
+      fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: sender,
+          to: [to],
+          subject: leadEmailSubject(lead),
+          html,
+          text,
+          ...(validEmail ? { reply_to: validEmail } : {}),
+        }),
+      });
+
     // Numele e `sent`, nu `res`: `res` e raspunsul functiei si umbrirea lui aici
     // trimitea obiectul gresit in send().
-    const sent = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from,
-        to: [to],
-        subject: leadEmailSubject(lead),
-        html,
-        text,
-        ...(validEmail ? { reply_to: validEmail } : {}),
-      }),
-    });
+    let sent = await deliver(from);
+
+    // Un expeditor pe un domeniu neverificat inca in Resend e refuzat cu 403.
+    // Decat sa pierdem lead-ul, il trimitem de pe expeditorul de proba al
+    // Resend, care merge fara domeniu. Cand domeniul e verificat, prima
+    // incercare reuseste si ramura asta nu se mai atinge.
+    if (!sent.ok && from !== SANDBOX_FROM && [401, 403, 422, 450].includes(sent.status)) {
+      console.error('resend refused sender', from, sent.status, await sent.text());
+      sent = await deliver(SANDBOX_FROM);
+    }
 
     if (!sent.ok) {
       console.error('resend failed', sent.status, await sent.text());

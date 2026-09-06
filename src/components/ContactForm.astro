@@ -212,7 +212,7 @@ const WHATSAPP = `https://wa.me/${SITE.phoneHref.replace(/\D/g, '')}`;
             headers: {
               'Content-Type': 'application/json',
               apikey: supaKey,
-              Authorization: `Bearer ${supaKey}`,
+              ...(supaKey.startsWith('eyJ') ? { Authorization: `Bearer ${supaKey}` } : {}),
               Prefer: 'return=minimal',
             },
             body: JSON.stringify(lead),
