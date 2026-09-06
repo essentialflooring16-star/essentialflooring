@@ -15,6 +15,34 @@ import AdminApp from '../../components/admin/AdminApp.tsx';
     <title>Admin | Essential Flooring</title>
     <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      /* Miscarea cabinetului sta aici, nu in global.css: acolo ar intra in
+         CSS-ul inline al fiecareia dintre cele 42 de pagini publice, pentru un
+         ecran pe care nu-l vede niciun vizitator. */
+      @media (prefers-reduced-motion: no-preference) {
+        @keyframes traffic-draw {
+          from { stroke-dashoffset: 1; }
+          to   { stroke-dashoffset: 0; }
+        }
+        @keyframes traffic-fill {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        @keyframes curtain-drop {
+          from { opacity: 0; transform: translateY(-10px); }
+          to   { opacity: 1; transform: none; }
+        }
+        /* Linia poarta pathLength="1" ca ATRIBUT (in CSS nu exista), deci
+           dasharray 1 acopera exact tot traseul si aceeasi animatie merge si
+           pentru 7 zile, si pentru 90, fara sa masuram lungimea reala. */
+        .traffic-line {
+          stroke-dasharray: 1;
+          animation: traffic-draw 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        .traffic-area { animation: traffic-fill 0.9s ease-out 0.35s both; }
+        .admin-curtain { animation: curtain-drop 0.24s cubic-bezier(0.22, 1, 0.36, 1) both; }
+      }
+    </style>
   </head>
   <body class="min-h-screen bg-surface">
     <AdminApp client:only="react" />
