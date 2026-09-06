@@ -9,9 +9,8 @@ import { leads } from './admin-strings/leads';
 import { portfolio } from './admin-strings/portfolio';
 import { reviews } from './admin-strings/reviews';
 import { blog } from './admin-strings/blog';
-import { seo } from './admin-strings/seo';
 
-const PARTS = [app, dashboard, leads, portfolio, reviews, blog, seo];
+const PARTS = [app, dashboard, leads, portfolio, reviews, blog];
 
 export const STRINGS = {
   en: Object.assign({}, ...PARTS.map((p) => p.en)) as Record<string, string>,
