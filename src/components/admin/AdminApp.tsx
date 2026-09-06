@@ -8,7 +8,6 @@ import PortfolioManager from './PortfolioManager';
 import LeadsInbox from './LeadsInbox';
 import BlogManager from './BlogManager';
 import ReviewsManager from './ReviewsManager';
-import SeoHealth from './SeoHealth';
 
 /**
  * Cadrul cabinetului, taiat ca anteta publica a site-ului, ca sa se simta
@@ -19,9 +18,9 @@ import SeoHealth from './SeoHealth';
  * coboara de sub bara si se inchide la Escape, pe fundal si la orice navigare.
  * De la lg in sus cortina lasa locul unei sine verzi fixe, cu logoul sus.
  *
- * Sectiunile sunt sase, nu noua: textele site-ului, viteza si setarile au fost
- * scoase la cererea lui Artiom. Clientul nu are ce cauta in ele si fiecare tab
- * in plus era inca un loc in care putea strica ceva fara sa vrea.
+ * Sectiunile sunt cinci, nu noua: textele site-ului, viteza, setarile si starea
+ * SEO au fost scoase la cererea lui Artiom. Clientul nu are ce cauta in ele si
+ * fiecare tab in plus era inca un loc in care putea strica ceva fara sa vrea.
  */
 
 /**
@@ -32,7 +31,7 @@ import SeoHealth from './SeoHealth';
  */
 const LOGO_INK = '#24282c';
 
-type Tab = 'dashboard' | 'leads' | 'portfolio' | 'reviews' | 'blog' | 'seo';
+type Tab = 'dashboard' | 'leads' | 'portfolio' | 'reviews' | 'blog';
 
 const TABS: { key: Tab; icon: IconName }[] = [
   { key: 'dashboard', icon: 'traffic' },
@@ -40,7 +39,6 @@ const TABS: { key: Tab; icon: IconName }[] = [
   { key: 'portfolio', icon: 'portfolio' },
   { key: 'reviews', icon: 'reviews' },
   { key: 'blog', icon: 'blog' },
-  { key: 'seo', icon: 'seo' },
 ];
 
 export default function AdminApp() {
@@ -277,7 +275,6 @@ export default function AdminApp() {
             {tab === 'portfolio' && <PortfolioManager />}
             {tab === 'reviews' && <ReviewsManager />}
             {tab === 'blog' && <BlogManager />}
-            {tab === 'seo' && <SeoHealth />}
           </div>
         </div>
       </main>

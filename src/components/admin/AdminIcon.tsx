@@ -1,7 +1,7 @@
 /**
  * Iconitele cabinetului, desenate pentru clientul asta, nu luate dintr-o
  * librarie: o dependenta noua ar fi adus zeci de kilobiti in bundle-ul de
- * admin pentru sase glife. Acelasi registru ca Icon.astro de pe site: grila
+ * admin pentru cinci glife. Acelasi registru ca Icon.astro de pe site: grila
  * 28x28, contur de 1.8 in culoarea textului, deci aceeasi iconita merge si pe
  * verde inchis, si pe hartie, fara nicio varianta separata.
  */
@@ -18,7 +18,6 @@ export type Name =
   | 'portfolio'
   | 'reviews'
   | 'blog'
-  | 'seo'
   | 'menu'
   | 'close'
   | 'external'
@@ -47,11 +46,6 @@ const glyphs: Record<Name, string> = {
     <path d="M6.5 4.5h11l5 5v14a1.5 1.5 0 0 1-1.5 1.5h-14A1.5 1.5 0 0 1 5 23.5v-17A1.5 1.5 0 0 1 6.5 4.5z" />
     <path d="M17.5 4.5v5.5h5" />
     <path d="M9 14.5h9M9 18.5h9M9 10.5h4" />`,
-  // lupa peste o pagina: starea SEO
-  seo: `
-    <circle cx="12.5" cy="12.5" r="6.5" />
-    <path d="m17.4 17.4 5.1 5.1" />
-    <path d="M9.5 12.5h6M12.5 9.5v6" />`,
   menu: `<path d="M4.5 8.5h19M4.5 14h19M4.5 19.5h19" />`,
   close: `<path d="m6.5 6.5 15 15M21.5 6.5l-15 15" />`,
   external: `
