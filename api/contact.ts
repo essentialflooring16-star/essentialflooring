@@ -8,13 +8,22 @@
 //                                                     emailul fara un deploy nou)
 //
 // Adresele de email NU sunt secrete: adresa clientului sta pe fiecare pagina a
-// site-ului. Locul lor este src/data/site.ts, ca sa existe intr-un singur loc.
+// site-ului. De aceea au un implicit in cod si formularul merge chiar daca
+// nimeni nu pune nimic pe Vercel.
 //
 // Ordinea conteaza: intai salvam cererea, abia apoi trimitem emailul. Daca Resend
 // pica, cererea tot exista in baza de date si raspundem 200, ca sa nu piarda
 // clientul un lead din cauza unui provider de email.
 
-import { SITE } from '../src/data/site';
+// ATENTIE: Vercel doar TRANSPILEAZA fisierele din api/, nu le impacheteaza, deci
+// un import din src/ ajunge in productie ca o cale care nu exista si functia
+// moare cu ERR_MODULE_NOT_FOUND. Tot ce foloseste functia se scrie aici.
+const CONTACT = {
+  name: 'Essential Flooring',
+  // Aceeasi adresa ca SITE.email din src/data/site.ts. Nu e un secret, sta pe
+  // fiecare pagina a site-ului; daca se schimba, se schimba in ambele locuri.
+  email: 'essentialflooring16@gmail.com',
+} as const;
 
 // Paleta E2 a site-ului, aceleasi valori ca LAYER 1 din global.css.
 const C = {
@@ -435,8 +444,8 @@ export default async function handler(req: Req, res: Res): Promise<void> {
 
   // 2) Trimitem emailul.
   const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.CONTACT_TO_EMAIL || SITE.email;
-  const from = process.env.CONTACT_FROM_EMAIL || `${SITE.name} <onboarding@resend.dev>`;
+  const to = process.env.CONTACT_TO_EMAIL || CONTACT.email;
+  const from = process.env.CONTACT_FROM_EMAIL || `${CONTACT.name} <onboarding@resend.dev>`;
 
   if (!apiKey) {
     diag.resendKey = 'lipseste';
