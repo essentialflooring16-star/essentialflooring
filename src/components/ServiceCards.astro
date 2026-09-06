@@ -4,13 +4,45 @@
 // gallery labels a frame — icon from the site's own set, serif title, one
 // line of text. The mat is what makes the phone photographs read as curated
 // work instead of screenshots.
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import { SERVICES } from '../data/site';
 import { getContent } from '../lib/content';
 import { photoImage, photoById } from '../lib/photos';
 import Icon from './Icon.astro';
 
 const c = await getContent();
+
+// Cardurile mici incadreaza fotografiile la 16:9, dar pozele clientului sunt
+// verticale (1200x1600, facute cu telefonul). Fara decupare browserul descarca
+// dreptunghiul inalt intreg si arunca peste 70% din el.
+//
+// <Image> nu stie sa decupeze pe fiecare latime din srcset: cere latime SI
+// inaltime, iar `widths` nu le da. Asa ca decupajele se cer aici, la build, cu
+// getImage, si srcset-ul se scrie de mana cu descriptori `w`. Descriptorii `w`
+// conteaza: cu `densities` browserul alege numai dupa densitatea ecranului si
+// ignora faptul ca acelasi card are 360px pe telefon si 640px pe calculator,
+// deci un Moto G lua o poza de 1120px pentru un loc de 360px.
+const CARD_WIDTHS = [400, 560, 760, 1080];
+const cardSources = new Map<string, { srcset: string; src: string }>();
+for (const s of SERVICES.slice(1)) {
+  const built = await Promise.all(
+    CARD_WIDTHS.map((w) =>
+      getImage({
+        src: photoImage(s.image),
+        width: w,
+        height: Math.round((w * 9) / 16),
+        fit: 'cover',
+        position: 'center',
+        format: 'webp',
+        quality: 68,
+      }),
+    ),
+  );
+  cardSources.set(s.slug, {
+    src: built[1].src,
+    srcset: built.map((img, i) => `${img.src} ${CARD_WIDTHS[i]}w`).join(', '),
+  });
+}
 
 // Cheia unui serviciu se compune din slug, dupa conventia din registru, deci
 // un serviciu nou nu cere nicio modificare aici.
@@ -53,24 +85,23 @@ const icons: Record<string, 'refinish' | 'plank' | 'stairs' | 'layers' | 'carpet
             <Image
               src={photoImage(s.image)}
               alt={'imageAlt' in s ? s.imageAlt : photoById(s.image).alt}
-              widths={[480, 760, 1100]}
-              sizes="(min-width:1024px) 50vw, 100vw"
+              widths={[400, 560, 760, 1100]}
+              sizes="(min-width:1024px) 640px, (min-width:640px) 44vw, 88vw"
               class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
               format="webp"
               quality={68}
             />
           ) : (
-            <Image
-              src={photoImage(s.image)}
+            <img
+              src={cardSources.get(s.slug)!.src}
+              srcset={cardSources.get(s.slug)!.srcset}
+              sizes="(min-width:1024px) 640px, (min-width:640px) 44vw, 88vw"
               alt={'imageAlt' in s ? s.imageAlt : photoById(s.image).alt}
-              width={700}
-              height={394}
-              fit="cover"
-              position="center"
-              densities={[1, 1.6]}
+              width="560"
+              height="315"
+              loading="lazy"
+              decoding="async"
               class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
-              format="webp"
-              quality={68}
             />
           )}
           <span
