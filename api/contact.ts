@@ -377,7 +377,13 @@ export default async function handler(req: Req, res: Res): Promise<void> {
   // Un email invalid ar rupe reply_to, deci il ignoram in loc sa respingem cererea.
   const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ? email : '';
 
+  // Diagnostic temporar: fara acces la logurile Vercel, singurul mod de a afla
+  // de ce refuza Supabase sau Resend e sa spunem motivul in raspuns. De scos
+  // imediat ce formularul trimite.
+  const diag: Record<string, string> = {};
+
   const s = supabase();
+  diag.supabaseConfigured = s ? 'da' : 'nu';
   const ipHash = await hashIp(clientIp(req));
 
   if (await isRateLimited(s, ipHash)) {
@@ -401,7 +407,11 @@ export default async function handler(req: Req, res: Res): Promise<void> {
         }),
       });
       stored = res.ok;
-      if (!res.ok) console.error('lead insert failed', res.status, await res.text());
+      if (!res.ok) {
+        const body = await res.text();
+        diag.supabase = `${res.status} ${body.slice(0, 160)}`;
+        console.error('lead insert failed', res.status, body);
+      }
     } catch (err) {
       console.error('lead insert threw', err);
     }
@@ -422,9 +432,11 @@ export default async function handler(req: Req, res: Res): Promise<void> {
   const from = process.env.CONTACT_FROM_EMAIL || 'Essential Flooring <onboarding@resend.dev>';
 
   if (!apiKey || !to) {
+    diag.resendKey = apiKey ? 'prezenta' : 'lipseste';
+    diag.contactTo = to ? 'prezent' : 'lipseste';
     return stored
       ? send(res, { ok: true, emailed: false }, 200)
-      : send(res, { error: 'Email not configured' }, 503);
+      : send(res, { error: 'Email not configured', diag }, 503);
   }
 
   // Ora locala a clientului, nu UTC. El citeste emailul in Sacramento.
@@ -468,21 +480,26 @@ export default async function handler(req: Req, res: Res): Promise<void> {
     // Decat sa pierdem lead-ul, il trimitem de pe expeditorul de proba al
     // Resend, care merge fara domeniu. Cand domeniul e verificat, prima
     // incercare reuseste si ramura asta nu se mai atinge.
-    if (!sent.ok && from !== SANDBOX_FROM && [401, 403, 422, 450].includes(sent.status)) {
-      console.error('resend refused sender', from, sent.status, await sent.text());
+    if (!sent.ok && from !== SANDBOX_FROM) {
+      const body = await sent.text();
+      diag.resendFirst = `${sent.status} ${body.slice(0, 160)}`;
+      console.error('resend refused sender', from, sent.status, body);
       sent = await deliver(SANDBOX_FROM);
     }
 
     if (!sent.ok) {
-      console.error('resend failed', sent.status, await sent.text());
+      const body = await sent.text();
+      diag.resend = `${sent.status} ${body.slice(0, 200)}`;
+      console.error('resend failed', sent.status, body);
       // Cererea e deja salvata, deci pentru vizitator trimiterea a reusit.
       return stored
         ? send(res, { ok: true, emailed: false }, 200)
-        : send(res, { error: 'Email delivery failed' }, 502);
+        : send(res, { error: 'Email delivery failed', diag }, 502);
     }
   } catch (err) {
     console.error('resend threw', err);
-    return stored ? send(res, { ok: true, emailed: false }, 200) : send(res, { error: 'Email delivery failed' }, 502);
+    diag.resendThrew = String(err).slice(0, 160);
+    return stored ? send(res, { ok: true, emailed: false }, 200) : send(res, { error: 'Email delivery failed', diag }, 502);
   }
 
   return send(res, { ok: true, emailed: true }, 200);
