@@ -101,12 +101,19 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid items-start gap-4 sm:grid-cols-3">
-        <StatCard label={t('dashboard.stat_page_views')} value={stats.total} />
-        <StatCard label={t('dashboard.stat_unique_visits')} value={stats.visitors} />
+      {/* Doua cifre, nu trei. "Vizualizari pe vizita" era o impartire pe care
+          trebuia sa i-o explice cineva, deci nu spunea nimic; fiecare din cele
+          ramase isi scrie sub ea, in cuvinte simple, ce numara. */}
+      <div className="grid items-start gap-4 sm:grid-cols-2">
         <StatCard
-          label={t('dashboard.stat_views_per_visit')}
-          value={stats.visitors ? (stats.total / stats.visitors).toFixed(1) : '0'}
+          label={t('dashboard.stat_page_views')}
+          note={t('dashboard.stat_page_views_note')}
+          value={stats.total}
+        />
+        <StatCard
+          label={t('dashboard.stat_unique_visits')}
+          note={t('dashboard.stat_unique_visits_note')}
+          value={stats.visitors}
         />
       </div>
 
@@ -150,11 +157,12 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ label, value }: { label: string; value: number | string }) {
+function StatCard({ label, note, value }: { label: string; note: string; value: number | string }) {
   return (
     <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
       <p className="text-[13px] uppercase tracking-[0.14em] text-fg-muted">{label}</p>
       <p className="mt-2 font-display font-semibold text-4xl text-fg">{value}</p>
+      <p className="mt-1.5 text-[13px] text-fg-muted">{note}</p>
     </div>
   );
 }

@@ -24,6 +24,14 @@ import SeoHealth from './SeoHealth';
  * in plus era inca un loc in care putea strica ceva fara sa vrea.
  */
 
+/**
+ * Fundalul logoului clientului, citit din fisierul lui: #24282c, uniform pe
+ * toata suprafata. Poza nu are transparenta, deci pusa pe verde se vedea ca un
+ * dreptunghi lipit. Banda din capul sinei poarta exact culoarea asta, si atunci
+ * logoul nu mai are margine: se termina unde se termina banda.
+ */
+const LOGO_INK = '#24282c';
+
 type Tab = 'dashboard' | 'leads' | 'portfolio' | 'reviews' | 'blog' | 'seo';
 
 const TABS: { key: Tab; icon: IconName }[] = [
@@ -123,8 +131,19 @@ export default function AdminApp() {
       {/* ─────────────────────────────────────────────── sina, de la desktop */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[264px] flex-col justify-between bg-surface-dark px-5 py-6 lg:flex">
         <div>
-          <Logo />
-          <nav className="mt-8 flex flex-col gap-1" aria-label={t('app.nav_label')}>
+          <div className="-mx-5 -mt-6 px-5 pb-5 pt-6" style={{ backgroundColor: LOGO_INK }}>
+            <img
+              src="/admin/logo.webp"
+              alt={t('app.brand')}
+              width={640}
+              height={243}
+              className="w-full"
+            />
+          </div>
+          <p className="mt-4 text-[11px] uppercase tracking-[0.2em] text-fg-on-dark/55">
+            {t('app.subtitle')}
+          </p>
+          <nav className="mt-7 flex flex-col gap-1" aria-label={t('app.nav_label')}>
             {TABS.map(({ key, icon }, i) => (
               <RailLink
                 key={key}
@@ -139,7 +158,7 @@ export default function AdminApp() {
           </nav>
         </div>
         <div className="grid gap-3">
-          <LangSwitch onDark />
+          <LangSwitch onDark full />
           <a
             href="/"
             className="flex items-center gap-2.5 rounded-btn border border-fg-on-dark/20 px-3.5 py-2.5 text-[13.5px] font-semibold text-fg-on-dark/80 transition-colors hover:border-accent-on-dark hover:text-fg-on-dark"
@@ -159,7 +178,10 @@ export default function AdminApp() {
       </aside>
 
       {/* ─────────────────────────────────────────── bara in trei, pe telefon */}
-      <header className="sticky top-0 z-50 grid grid-cols-[1fr_auto_1fr] items-center gap-2 bg-surface-dark px-3 py-2.5 lg:hidden">
+      <header
+        className="sticky top-0 z-50 grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 py-2.5 lg:hidden"
+        style={{ backgroundColor: LOGO_INK }}
+      >
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -175,7 +197,7 @@ export default function AdminApp() {
           alt={t('app.brand')}
           width={640}
           height={243}
-          className="h-11 w-auto justify-self-center rounded-media"
+          className="h-11 w-auto justify-self-center"
         />
 
         <button
@@ -202,11 +224,12 @@ export default function AdminApp() {
             onClick={() => setOpen(false)}
             className="fixed inset-0 z-30 bg-scrim/50 lg:hidden"
           />
+          <div className="fixed inset-x-0 top-[64px] z-40 overflow-hidden shadow-lift lg:hidden">
           <nav
             aria-label={t('app.nav_label')}
-            className="admin-curtain fixed inset-x-0 top-[64px] z-40 grid gap-1 bg-surface-dark px-4 pb-6 pt-2 shadow-lift lg:hidden"
+            className="admin-curtain grid gap-1 bg-surface-dark px-4 pb-6 pt-2"
           >
-            {TABS.map(({ key, icon }, i) => (
+            {TABS.map(({ key, icon }) => (
               <RailLink
                 key={key}
                 icon={icon}
@@ -214,7 +237,8 @@ export default function AdminApp() {
                 badge={key === 'leads' ? unread : 0}
                 current={tab === key}
                 onClick={() => go(key)}
-                index={i}
+                index={0}
+                animate={false}
               />
             ))}
             <div className="mt-4 flex items-center justify-between gap-3 border-t border-fg-on-dark/15 pt-4">
@@ -238,6 +262,7 @@ export default function AdminApp() {
               </div>
             </div>
           </nav>
+          </div>
         </>
       )}
 
@@ -260,17 +285,17 @@ export default function AdminApp() {
   );
 }
 
-/** Logoul clientului, exact fisierul lui, pe fundalul lui antracit. */
-function Logo({ center = false }: { center?: boolean }) {
+/** Logoul clientului pe fundalul lui, pentru capul ecranului de autentificare. */
+function Logo() {
   const { t } = useT();
   return (
-    <div className={center ? 'text-center' : ''}>
+    <div className="text-center">
       <img
         src="/admin/logo.webp"
         alt={t('app.brand')}
         width={640}
         height={243}
-        className={`w-full max-w-[212px] rounded-card ${center ? 'mx-auto' : ''}`}
+        className="mx-auto w-full max-w-[212px]"
       />
       <p className="mt-3 text-[11px] uppercase tracking-[0.2em] text-fg-on-dark/55">{t('app.subtitle')}</p>
     </div>
@@ -284,6 +309,7 @@ function RailLink({
   current,
   onClick,
   index,
+  animate = true,
 }: {
   icon: IconName;
   label: string;
@@ -291,6 +317,9 @@ function RailLink({
   current: boolean;
   onClick: () => void;
   index: number;
+  /** In cortina, panoul intreg coboara deja; inca o intrare pe fiecare link
+      s-ar bate cu ea si ar parea ca elementele vin din alta parte. */
+  animate?: boolean;
 }) {
   return (
     <button
@@ -298,7 +327,7 @@ function RailLink({
       onClick={onClick}
       aria-current={current ? 'page' : undefined}
       style={{ '--i': index } as React.CSSProperties}
-      className={`m-intro group flex items-center gap-3 rounded-btn px-3.5 py-3 text-left text-[14.5px] font-semibold transition-colors ${
+      className={`${animate ? 'm-intro' : ''} group flex items-center gap-3 rounded-btn px-3.5 py-3 text-left text-[14.5px] font-semibold transition-colors ${
         current
           ? 'bg-accent-on-dark text-fg'
           : 'text-fg-on-dark/70 hover:bg-fg-on-dark/10 hover:text-fg-on-dark'
@@ -355,8 +384,8 @@ function Login() {
         onSubmit={onSubmit}
         className="m-intro w-full max-w-sm overflow-hidden rounded-card border border-hairline bg-surface-raised shadow-lift"
       >
-        <div className="bg-surface-dark px-8 pb-7 pt-8">
-          <Logo center />
+        <div className="px-8 pb-7 pt-8" style={{ backgroundColor: LOGO_INK }}>
+          <Logo />
         </div>
         <div className="p-8">
           <div className="mb-6 flex justify-center">
@@ -405,11 +434,11 @@ function Login() {
  * deschide cabinetul si nu stie romana trebuie sa poata trece pe engleza
  * inainte sa se poata autentifica, nu dupa.
  */
-function LangSwitch({ onDark = false }: { onDark?: boolean }) {
+function LangSwitch({ onDark = false, full = false }: { onDark?: boolean; full?: boolean }) {
   const [lang, setLang] = useLang();
   return (
     <div
-      className={`inline-flex overflow-hidden rounded-btn border ${
+      className={`overflow-hidden rounded-btn border ${full ? 'flex w-full' : 'inline-flex'} ${
         onDark ? 'border-fg-on-dark/20' : 'border-hairline'
       }`}
       role="group"
@@ -421,7 +450,7 @@ function LangSwitch({ onDark = false }: { onDark?: boolean }) {
           type="button"
           onClick={() => setLang(option.code)}
           aria-pressed={lang === option.code}
-          className={`px-3 py-2 text-[13px] font-semibold transition-colors ${
+          className={`px-3 py-2 text-[13px] font-semibold transition-colors ${full ? 'flex-1' : ''} ${
             lang === option.code
               ? onDark
                 ? 'bg-accent-on-dark text-fg'
