@@ -16,8 +16,8 @@ const known = new Set(Object.keys(STRINGS.en));
 
 const PANELS = {
   AdminApp: 'app', Dashboard: 'dashboard', LeadsInbox: 'leads',
-  PortfolioManager: 'portfolio', BlogManager: 'blog', ContentManager: 'content',
-  ReviewsManager: 'reviews', VitalsPanel: 'vitals', SeoHealth: 'seo', SettingsPanel: 'settings',
+  PortfolioManager: 'portfolio', BlogManager: 'blog',
+  ReviewsManager: 'reviews', SeoHealth: 'seo',
 };
 
 let problems = 0;

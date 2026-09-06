@@ -25,8 +25,36 @@ const TABLES = {
     { id: 1, created_at: now, author: 'John D.', rating: 5, text: 'Great work on our stairs.', city: 'Folsom',
       review_date: '2026-08-01', source: 'google', published: true, sort_order: 1 },
   ],
-  posts: [], portfolio_items: [], page_views: [], web_vitals: [],
+  posts: [], portfolio_items: [], web_vitals: [],
+  // Traficul simulat: 30 de zile cu o forma stabila, ca sa se poata vedea
+  // curba din panoul Trafic. Valorile vin dintr-o formula, nu din random, ca
+  // doua rulari sa dea aceeasi imagine si capturile sa fie comparabile.
+  page_views: buildViews(),
 };
+
+function buildViews() {
+  const PATHS = ['/', '/contact/', '/portfolio/', '/services/hardwood-floor-refinishing/', '/reviews/'];
+  const REFS = ['https://www.google.com/', 'https://www.facebook.com/', null];
+  const rows = [];
+  let id = 0;
+  for (let d = 29; d >= 0; d--) {
+    const day = new Date(Date.now() - d * 86400_000);
+    const n = 3 + Math.round(9 * Math.abs(Math.sin(d / 4.5))) + (d % 7 === 0 ? 6 : 0);
+    for (let i = 0; i < n; i++) {
+      const at = new Date(day);
+      at.setHours(8 + (i % 12), (i * 7) % 60, 0, 0);
+      rows.push({
+        id: ++id,
+        created_at: at.toISOString(),
+        path: PATHS[(d + i) % PATHS.length],
+        referrer: REFS[(d + i) % REFS.length],
+        device: i % 3 === 0 ? 'desktop' : 'mobile',
+        session_id: `s${d}-${Math.floor(i / 2)}`,
+      });
+    }
+  }
+  return rows;
+}
 
 const server = createServer((req, res) => {
   const url = new URL(req.url, 'http://x');
