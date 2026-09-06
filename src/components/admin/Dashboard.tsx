@@ -101,7 +101,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid sm:grid-cols-3 gap-4">
+      <div className="grid items-start gap-4 sm:grid-cols-3">
         <StatCard label={t('dashboard.stat_page_views')} value={stats.total} />
         <StatCard label={t('dashboard.stat_unique_visits')} value={stats.visitors} />
         <StatCard
@@ -110,35 +110,21 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Daily bar chart */}
       <div className="rounded-card border border-hairline bg-surface-raised p-6 shadow-card">
-        <h2 className="font-semibold text-[15px] text-fg-body mb-4">{t('dashboard.chart_title')}</h2>
-        <svg viewBox={`0 0 ${stats.daily.length * 12} 120`} className="w-full h-36" role="img" aria-label={t('dashboard.chart_aria_label')}>
-          {stats.daily.map(([day, v], i) => {
-            const h = Math.max(2, (v / max) * 100);
-            return (
-              <g key={day}>
-                <rect
-                  x={i * 12 + 2}
-                  y={110 - h}
-                  width={8}
-                  height={h}
-                  rx={2}
-                  fill={v > 0 ? 'var(--ef-accent-fill)' : 'var(--ef-hairline)'}
-                >
-                  <title>{t('dashboard.chart_bar_tooltip', { day, n: v })}</title>
-                </rect>
-              </g>
-            );
-          })}
-        </svg>
-        <div className="flex justify-between text-[12px] text-fg-muted mt-1">
+        <h2 className="font-semibold text-[15px] text-fg-body mb-5">{t('dashboard.chart_title')}</h2>
+        <TrafficCurve
+          daily={stats.daily}
+          max={max}
+          label={t('dashboard.chart_aria_label')}
+          tip={(day, n) => t('dashboard.chart_bar_tooltip', { day, n })}
+        />
+        <div className="flex justify-between text-[12px] text-fg-muted mt-2">
           <span>{stats.daily[0]?.[0]}</span>
           <span>{stats.daily[stats.daily.length - 1]?.[0]}</span>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid items-start gap-4 md:grid-cols-2">
         <ListCard
           title={t('dashboard.top_pages_title')}
           rows={stats.topPages}
@@ -208,5 +194,108 @@ function ListCard({
         </ul>
       )}
     </div>
+  );
+}
+
+/**
+ * Traficul zilnic ca o curba, nu ca un gard de bare.
+ *
+ * Punctele se leaga cu un Catmull-Rom convertit in bezier, cu tensiunea taiata
+ * la jumatate ca sa nu iasa bucle sub zero cand o zi cu multe vizite sta intre
+ * doua zile goale. Sub linie sta un gradient care se stinge, iar linia se
+ * deseneaza singura o data la intrare (dasharray animat in admin/index.astro).
+ * Zilele raman puncte reale pe curba, cu <title> pe fiecare, deci cifra exacta
+ * se vede la hover si o citeste si un cititor de ecran.
+ */
+function TrafficCurve({
+  daily,
+  max,
+  label,
+  tip,
+}: {
+  daily: [string, number][];
+  max: number;
+  label: string;
+  tip: (day: string, n: number) => string;
+}) {
+  const W = 720;
+  const H = 190;
+  const PAD = 14;
+  const step = daily.length > 1 ? (W - PAD * 2) / (daily.length - 1) : 0;
+  const y = (v: number) => H - PAD - (v / max) * (H - PAD * 2);
+  const pts = daily.map(([, v], i) => [PAD + i * step, y(v)] as const);
+
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] ?? pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] ?? p2;
+    const c1x = p1[0] + (p2[0] - p0[0]) / 12;
+    const c1y = p1[1] + (p2[1] - p0[1]) / 12;
+    const c2x = p2[0] - (p3[0] - p1[0]) / 12;
+    const c2y = p2[1] - (p3[1] - p1[1]) / 12;
+    d += ` C${c1x},${c1y} ${c2x},${c2y} ${p2[0]},${p2[1]}`;
+  }
+  const area = `${d} L${pts[pts.length - 1][0]},${H - PAD} L${pts[0][0]},${H - PAD} Z`;
+
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      className="h-44 w-full"
+      preserveAspectRatio="none"
+      role="img"
+      aria-label={label}
+    >
+      <defs>
+        <linearGradient id="traffic-fade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--ef-accent-fill)" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="var(--ef-accent-fill)" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+
+      {/* Trei repere, atat cat sa se poata citi inaltimea curbei. */}
+      {[0, 0.5, 1].map((f) => (
+        <line
+          key={f}
+          x1={PAD}
+          x2={W - PAD}
+          y1={y(max * f)}
+          y2={y(max * f)}
+          stroke="var(--ef-hairline)"
+          strokeWidth="1"
+          vectorEffect="non-scaling-stroke"
+        />
+      ))}
+
+      <path d={area} fill="url(#traffic-fade)" className="traffic-area" />
+      <path
+        d={d}
+        fill="none"
+        stroke="var(--ef-accent-fill)"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+        pathLength={1}
+        className="traffic-line"
+      />
+
+      {/* Desenul se intinde pe latime, deci un cerc ar iesi elipsa. Zilele sunt
+          benzi transparente: pastreaza cifra la hover si o da cititorului de
+          ecran, fara sa puna in pagina o forma care se deformeaza. */}
+      {daily.map(([day, v], i) => (
+        <rect
+          key={day}
+          x={pts[i][0] - step / 2}
+          y={0}
+          width={step || W}
+          height={H}
+          fill="transparent"
+        >
+          <title>{tip(day, v)}</title>
+        </rect>
+      ))}
+    </svg>
   );
 }
