@@ -146,7 +146,7 @@ const steps = [
             <path id="stamp-arc" d="M82 12a70 70 0 1 1 0 140a70 70 0 1 1 0-140" />
           </defs>
           <text class="font-display" fill="var(--ef-accent-on-light)" font-size="13.5" font-weight="600" letter-spacing="3.4">
-            <textPath href="#stamp-arc" startOffset="0">EST. 2023 · SACRAMENTO CA · LICENSED &amp; INSURED ·</textPath>
+            <textPath href="#stamp-arc" startOffset="0">EST. 2023 · SACRAMENTO CA · LICENSED &amp; BONDED ·</textPath>
           </text>
         </svg>
         <svg viewBox="0 0 28 28" class="absolute inset-0 m-auto size-11" fill="none">
@@ -226,7 +226,7 @@ const steps = [
       <ul class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5 text-[13.5px] text-fg-muted border-t border-hairline pt-6">
         <li class="flex items-center gap-3">
           <Icon name="shield" size={26} class="shrink-0 text-fg" />
-          <span><span class="block text-fg font-semibold">Licensed &amp; insured</span>{c.site.license}</span>
+          <span><span class="block text-fg font-semibold">Licensed &amp; bonded</span>{c.site.license}</span>
         </li>
         <li class="flex items-center gap-3">
           <Icon name="clock" size={26} class="shrink-0 text-fg" />
@@ -424,11 +424,11 @@ const steps = [
           {[
             {
               t: 'California licensed contractor',
-              d: `We operate under ${c.site.license}, fully insured. You are protected, and the work is up to code.`,
+              d: `We operate under ${c.site.license}, with a $25,000 contractor bond filed with the state. You can look up both on the CSLB website.`,
             },
             {
               t: 'Transparent quotes',
-              d: 'Your written estimate spells out materials, labor and timeline. The price we quote is the price you pay.',
+              d: 'Your written estimate spells out materials, labor and timeline. The price you approve is the price you pay, and anything unexpected is agreed with you first.',
             },
             {
               t: 'On-time completion',

@@ -55,9 +55,13 @@ export async function getReviews(): Promise<Review[]> {
 }
 
 /**
- * Average to one decimal. Returned separately from the count because
- * schema.org AggregateRating needs both, and it must never be emitted from
- * zero reviews: a rating with no reviews behind it is a fabricated claim.
+ * Average to one decimal, or null when there are no reviews at all, so a page
+ * can never print a rating with nothing behind it.
+ *
+ * This feeds the visible rating badge only. It is deliberately NOT turned into
+ * schema.org AggregateRating anywhere: reviews republished by a business on its
+ * own site are self-serving under Google's review snippet policy and are not
+ * eligible for the star feature. See the comment in src/pages/reviews.astro.
  */
 export function ratingSummary(reviews: Review[]): { count: number; average: number } | null {
   if (!reviews.length) return null;

@@ -12,6 +12,12 @@ const FIELD =
 // Derived from the one place the number is written, like every other phone
 // link on the site.
 const WHATSAPP = `https://wa.me/${SITE.phoneHref.replace(/\D/g, '')}`;
+
+// The exact wording the visitor agrees to. It is written once, shown next to
+// the box, and sent with the request so that what was agreed is recorded in the
+// same words rather than described afterwards from memory.
+const CONSENT_TEXT =
+  'I agree that Essential Flooring may use the details above to answer this request and arrange an estimate, and I have read the Privacy Policy.';
 ---
 
 <div data-contact>
@@ -111,6 +117,25 @@ const WHATSAPP = `https://wa.me/${SITE.phoneHref.replace(/\D/g, '')}`;
       </p>
     </div>
 
+    <label class="mt-1 grid grid-cols-[auto_1fr] items-start gap-3 text-[13.5px] leading-relaxed text-fg-body">
+      <input
+        required
+        type="checkbox"
+        name="consent"
+        data-consent
+        data-consent-text={CONSENT_TEXT}
+        class="mt-0.5 size-[18px] shrink-0 accent-surface-dark rounded-[3px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      />
+      <span>
+        I agree that Essential Flooring may use the details above to answer this request and
+        arrange an estimate, and I have read the{' '}
+        <a
+          href="/privacy-policy/"
+          class="underline underline-offset-2 decoration-1 text-accent-on-light hover:text-fg transition-colors"
+        >Privacy Policy</a>.
+      </span>
+    </label>
+
     <button
       type="submit"
       data-submit
@@ -119,14 +144,16 @@ const WHATSAPP = `https://wa.me/${SITE.phoneHref.replace(/\D/g, '')}`;
       Request Free Estimate
     </button>
     <p class="text-[13px] leading-relaxed text-fg-muted">
-      By sending this request you agree to our{' '}
-      <a
-        href="/privacy-policy/"
+      Sending this asks us for a free estimate. It does not book anything and it costs nothing. We
+      use your details only to reply, we never sell them, and we do not add you to a mailing list.
+      See the <a
+        href="/terms-of-use/"
         class="underline underline-offset-2 decoration-1 text-accent-on-light hover:text-fg transition-colors"
-      >
-        Privacy Policy
-      </a>
-      . We use your details only to respond to your estimate request.
+      >Terms of Use</a> and{' '}
+      <a
+        href="/cancellation-and-refunds/"
+        class="underline underline-offset-2 decoration-1 text-accent-on-light hover:text-fg transition-colors"
+      >Cancellations and Refunds</a>.
     </p>
   </form>
 </div>
@@ -140,6 +167,7 @@ const WHATSAPP = `https://wa.me/${SITE.phoneHref.replace(/\D/g, '')}`;
     const errorBox = root.querySelector('[data-error]') as HTMLElement;
     const waLink = root.querySelector('[data-whatsapp]') as HTMLAnchorElement;
     const submit = root.querySelector('[data-submit]') as HTMLButtonElement;
+    const consentBox = root.querySelector('[data-consent]') as HTMLInputElement | null;
     const base = waLink.href;
     const openedAt = Date.now();
 
@@ -187,6 +215,15 @@ const WHATSAPP = `https://wa.me/${SITE.phoneHref.replace(/\D/g, '')}`;
         message: (data.message || '').trim() || null,
       };
 
+      // The browser will not submit without the box, so this is always true by
+      // the time we get here. It is sent anyway, with the sentence that was on
+      // screen, so the record says what was agreed and not merely that
+      // something was.
+      const consent = {
+        consent: Boolean(data.consent),
+        consentText: consentBox?.dataset.consentText || '',
+      };
+
       let delivered = false;
       let rateLimited = false;
 
@@ -195,7 +232,7 @@ const WHATSAPP = `https://wa.me/${SITE.phoneHref.replace(/\D/g, '')}`;
         const res = await fetch('/api/contact/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...lead, elapsedMs: Date.now() - openedAt }),
+          body: JSON.stringify({ ...lead, ...consent, elapsedMs: Date.now() - openedAt }),
         });
         if (res.ok) delivered = true;
         if (res.status === 429) rateLimited = true;

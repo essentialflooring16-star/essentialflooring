@@ -1,0 +1,158 @@
+---
+// Cancellations, deposits and refunds.
+//
+// Every rule quoted here is California law that applies to the client whether
+// or not it is written on a website: Civil Code 1689.5 to 1689.14 for the
+// three day cancellation and the ten day refund, B&P 7159 and 7159.5 for the
+// contract requirements and the down payment cap, and B&P 7030 for the CSLB
+// notice. Nothing on this page invents a promise the client has not made, and
+// nothing on it mentions a workmanship warranty, which he asked us to keep off
+// the site entirely.
+import Legal from '../layouts/Legal.astro';
+import { PROSE } from '../lib/legal';
+import { getContent } from '../lib/content';
+
+const c = await getContent();
+const effective = 'September 9, 2026';
+---
+
+<Legal
+  title="Cancellations and Refunds"
+  description="Your right to cancel a flooring contract in California, the legal limit on a down payment, how refunds work, and what to do if something goes wrong."
+  heading="Cancellations and Refunds"
+  lead="Estimates are free and cost you nothing. Once you sign a contract, California gives you three business days to change your mind for any reason, and it caps what we may take up front. This page explains all of it in plain language."
+  effective={effective}
+  path="/cancellation-and-refunds/"
+>
+  <h2 class={PROSE.h2}>The estimate costs nothing</h2>
+  <p>
+    We come out, measure, look at the subfloor and give you a written quote. There is no charge for
+    the visit, we do not ask for a deposit to produce a quote, and there is nothing to cancel and
+    nothing to refund if you decide not to go ahead. Call{' '}
+    <a href={c.site.phoneHref} class={PROSE.a}>{c.site.phone}</a>, send a message on WhatsApp, or
+    email <a href={`mailto:${c.site.email}`} class={PROSE.a}>{c.site.email}</a> and tell us. No
+    explanation needed.
+  </p>
+
+  <h2 class={PROSE.h2}>Your three day right to cancel</h2>
+  <p>
+    Almost every job we sign is signed in the customer's home, which under California law makes it a
+    home solicitation contract. That gives you the right to cancel it, for any reason or none, until
+    midnight of the third business day after you signed.
+  </p>
+  <ul class={PROSE.ul}>
+    <li>
+      <strong class={PROSE.strong}>Five business days if you are 65 or older.</strong> The law gives
+      seniors two extra days, and we apply it automatically.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>You do not have to give a reason.</strong> Nobody will ask you
+      for one.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>Your contract comes with the form.</strong> California requires
+      us to hand you two copies of a Notice of Cancellation, already dated, when you sign. Sign one,
+      send it back, and you are done. Any clear written notice by the deadline works just as well.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>We refund everything within ten days.</strong> That is the
+      deadline the law sets, and it covers every payment you have made.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>Materials already delivered.</strong> If we have dropped anything
+      off, we may ask for it back within twenty days, and we collect it from you rather than asking
+      you to carry it anywhere. If we do not ask within twenty days, it is yours to keep and you owe
+      nothing for it.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>Work already started.</strong> If we began before the three days
+      were up and you then cancel, the law says we are entitled to nothing for it. That is not a
+      concession, it is the rule, and it is a good reason not to let any contractor rush you into
+      starting early.
+    </li>
+  </ul>
+
+  <h2 class={PROSE.h2}>What we may ask for up front</h2>
+  <p>
+    California law puts a hard ceiling on the down payment for home improvement work, and it is
+    lower than most people expect.
+  </p>
+  <div class={PROSE.note}>
+    The down payment may not exceed <strong class={PROSE.strong}>$1,000 or 10 percent of the
+    contract price, whichever is less</strong>. That is the whole rule. A contractor who asks for
+    half the job in advance is breaking it, whoever they are.
+  </div>
+  <p>
+    After the down payment, we may not ask for or accept a payment larger than the work already done
+    and the materials already delivered. Your contract sets out the payment schedule in dollars and
+    cents, tied to specific stages of the job, so at every point you can see what you are paying for.
+  </p>
+
+  <h2 class={PROSE.h2}>Canceling later than three days</h2>
+  <p>
+    Once the cancellation period has passed, a signed contract is a contract. If your plans change
+    anyway, tell us as early as you can and we will settle it fairly rather than argue about it. In
+    practice that means you pay for the work already carried out and for materials bought or cut
+    specifically for your job that cannot be returned, and anything you have paid beyond that comes
+    back to you. We put the arithmetic in writing before we settle, with the supplier receipts
+    attached.
+  </p>
+  <p>
+    If there is a particular arrangement you want, for example a fixed cancellation fee or a
+    deadline for confirming a material choice, ask for it to be written into the contract before you
+    sign. Then it is in black and white for both of us.
+  </p>
+
+  <h2 class={PROSE.h2}>If we are the ones who cancel</h2>
+  <p>
+    Sometimes a job cannot go ahead: a subfloor turns out to need work outside a flooring license, a
+    material is discontinued, a schedule collapses. If we cancel, you get every payment back in
+    full, within the same ten days, and we tell you why in writing. We return money the way you paid
+    it wherever we can, and by check or bank transfer where we cannot.
+  </p>
+
+  <h2 class={PROSE.h2}>If you are not happy with the finished work</h2>
+  <p>
+    Call us first. We would far rather come and look at it than have you take it anywhere else, and
+    most things are quicker to put right than to argue about. If we cannot sort it out between us,
+    California gives you a route that does not depend on our goodwill.
+  </p>
+  <ul class={PROSE.ul}>
+    <li>
+      <strong class={PROSE.strong}>The Contractors State License Board.</strong> CSLB is the state
+      agency that licenses and regulates contractors, and it investigates complaints against them.
+      Write to Contractors State License Board, P.O. Box 26000, Sacramento, CA 95826, call{' '}
+      <span class="whitespace-nowrap">800-321-CSLB (2752)</span>, or start at{' '}
+      <a href="https://www.cslb.ca.gov/" target="_blank" rel="noopener" class={PROSE.a}>cslb.ca.gov</a>.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>The deadlines.</strong> A complaint about something you can see
+      has to reach CSLB within four years of the work. For a hidden structural defect the window is
+      ten years.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>Our bond.</strong> We hold the {c.site.bondAmount} contractor
+      bond the state requires, with {c.site.bondSurety}. It exists so a homeowner who is harmed by a
+      licensed contractor has something to claim against, and it is listed on our{' '}
+      <a
+        href={`https://www.cslb.ca.gov/OnlineServices/CheckLicenseII/LicenseDetail.aspx?LicNum=${c.site.licenseNumber}`}
+        target="_blank"
+        rel="noopener"
+        class={PROSE.a}
+      >CSLB license record</a>, along with every complaint the board is allowed to publish.
+    </li>
+  </ul>
+
+  <h2 class={PROSE.h2}>What this page is</h2>
+  <p>
+    A plain summary, so that you know what to expect before anyone knocks on your door. It is not
+    the contract and it is not legal advice. The contract you sign contains the terms for your
+    project, including the payment schedule, the cancellation notice, the mechanics lien warning and
+    a statement of what insurance we carry. Where this page and your contract differ, your contract
+    governs, and neither one can take away a right California law gives you.
+  </p>
+  <p>
+    Questions before you sign anything are always welcome. Call{' '}
+    <a href={c.site.phoneHref} class={PROSE.a}>{c.site.phone}</a>, {c.site.hours}.
+  </p>
+</Legal>

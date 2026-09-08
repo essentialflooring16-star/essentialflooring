@@ -1,0 +1,116 @@
+---
+// Shared frame for the legal pages: privacy, cookies, terms, cancellations.
+//
+// One heading style, one date line, one nav between the four, one identity
+// block at the end. A page written against this layout only has to supply its
+// prose, which is what keeps the four of them consistent with each other and
+// with the rest of the site.
+import Base from './Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { LEGAL_PAGES, PROSE } from '../lib/legal';
+import { getContent } from '../lib/content';
+
+interface Props {
+  /** Browser title, without the brand suffix. */
+  title: string;
+  /** Meta description. Say what the page answers, not that it is a legal page. */
+  description: string;
+  /** The visible page heading, usually the same as the nav label. */
+  heading: string;
+  /** One or two sentences under the heading, before the sections. */
+  lead: string;
+  /** Human date, e.g. "September 9, 2026". Change it whenever the text changes. */
+  effective: string;
+  /** Path of this page, so it is marked as current in the nav. */
+  path: string;
+}
+
+const { title, description, heading, lead, effective, path } = Astro.props;
+const c = await getContent();
+---
+
+<Base title={`${title} | Essential Flooring`} description={description}>
+  <section class="pt-10 pb-20">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6">
+      <Breadcrumbs crumbs={[{ label: heading }]} />
+
+      <h1 class="mt-8 font-display font-semibold text-4xl leading-[1.1] tracking-tight text-fg">
+        {heading}
+      </h1>
+      <p class="mt-3 text-[14px] text-fg-muted">Effective {effective}</p>
+      <p class="mt-6 text-[17px] leading-relaxed text-fg-body">{lead}</p>
+
+      <nav aria-label="Legal pages" class="mt-8 flex flex-wrap gap-2">
+        {LEGAL_PAGES.map((p) => (
+          <a
+            href={p.href}
+            aria-current={p.href === path ? 'page' : undefined}
+            class={`rounded-btn border px-3.5 py-2 text-[13.5px] font-medium transition-colors ${
+              p.href === path
+                ? 'border-accent-display bg-accent-wash text-accent-on-light'
+                : 'border-hairline bg-surface-raised text-fg-muted hover:border-accent-display hover:text-fg'
+            }`}
+          >
+            {p.label}
+          </a>
+        ))}
+      </nav>
+
+      <div class="mt-10 space-y-6 text-[15.5px] leading-relaxed text-fg-body">
+        <slot />
+      </div>
+
+      <!-- Who you are actually dealing with. Every value is on the public
+           record: the CSLB license detail page for 1117565, and the Google
+           Business Profile. -->
+      <div class="mt-14 rounded-card border border-hairline bg-surface-sunken p-6 sm:p-8">
+        <h2 class="font-display font-semibold text-xl text-fg">Who runs this website</h2>
+        <dl class="mt-4 grid sm:grid-cols-2 gap-x-8 gap-y-3 text-[15px]">
+          <div>
+            <dt class="text-[13px] uppercase tracking-[0.14em] text-fg-muted">Business</dt>
+            <dd class="mt-0.5 text-fg">{c.site.legalName}, a {c.site.entity}</dd>
+          </div>
+          <div>
+            <dt class="text-[13px] uppercase tracking-[0.14em] text-fg-muted">Owner</dt>
+            <dd class="mt-0.5 text-fg">{c.site.founder}</dd>
+          </div>
+          <div>
+            <dt class="text-[13px] uppercase tracking-[0.14em] text-fg-muted">State license</dt>
+            <dd class="mt-0.5 text-fg">
+              {c.site.license}, class {c.site.licenseClass}
+              <span class="block text-fg-muted text-[14px]">
+                Issued {c.site.licenseIssued}, current through {c.site.licenseExpires}.
+                <a
+                  href={`https://www.cslb.ca.gov/OnlineServices/CheckLicenseII/LicenseDetail.aspx?LicNum=${c.site.licenseNumber}`}
+                  target="_blank"
+                  rel="noopener"
+                  class={PROSE.a}
+                >Check it on the CSLB website</a>.
+              </span>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-[13px] uppercase tracking-[0.14em] text-fg-muted">Contractor bond</dt>
+            <dd class="mt-0.5 text-fg">{c.site.bondAmount}, {c.site.bondSurety}</dd>
+          </div>
+          <div>
+            <dt class="text-[13px] uppercase tracking-[0.14em] text-fg-muted">Address</dt>
+            <dd class="mt-0.5 text-fg">
+              {c.site.address.locality}, {c.site.address.region} {c.site.address.postalCode}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-[13px] uppercase tracking-[0.14em] text-fg-muted">How to reach us</dt>
+            <dd class="mt-0.5 text-fg">
+              <a href={c.site.phoneHref} class={PROSE.a}>{c.site.phone}</a>
+              <span class="block break-all">
+                <a href={`mailto:${c.site.email}`} class={PROSE.a}>{c.site.email}</a>
+              </span>
+              <span class="block text-fg-muted text-[14px]">{c.site.hours}</span>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -108,11 +108,11 @@ export const acasa: ContentField[] = [
     label: { ro: 'Cele patru fapte de sub fotografie', en: 'The four facts under the photo' },
     help: {
       ro: 'Rândul de patru fapte de sub poza mare. Titlul e scris îngroșat, detaliul apare sub el. {license} se completează singur cu licența din Datele firmei, iar {cities} cu numărul de orașe deservite, deci lasă-le în text. Ține fiecare rând sub cinci cuvinte, altfel faptele nu mai stau aliniate.',
-      en: 'The row of four facts under the large photo. The title is in bold, the detail sits under it. {license} fills in automatically with the licence from Business details, and {cities} with the number of cities served, so leave them in the text. Keep each line under five words, otherwise the facts stop lining up.',
+      en: 'The row of four facts under the large photo. The title is in bold, the detail sits under it. {license} fills in automatically with the license from Business details, and {cities} with the number of cities served, so leave them in the text. Keep each line under five words, otherwise the facts stop lining up.',
     },
     type: 'pairs',
     default:
-      '[{"title":"Licensed & insured","text":"{license}"},{"title":"Mon to Sat","text":"7 AM to 7 PM"},{"title":"{cities} cities and areas","text":"across Northern California"},{"title":"Free estimates","text":"written, no hidden fees"}]',
+      '[{"title":"Licensed & bonded","text":"{license}"},{"title":"Mon to Sat","text":"7 AM to 7 PM"},{"title":"{cities} cities and areas","text":"across Northern California"},{"title":"Free estimates","text":"written, no hidden fees"}]',
     page: '/',
     required: true,
   },
@@ -267,7 +267,7 @@ export const acasa: ContentField[] = [
       en: 'The heading on the left, above the four ticked reasons. Past two lines it sits too close to the first tick.',
     },
     type: 'text',
-    default: 'Licensed, insured and owner operated',
+    default: 'Licensed, bonded and owner operated',
     page: '/',
     softMax: 46,
     required: true,
@@ -279,11 +279,11 @@ export const acasa: ContentField[] = [
     label: { ro: 'Cele patru motive', en: 'The four reasons' },
     help: {
       ro: 'Fiecare motiv are un titlu scurt și o explicație de un rând, două. {license} se completează singur cu licența din Datele firmei, deci las-o în text. Patru motive încap fără să lungească pagina.',
-      en: 'Each reason has a short title and a one or two line explanation. {license} fills in automatically with the licence from Business details, so leave it in the text. Four reasons fit without stretching the page.',
+      en: 'Each reason has a short title and a one or two line explanation. {license} fills in automatically with the license from Business details, so leave it in the text. Four reasons fit without stretching the page.',
     },
     type: 'pairs',
     default:
-      '[{"title":"California licensed contractor","text":"We operate under {license}, fully insured. You are protected, and the work is up to code."},{"title":"Transparent quotes","text":"Your written estimate spells out materials, labor and timeline. The price we quote is the price you pay."},{"title":"On-time completion","text":"Flooring work disrupts your routine, so we plan carefully and finish when we said we would."},{"title":"Prep work done properly","text":"Old flooring out, subfloor levelled and cleaned, moisture checked. The part you never see is what keeps a floor flat."}]',
+      '[{"title":"California licensed contractor","text":"We operate under {license}, with a $25,000 contractor bond filed with the state. You can look up both on the CSLB website."},{"title":"Transparent quotes","text":"Your written estimate spells out materials, labor and timeline. The price you approve is the price you pay, and anything unexpected is agreed with you first."},{"title":"On-time completion","text":"Flooring work disrupts your routine, so we plan carefully and finish when we said we would."},{"title":"Prep work done properly","text":"Old flooring out, subfloor levelled and cleaned, moisture checked. The part you never see is what keeps a floor flat."}]',
     page: '/',
     required: true,
   },

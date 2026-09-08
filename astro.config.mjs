@@ -8,7 +8,11 @@ export default defineConfig({
   integrations: [
     react(),
     sitemap({
-      filter: (page) => !page.includes('/admin') && !page.includes('/privacy-policy'),
+      // Only the admin cabinet stays out. The four legal pages used to be
+      // excluded along with it, which meant the one part of the site a
+      // suspicious homeowner goes looking for was the hardest to find. They are
+      // ordinary public pages now, indexable and in the sitemap.
+      filter: (page) => !page.includes('/admin'),
     }),
   ],
   vite: {

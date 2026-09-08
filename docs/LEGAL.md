@@ -1,0 +1,207 @@
+# Partea juridică a site-ului
+
+Ce s-a verificat, ce s-a schimbat și ce a rămas de confirmat cu Alex.
+Data reviziei: **9 septembrie 2026**.
+
+---
+
+## 1. Faptele verificate la sursă
+
+Toate valorile din `src/data/site.ts` care spun ceva despre firmă vin de aici,
+nu din memorie. Dacă se schimbă una, se schimbă și pagina care o afișează.
+
+**Registrul CSLB**, licența 1117565
+(https://www.cslb.ca.gov/OnlineServices/CheckLicenseII/LicenseDetail.aspx?LicNum=1117565):
+
+| Ce scrie acolo | Valoare |
+| --- | --- |
+| Denumire | ESSENTIAL FLOORING INC |
+| Adresă | 7733 Borthwick Way, Antelope, CA 95843 |
+| Telefon | (916) 425-1361 |
+| Tip | Corporation |
+| Emisă | 03/07/2024 |
+| Expiră | 03/31/2028 |
+| Stare | current and active |
+| Clasificare | **C15, Flooring and Floor Covering** |
+| Garanție (bond) | 25.000 $, Western Surety, nr. 67661394, din 20.02.2026 |
+| Asigurare de accidente de muncă | **scutit**, a declarat că nu are angajați |
+
+**Fișa Google (Google Business Profile)**: adresa publicată acolo este
+**8020 Walerga Rd, Antelope, CA 95843**, ratingul 5,0 din 18 recenzii, site-ul
+trecut în fișă este încă cel vechi, `essentialflooring.pro`.
+
+**Registrul comerțului (California SOS)**: firma apare înregistrată la
+**22 mai 2023**, deci „Founded 2023" de pe site se susține.
+
+---
+
+## 2. Ce s-a scos de pe site și de ce
+
+### „Insured" → „Bonded"
+
+Nicăieri, în niciun registru public, nu scrie că firma are asigurare de
+răspundere civilă (general liability). CSLB nu urmărește asta, iar Alex nu a
+trimis niciodată un certificat, deși i s-a cerut încă din august. Site-ul
+scria „Licensed & Insured" în **peste 40 de locuri**, inclusiv pe cele 25 de
+pagini de oraș.
+
+S-a înlocuit peste tot cu **„Licensed & Bonded"**, plus garanția de 25.000 $
+scrisă explicit acolo unde era o frază întreagă. Asta e verificabil de oricine
+în 30 de secunde pe site-ul CSLB, și e exact cuvântul pe care îl caută un
+proprietar de casă.
+
+**Ca să pui „insured" înapoi** (după ce Alex trimite certificatul, o poză pe
+WhatsApp e de ajuns):
+
+1. `src/data/site.ts`, câmpul `insured: false` → `true` și scrie în comentariu
+   de la cine e polița și până când e valabilă.
+2. Caută în tot proiectul `bonded` și `Bonded` și pune la loc formularea care
+   îți place, în perechi: textul din pagină **și** valoarea implicită din
+   `src/data/content/*.ts`, altfel `node scripts/check-content.mjs` pică.
+3. Întrebarea din FAQ (`src/data/faq.json` și `src/data/content/despre-contact.ts`)
+   e scrisă cu grijă, o rescrii o singură dată în ambele fișiere.
+
+### „Tile installation" → „Vinyl and resilient tile installation"
+
+Clasificarea C-15 acoperă „carpet, resilient sheet goods, resilient tile, wood
+floors ... **except ceramic tile**" (16 CCR 832.15). Gresia și mozaicul sunt
+C-54, altă licență. Iar B&P 7027.1 spune că e **infracțiune** (misdemeanor) să
+faci reclamă pentru lucrări în afara clasificării pe care o ai.
+
+Site-ul scria „Tile installation" în lista de servicii, în `knowsAbout` din
+datele structurate și într-un card de pe pagina de servicii. Peste tot scrie
+acum „vinyl and resilient tile", ceea ce **este** în C-15. Demontarea gresiei
+vechi a rămas, aia e demolare, nu montaj.
+
+Dacă Alex chiar montează gresie, are nevoie de C-54. Până atunci nu se face
+reclamă la ea nicăieri: nici pe site, nici pe Facebook (unde textul lui actual
+zice „carpet to tile"), nici pe Google.
+
+### Promisiunea „prețul din ofertă e prețul pe care îl plătești"
+
+Apărea în patru locuri, fără nicio excepție scrisă. La pardoseli, o problemă
+sub podeaua veche schimbă prețul, e normal. Acum scrie „prețul pe care îl
+aprobi e prețul pe care îl plătești, iar orice apare neprevăzut se agreează cu
+tine înainte să continuăm", ceea ce e și adevărat, și liniștitor.
+
+### Datele structurate cu recenzii (AggregateRating + Review)
+
+Scoase din `src/pages/reviews.astro`. Regula Google: dacă entitatea recenzată
+controlează recenziile despre ea, pagina **nu e eligibilă** pentru stele în
+rezultate, iar marcajul poate atrage o penalizare manuală pentru „spammy
+structured data". Recenziile rămân pe pagină, întregi, cu link la fișa Google.
+Stelele din Google vin oricum din fișa lui, nu din site.
+
+### Adresa
+
+`addressLocality` era „Sacramento". Firma e în **Antelope** și în registrul
+CSLB, și în fișa Google. S-a corectat în `site.ts`, în datele structurate (cu
+cod poștal), în subsol și în emailul de lead. Textul de marketing rămâne
+„serving the greater Sacramento area", care e adevărat.
+
+**Strada nu e publicată.** Cele două registre dau două adrese diferite
+(Borthwick la CSLB, Walerga la Google) și una dintre ele e probabil casa lui.
+De întrebat pe Alex care e cea bună înainte de a o pune pe site. Dacă o punem,
+trebuie să fie **identică** cu cea din fișa Google, altfel strică semnalul
+local NAP.
+
+---
+
+## 3. Recenziile sunt reale, nu s-a șters niciuna
+
+Verificate una câte una pe Google Maps: Priyanka, Jason Tan, Emanuel Gana și
+restul apar acolo cuvânt cu cuvânt, cu răspunsurile lui Alex sub ele. Fișa are
+5,0 din 18 recenzii, site-ul arată 17. Nu e nimic fabricat, deci nu s-a șters
+nimic. S-a adăugat în schimb o frază care spune de unde vin și că niciuna nu a
+fost ascunsă pentru că nu ne-a plăcut, ceea ce e exact ce cere regula FTC
+16 CFR 465.
+
+Când Alex mai primește recenzii, se lipesc în cabinet, la Recenzii.
+
+---
+
+## 4. Cookie-uri: nu e nevoie de banner
+
+Măsurat pe site-ul live, cu browser real, derulând pagina până jos:
+
+- gazde contactate: `essentialflooringinc.com`, `dddtuvwqltjbtdaxcryp.supabase.co`
+  (statistica noastră) și `www.google.com` (harta);
+- **cookie-uri puse: zero**;
+- `sessionStorage`: o singură cheie, `ef_sid`, care dispare la închiderea filei;
+- `localStorage`: gol.
+
+Harta, încărcată separat, cheamă `maps.googleapis.com` și `maps.gstatic.com`
+și nu a pus niciun cookie în testul nostru, dar cererile duc oricum IP-ul
+vizitatorului la Google.
+
+Bannerele de cookie-uri vin din dreptul european, care cere consimțământ
+*înainte*. Firma e din California și lucrează pentru proprietari din regiunea
+Sacramento, nu se adresează Uniunii Europene. Legea aplicabilă este cea din
+California: CalOPPA cere o politică publicată (o avem), iar CCPA/CPRA
+funcționează pe principiul opt-out din vânzarea datelor, iar noi nu vindem
+nimic. **Deci nu, nu trebuie banner.** Explicația stă scrisă pe
+`/cookie-policy/`, ca să nu mai fie întrebarea pusă a doua oară.
+
+Dacă vreodată apare Google Analytics, un pixel de Facebook sau un chat, situația
+se schimbă și trebuie recitită pagina asta.
+
+---
+
+## 5. Formularul
+
+Colectează strict: nume și telefon (obligatorii), email, oraș, serviciu și
+mesaj (opționale). Plus un hash SHA-256 cu cheie al IP-ului, doar pentru
+limitarea trimiterilor, care nu se poate întoarce în IP.
+
+S-a adăugat o **bifă obligatorie** de consimțământ. Propoziția bifată se scrie
+o singură dată în `ContactForm.astro`, ajunge la server prin `data-consent-text`
+și se scrie în emailul de lead, ca să existe dovada a *ce* s-a acceptat, nu
+doar că s-a acceptat ceva. Verificat în browser: formularul nu se trimite fără
+bifă, iar corpul cererii conține `consent` și `consentText`.
+
+Consimțământul **nu** se scrie în tabelul `leads`, fiindcă tabelul nu are
+coloană pentru el și un câmp necunoscut ar face insertul să pice cu PGRST204,
+adică s-ar pierde exact cererea. Dacă vrei să se salveze și în baza de date,
+rulează întâi asta în SQL Editor din Supabase:
+
+```sql
+alter table public.leads
+  add column if not exists consent_text text,
+  add column if not exists consent_at timestamptz;
+```
+
+și abia apoi adaugă `consent_text` și `consent_at` în obiectul trimis către
+`leads` din `api/contact.ts`. În ordinea asta, nu invers.
+
+---
+
+## 6. Poze și fonturi
+
+- Pozele de lucrări sunt ale lui Alex. Nu apare nicio persoană identificabilă
+  și niciun număr de casă.
+- Cele 7 poze de stoc sunt de pe Pexels, licență comercială fără atribuire
+  obligatorie, listate cu fotograf și link în `docs/PHOTO-CREDITS.md`.
+  Verificate: niciuna nu arată o persoană identificabilă la față și niciuna nu
+  e prezentată drept lucrare de-a noastră, ceea ce acoperă cele două restricții
+  reale din licența Pexels.
+- Fonturile Archivo și Fraunces sunt sub SIL Open Font License 1.1, servite de
+  pe serverul nostru. Nu cer atribuire pe pagină.
+
+---
+
+## 7. Ce a rămas de făcut, în ordine
+
+1. **Certificatul de asigurare de la Alex.** O poză pe WhatsApp. Până atunci
+   site-ul nu are voie să scrie „insured".
+2. **Anul înființării.** Site-ul zice 2023 (și registrul comerțului la fel),
+   dar descrierea din fișa lui Google zice „Founded in 2024". Una dintre ele
+   trebuie schimbată, și e mai simplu să schimbe el textul din Google.
+3. **Site-ul din fișa Google** e încă `essentialflooring.pro`. De pus
+   `essentialflooringinc.com`.
+4. **Gresia.** Dacă o montează, îi trebuie C-54. Dacă nu, textul de pe
+   Facebook („carpet to tile") ar trebui schimbat și acolo.
+5. **Strada**, dacă vrea să apară pe site. Vezi punctul 2 de mai sus.
+6. **Contractul.** Paginile de pe site descriu corect ce cere legea, dar
+   contractul propriu-zis e treaba lui: scris, semnat, cu formularul de
+   anulare în două exemplare, plafonul de avans, graficul de plăți și
+   declarația despre asigurare. CSLB are un model gata făcut.

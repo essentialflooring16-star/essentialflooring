@@ -42,35 +42,26 @@ const heroPhoto = photoById('stairs-15');
 const proofPhotos = ['hardwood-refinishing-01', 'lvp-vinyl-01', 'stairs-01'].map(photoById);
 
 const facts = [
-  { icon: 'shield', title: 'Licensed and insured', text: c.site.license },
+  { icon: 'shield', title: 'Licensed and bonded', text: c.site.license },
   { icon: 'hammer', title: `Founded ${c.site.founded}`, text: `${c.site.experienceYears}+ years of hands-on experience` },
   { icon: 'ruler', title: 'Free written estimates', text: 'no hidden fees' },
 ] as const;
 
-// AggregateRating is only emitted when real reviews exist. Publishing a rating
-// with nothing behind it would be a fabricated claim.
-const schema = summary
-  ? [{
-      '@context': 'https://schema.org',
-      '@type': 'LocalBusiness',
-      '@id': `${c.site.domain}/#business`,
-      name: c.site.legalName,
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: summary.average,
-        reviewCount: summary.count,
-        bestRating: 5,
-        worstRating: 1,
-      },
-      review: reviews.slice(0, 10).map((r) => ({
-        '@type': 'Review',
-        author: { '@type': 'Person', name: r.author },
-        reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5, worstRating: 1 },
-        reviewBody: r.text,
-        ...(r.date ? { datePublished: r.date } : {}),
-      })),
-    }]
-  : [];
+// No AggregateRating, and no Review markup, on purpose.
+//
+// These reviews are real: every one of them is on the Google Business Profile,
+// word for word, and the page says so. But Google's own rule for review
+// snippets is that "if the entity that's being reviewed controls the reviews
+// about itself", a LocalBusiness or Organization page is not eligible for the
+// star feature. Reviews republished by the business on the business's own site
+// are exactly that case, so marking them up would be ineligible markup at best
+// and a manual action for spammy structured data at worst. The stars a
+// searcher sees for Essential Flooring should come from Google's own copy of
+// the profile, which already carries them.
+//
+// Nothing is lost by leaving it out: the reviews stay on the page, in full,
+// with the profile linked next to them.
+const schema: unknown[] = [];
 ---
 
 <Base
@@ -117,8 +108,15 @@ const schema = summary
               </span>
               <span class="text-[15px] font-semibold text-fg">{summary.average.toFixed(1)}</span>
               <span class="text-[14px] text-fg-muted">
-                from {summary.count} Google {summary.count === 1 ? 'review' : 'reviews'}
+                across {summary.count} Google {summary.count === 1 ? 'review' : 'reviews'}
               </span>
+            </p>
+          )}
+          {summary && (
+            <p class="mt-4 max-w-lg text-[13.5px] leading-relaxed text-fg-muted">
+              Reproduced in full and unedited. We did not write them, we do not pay for them, and
+              none has been left out because we did not like it. New ones show on the profile
+              before they show here.
             </p>
           )}
         </div>

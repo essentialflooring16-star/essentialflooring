@@ -8,14 +8,36 @@ export const SITE = {
   phoneSchema: '+1-916-425-1361',
   email: 'essentialflooring16@gmail.com',
   license: 'CSLB #1117565',
+  // Everything in this block is checkable by anyone, on the CSLB public record
+  // for license 1117565 (cslb.ca.gov, Check A License). Read on 9 September
+  // 2026. Nothing on the site may claim a credential that is not here.
+  licenseNumber: '1117565',
+  licenseClass: 'C-15, Flooring and Floor Covering',
+  licenseIssued: 'March 7, 2024',
+  licenseExpires: 'March 31, 2028',
+  bondAmount: '$25,000',
+  bondSurety: 'Western Surety Company',
+  entity: 'California corporation',
+  // Workers' compensation: exempt on the CSLB record, certified as having no
+  // employees. General liability insurance is NOT on any public record and the
+  // client has never sent a certificate, so the site says "bonded", not
+  // "insured". When a certificate of insurance arrives, flip this to true and
+  // put the word back in the places listed in docs/LEGAL.md.
+  insured: false,
   founded: 2023,
   founder: 'Alexandru Szep',
   experienceYears: 5, // rendered with a '+' suffix; keep numeric for the count-up
   hours: 'Monday to Saturday, 7 AM to 7 PM',
   hoursSchema: 'Mo-Sa 07:00-19:00',
+  // The business sits in Antelope, which is what both the CSLB record and the
+  // Google Business Profile say. Earlier this read "Sacramento", which was the
+  // marketing region rather than the address, and it disagreed with both
+  // public records. The street number is deliberately not published here; see
+  // docs/LEGAL.md.
   address: {
-    locality: 'Sacramento',
+    locality: 'Antelope',
     region: 'CA',
+    postalCode: '95843',
     country: 'US',
   },
   instagram: 'https://www.instagram.com/essentialflooring16',
@@ -68,7 +90,7 @@ export const ALL_SERVICES = [
   'Hardwood refinishing',
   'LVP installation',
   'Laminate installation',
-  'Tile installation',
+  'Vinyl and resilient tile installation',
   'Linoleum installation',
   'Carpet installation',
   'Stairs installation',

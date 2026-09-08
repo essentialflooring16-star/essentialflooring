@@ -1,194 +1,201 @@
 ---
-import Base from '../layouts/Base.astro';
-import Breadcrumbs from '../components/Breadcrumbs.astro';
+// Privacy policy.
+//
+// The text describes exactly what the code does: api/contact.ts, lib/analytics.ts,
+// lib/vitals.ts and the Google map in index.astro and service-areas/index.astro.
+// If the data flow changes, this page changes with it, and so does the date.
+import Legal from '../layouts/Legal.astro';
+import { PROSE } from '../lib/legal';
 import { getContent } from '../lib/content';
 
 const c = await getContent();
-
-// Textul de mai jos descrie exact ce face codul (api/contact.ts, lib/analytics.ts,
-// lib/vitals.ts, harta Google din index.astro). Daca se schimba fluxul de date,
-// se schimba si pagina asta, impreuna cu data de mai jos.
-const effectiveDate = 'September 2, 2026';
-
-const h2 = 'font-display font-semibold text-2xl text-fg pt-4';
-const h3 = 'font-display font-semibold text-xl text-fg pt-1';
-const list = 'list-disc pl-5 space-y-2 marker:text-accent-display';
-const link =
-  'text-accent-on-light font-medium underline underline-offset-4 decoration-1 hover:text-fg transition-colors';
+const effective = 'September 9, 2026';
 ---
 
-<Base
-  title="Privacy Policy | Essential Flooring"
-  description="What Essential Flooring Inc collects through this website, who handles it on our behalf, how long it is kept, and how to ask for a copy or deletion."
-  noindex
+<Legal
+  title="Privacy Policy"
+  description="What Essential Flooring collects through this website, who handles it on our behalf, how long it is kept, and how to ask for a copy or a deletion."
+  heading="Privacy Policy"
+  lead="We collect the least we can get away with: what you type into the estimate form, so that we can answer it. No advertising trackers, no data sold to anyone, no profile built about you."
+  effective={effective}
+  path="/privacy-policy/"
 >
-  <section class="pt-10 pb-20">
-    <div class="mx-auto max-w-3xl px-4 sm:px-6">
-      <Breadcrumbs crumbs={[{ label: 'Privacy Policy' }]} />
-      <h1 class="mt-8 font-display font-semibold text-4xl leading-[1.1] tracking-tight text-fg">
-        Privacy Policy
-      </h1>
-      <p class="mt-3 text-[14px] text-fg-muted">Effective {effectiveDate}</p>
+  <h2 class={PROSE.h2}>The short version</h2>
+  <ul class={PROSE.ul}>
+    <li>We collect what you type into the estimate form, and nothing else about you personally.</li>
+    <li>
+      The site sets no cookies. The one exception is the map on our home page and service areas
+      page, which is served by Google and covered in our{' '}
+      <a href="/cookie-policy/" class={PROSE.a}>Cookie Policy</a>.
+    </li>
+    <li>We never sell your information and never pass it to advertisers.</li>
+    <li>We do not add you to a mailing list. We answer your request, and that is the end of it.</li>
+    <li>Email or call us and we will show you what we have, fix it, or delete it.</li>
+  </ul>
 
-      <div class="mt-8 space-y-6 text-[15.5px] leading-relaxed text-fg-body">
-        <p>
-          This website is operated by {c.site.legalName}, a licensed flooring contractor in
-          Sacramento, California ({c.site.license}). This page explains what the site collects,
-          why, who handles it on our behalf, and how to ask us to show, correct or delete it.
-          We collect the minimum needed to answer your estimate request.
-        </p>
+  <h2 class={PROSE.h2}>What we collect and why</h2>
 
-        <h2 class={h2}>The short version</h2>
-        <ul class={list}>
-          <li>We collect what you type into the estimate form, and nothing else about you personally.</li>
-          <li>The site sets no cookies. The one exception is the map on our home page and service areas page, which is served by Google.</li>
-          <li>We never sell your information or pass it to advertisers.</li>
-          <li>Email or call us and we will show you what we have, fix it, or delete it.</li>
-        </ul>
+  <h3 class={PROSE.h3}>Your estimate request</h3>
+  <p>
+    When you send the form on our contact page we receive your name, your phone number, and, if you
+    choose to fill them in, your email address, your city, the service you are interested in and
+    whatever you write about the project. Only the name and the phone number are required, because
+    without them we cannot call you back. We use these details to get back to you, arrange a site
+    visit and prepare your quote. We do not use them for marketing and we do not use them to
+    advertise to you anywhere else.
+  </p>
+  <p>
+    We also record the fact that you ticked the consent box, and when. That record exists so that
+    both of us can see what you agreed to, and it is stored with your request.
+  </p>
+  <p>
+    The form measures how long it was open before you pressed send, and it contains a hidden field
+    that real visitors never see. Both exist only to filter out spam robots and tell us nothing
+    about you.
+  </p>
 
-        <h2 class={h2}>What we collect and why</h2>
+  <h3 class={PROSE.h3}>Your IP address, in hashed form</h3>
+  <p>
+    To stop one person from flooding the form, our server counts how many requests arrive from the
+    same internet connection within ten minutes. It does this with a one way hash, SHA-256 with a
+    secret key, of your IP address, so the stored value cannot be turned back into your address. The
+    hash is stored separately from your request, and the counter clears itself. We do not store the
+    plain IP address.
+  </p>
 
-        <h3 class={h3}>Your estimate request</h3>
-        <p>
-          When you send the form on our contact page we receive your name, phone number, email
-          address (optional), city, the service you are interested in and whatever you write
-          about the project. We use these details only to get back to you, arrange a site visit
-          and prepare your quote.
-        </p>
-        <p>
-          The form also records how long it was open before you pressed send, and it contains a
-          hidden field that real visitors never see. Both exist only to filter out spam robots
-          and tell us nothing about you.
-        </p>
+  <h3 class={PROSE.h3}>Site measurement, without cookies</h3>
+  <p>
+    To see which pages people read and how fast the site loads, our own pages send a small report to
+    our database: the page address, the domain of the site that linked you here if there was one,
+    whether you are on a phone, tablet or desktop, and a few speed measurements. The report carries
+    a random session number that your browser keeps only until you close the tab. It is not a cookie
+    and it is not linked to your name, phone, email or IP address. We use no Google Analytics, no
+    advertising pixels and no social media tracking.
+  </p>
 
-        <h3 class={h3}>Your IP address, in hashed form</h3>
-        <p>
-          To stop one person from flooding the form, our server counts how many requests arrive
-          from the same internet connection within ten minutes. It does this with a one-way hash
-          (SHA-256 with a secret key) of your IP address, so the stored value cannot be turned
-          back into your address. The hash is stored separately from your request. We do not
-          store the plain IP address.
-        </p>
+  <h3 class={PROSE.h3}>Hosting logs</h3>
+  <p>
+    Like every website, ours runs on servers that keep standard technical logs: the page requested,
+    the time, your IP address and browser type. Our hosting provider keeps these for security and
+    troubleshooting.
+  </p>
 
-        <h3 class={h3}>Site measurement, without cookies</h3>
-        <p>
-          To see which pages people read and how fast the site loads, our own pages send a small
-          report to our database: the page address, the domain of the site that linked you here
-          (if any), whether you are on a phone, tablet or desktop, and a few speed measurements.
-          The report carries a random session number that your browser keeps only until you
-          close the tab. It is not a cookie and it is not linked to your name, phone, email or
-          IP address. We use no Google Analytics, no advertising pixels and no social media
-          tracking.
-        </p>
+  <h3 class={PROSE.h3}>What we never ask for</h3>
+  <p>
+    There is no account to create on this site, no payment page and no upload. We never ask you here
+    for a date of birth, a social security number, a driver license number, bank or card details, or
+    anything about your household beyond the room you want floored. If a page ever appears to be
+    asking you for any of that in our name, it is not us. Call us on{' '}
+    <a href={c.site.phoneHref} class={PROSE.a}>{c.site.phone}</a> and tell us.
+  </p>
 
-        <h3 class={h3}>Hosting logs</h3>
-        <p>
-          Like every website, ours runs on servers that keep standard technical logs: the page
-          requested, the time, your IP address and browser type. Our hosting provider keeps
-          these for security and troubleshooting.
-        </p>
+  <h2 class={PROSE.h2}>Who handles your information</h2>
+  <p>
+    We do not share personal information with anyone except the companies that run parts of this
+    website for us. They process it only to provide their service to us and may not use it for their
+    own purposes.
+  </p>
+  <ul class={PROSE.ul}>
+    <li>
+      <strong class={PROSE.strong}>Supabase</strong> stores our database, including estimate
+      requests and the site measurements described above.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>Resend</strong> delivers each estimate request to our inbox as an
+      email. If you gave us an email address, it is set as the reply address so that our answer goes
+      straight to you.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>Vercel</strong> hosts the website, runs the code that receives
+      the form, and keeps the hosting logs described above.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>Google Maps</strong> provides the map of the Sacramento area on
+      our home page and service areas page. It loads only when it comes into view, and loading it
+      reaches google.com, maps.googleapis.com and maps.gstatic.com. Those requests carry your IP
+      address and the address of the page you are on. Whether Google uses that to build a picture of
+      you across other websites is governed by the Google privacy policy, not ours. We receive
+      nothing from it. There is more, including how to stop it, in our{' '}
+      <a href="/cookie-policy/" class={PROSE.a}>Cookie Policy</a>.
+    </li>
+  </ul>
+  <p>
+    Our pages also link to our Instagram, Facebook and Google profiles and offer a WhatsApp link for
+    messaging us. Following any of these takes you off our site and onto theirs, under their own
+    privacy terms. If you message us on WhatsApp, that conversation lives on WhatsApp, under the
+    terms you accepted with them.
+  </p>
 
-        <h2 class={h2}>Who handles your information</h2>
-        <p>
-          We do not share personal information with anyone except the companies that run parts
-          of this website for us. They process it only to provide their service to us and may
-          not use it for their own purposes.
-        </p>
-        <ul class={list}>
-          <li>
-            <strong class="font-semibold text-fg">Supabase</strong> stores our database,
-            including estimate requests and the site measurements described above.
-          </li>
-          <li>
-            <strong class="font-semibold text-fg">Resend</strong> delivers each estimate request
-            to our inbox as an email. If you gave us an email address, it is set as the reply
-            address so that our answer goes straight to you.
-          </li>
-          <li>
-            <strong class="font-semibold text-fg">Vercel</strong> hosts the website, runs the
-            code that receives the form, and keeps the hosting logs described above.
-          </li>
-          <li>
-            <strong class="font-semibold text-fg">Google Maps</strong> provides the map of the
-            Sacramento area on our home page and service areas page. It loads only when it comes into view. Once it
-            does, Google receives your IP address and the address of the page you are on, and it
-            may set its own cookies. Whether Google uses that to build a picture of you across
-            other websites is governed by Google's privacy policy, not ours. We receive nothing
-            from it.
-          </li>
-        </ul>
-        <p>
-          Our pages also link to our Instagram, Facebook and Google profiles and offer a WhatsApp
-          link for messaging us. Following any of these takes you off our site and onto theirs,
-          under their own privacy terms.
-        </p>
+  <h2 class={PROSE.h2}>No sale, no advertising</h2>
+  <p>
+    We do not sell personal information, we do not share it for cross context behavioral
+    advertising, and we have never done either. Apart from the Google map, no outside party collects
+    information about your activity on this site, and we do not allow anyone to track you over time
+    and across other websites.
+  </p>
+  <p>
+    California's Shine the Light law lets a customer ask a business whether it shared personal
+    information with third parties for their direct marketing. We have not, and we do not, so there
+    is nothing to disclose. Ask anyway if you like, and we will say so in writing.
+  </p>
 
-        <h2 class={h2}>No sale, no advertising</h2>
-        <p>
-          We do not sell personal information and we do not share it for advertising of any kind.
-          Apart from Google's map, no outside party collects information about your activity on
-          this site, and we do not allow anyone to track you over time and across other websites.
-        </p>
+  <h2 class={PROSE.h2}>How long we keep it</h2>
+  <ul class={PROSE.ul}>
+    <li>
+      <strong class={PROSE.strong}>Estimate requests</strong> are kept while we answer you, and then
+      as a business record, for example to prepare a quote or refer back to a job we completed. If
+      you ask us to delete yours, we remove it from our database and from our inbox.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>The spam counter</strong> holds a hashed IP address for a short
+      window and then deletes itself.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>Site measurements</strong> contain no personal information and
+      are kept as statistics.
+    </li>
+  </ul>
 
-        <h2 class={h2}>How long we keep it</h2>
-        <p>
-          Estimate requests are kept for as long as we need them to respond to you and as records
-          of our business, for example to prepare a quote or refer back to a job we completed. If
-          you ask us to delete your request, we remove it from our database and our inbox. Site
-          measurements contain no personal information and are kept as statistics.
-        </p>
+  <h2 class={PROSE.h2}>Your rights and how to use them</h2>
+  <p>You can ask us at any time to:</p>
+  <ul class={PROSE.ul}>
+    <li>tell you what information we hold about you,</li>
+    <li>correct something that is wrong,</li>
+    <li>delete your request entirely,</li>
+    <li>stop contacting you.</li>
+  </ul>
+  <p>
+    Email <a href={`mailto:${c.site.email}`} class={PROSE.a}>{c.site.email}</a> or call{' '}
+    <a href={c.site.phoneHref} class={PROSE.a}>{c.site.phone}</a>, {c.site.hours}. We may ask you to
+    confirm you are the person who sent the request, for example by writing from the same email
+    address or calling from the same phone number. There is no charge, and we will not treat you any
+    differently for asking.
+  </p>
+  <p>
+    {c.site.legalName} is a small local business and does not meet the size thresholds that bring a
+    company under the California Consumer Privacy Act, as amended by the CPRA. We honor the
+    requests above regardless.
+  </p>
 
-        <h2 class={h2}>Your rights and how to use them</h2>
-        <p>You can ask us at any time to:</p>
-        <ul class={list}>
-          <li>tell you what information we hold about you,</li>
-          <li>correct something that is wrong,</li>
-          <li>delete your request entirely.</li>
-        </ul>
-        <p>
-          Email <a href={`mailto:${c.site.email}`} class={link}>{c.site.email}</a> or call
-          <a href={c.site.phoneHref} class={link}>{c.site.phone}</a>, {c.site.hours}. We may ask you to
-          confirm you are the person who sent the request, for example by writing from the same
-          email address or calling from the same phone number. There is no charge, and we will
-          not treat you any differently for asking.
-        </p>
-        <p>
-          {c.site.legalName} is a small local business and does not meet the size thresholds that
-          bring a company under the California Consumer Privacy Act (CCPA, as amended by the
-          CPRA). We honor the requests above regardless.
-        </p>
+  <h2 class={PROSE.h2}>Do Not Track and Global Privacy Control</h2>
+  <p>
+    If your browser sends a Do Not Track signal, the page view and speed measurement described above
+    does not run at all. Because we do not sell or share personal information and do not track
+    visitors across other websites, there is nothing further for a Do Not Track or Global Privacy
+    Control signal to switch off.
+  </p>
 
-        <h2 class={h2}>Do Not Track and Global Privacy Control</h2>
-        <p>
-          If your browser sends a Do Not Track signal, the page-view and speed measurement
-          described above does not run at all. Because we do not sell or share personal
-          information and do not track visitors across other websites, there is nothing further
-          for a Do Not Track or Global Privacy Control signal to switch off.
-        </p>
+  <h2 class={PROSE.h2}>Children</h2>
+  <p>
+    This site is for homeowners and property managers and is not directed to anyone under 16. We do
+    not knowingly collect personal information from children. If you believe a child has sent us a
+    request, contact us and we will delete it.
+  </p>
 
-        <h2 class={h2}>Children</h2>
-        <p>
-          This site is for homeowners and property managers and is not directed to anyone under
-          16. We do not knowingly collect personal information from children. If you believe a
-          child has sent us a request, contact us and we will delete it.
-        </p>
-
-        <h2 class={h2}>Changes to this policy</h2>
-        <p>
-          If we change this policy, the new version is posted on this page with a new effective
-          date at the top. We do not keep visitor accounts or a mailing list, so this page is the
-          only place changes are announced. Please check it whenever you send us a request.
-        </p>
-
-        <h2 class={h2}>Contact</h2>
-        <p>
-          {c.site.legalName}, Sacramento, CA, {c.site.license}.
-          <br />
-          <a href={`mailto:${c.site.email}`} class={link}>{c.site.email}</a>
-          <br />
-          <a href={c.site.phoneHref} class={link}>{c.site.phone}</a>
-        </p>
-      </div>
-    </div>
-  </section>
-</Base>
+  <h2 class={PROSE.h2}>Changes to this policy</h2>
+  <p>
+    If we change this policy, the new version is posted on this page with a new effective date at
+    the top. We do not keep visitor accounts or a mailing list, so this page is the only place
+    changes are announced. Please check it whenever you send us a request.
+  </p>
+</Legal>

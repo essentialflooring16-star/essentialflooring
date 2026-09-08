@@ -47,7 +47,20 @@ const localBusiness = {
     '@type': 'PostalAddress',
     addressLocality: c.site.address.locality,
     addressRegion: c.site.address.region,
+    postalCode: c.site.address.postalCode,
     addressCountry: c.site.address.country,
+  },
+  // The state license, stated the way schema.org expects a professional
+  // credential. Every value here is on the CSLB public record.
+  hasCredential: {
+    '@type': 'EducationalOccupationalCredential',
+    credentialCategory: 'license',
+    name: `California contractor license ${c.site.licenseNumber}, ${c.site.licenseClass}`,
+    recognizedBy: {
+      '@type': 'GovernmentOrganization',
+      name: 'Contractors State License Board',
+      url: 'https://www.cslb.ca.gov/',
+    },
   },
   areaServed: AREA_SERVED,
   sameAs: [c.site.instagram, c.site.facebook, c.site.googleProfile],
@@ -56,7 +69,7 @@ const localBusiness = {
   founder: { '@type': 'Person', name: c.site.founder },
   knowsAbout: [
     'Hardwood floor refinishing', 'Hardwood installation', 'LVP flooring installation',
-    'Laminate flooring installation', 'Tile installation', 'Carpet installation',
+    'Laminate flooring installation', 'Vinyl and resilient tile installation', 'Carpet installation',
     'Stair installation and refinishing',
   ],
 };

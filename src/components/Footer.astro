@@ -15,7 +15,12 @@ const year = new Date().getFullYear();
         Licensed flooring contractor serving the greater Sacramento area.
         Hardwood refinishing, LVP, laminate and carpet, done right and on time.
       </p>
-      <p class="mt-4 text-[14px] text-fg-on-dark/60">Licensed &amp; Insured, {c.site.license}</p>
+      <p class="mt-4 text-[14px] text-fg-on-dark/60">
+        Licensed &amp; Bonded, {c.site.license}
+        <span class="block mt-1 text-[13px]">
+          {c.site.legalName}, a {c.site.entity}. License class {c.site.licenseClass}.
+        </span>
+      </p>
       <div class="mt-4 flex items-center gap-4">
         <a
           href={c.site.instagram}
@@ -84,7 +89,10 @@ const year = new Date().getFullYear();
             {c.site.email}
           </a>
         </li>
-        <li>Sacramento, California</li>
+        <li>
+          {c.site.address.locality}, {c.site.address.region} {c.site.address.postalCode}
+          <span class="block text-fg-on-dark/60">Serving the greater Sacramento area</span>
+        </li>
         <li class="text-fg-on-dark/60">Mon to Sat, 7 AM to 7 PM</li>
       </ul>
       <a
@@ -99,10 +107,13 @@ const year = new Date().getFullYear();
   <div class="border-t border-hairline-on-dark/10">
     <div class="mx-auto max-w-6xl px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[13px] text-fg-on-dark/70">
       <p>&copy; {year} {c.site.legalName}. All rights reserved.</p>
-      <div class="flex items-center gap-5">
+      <nav aria-label="Legal" class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
         <a href="/privacy-policy/" class="hover:text-fg-on-dark/80 transition-colors">Privacy Policy</a>
+        <a href="/cookie-policy/" class="hover:text-fg-on-dark/80 transition-colors">Cookie Policy</a>
+        <a href="/terms-of-use/" class="hover:text-fg-on-dark/80 transition-colors">Terms of Use</a>
+        <a href="/cancellation-and-refunds/" class="hover:text-fg-on-dark/80 transition-colors">Cancellations &amp; Refunds</a>
         <a href="/sitemap-index.xml" class="hover:text-fg-on-dark/80 transition-colors">Sitemap</a>
-      </div>
+      </nav>
     </div>
   </div>
 </footer>

@@ -175,7 +175,7 @@ export const zone: ContentField[] = [
     label: { ro: 'Titlul secțiunii de încredere', en: 'Heading of the trust section' },
     help: {
       ro: 'Ultimul titlu din corpul paginii de oraș, deasupra paragrafului cu licența și felul în care lucrați.',
-      en: 'The last heading in the body of a city page, above the paragraph about your licence and the way you work.',
+      en: 'The last heading in the body of a city page, above the paragraph about your license and the way you work.',
     },
     type: 'text',
     default: 'Why neighbors trust us',
@@ -353,8 +353,8 @@ export const CITY_FIELDS: CityField[] = [
     source: 'whyUs',
     label: { ro: 'De ce să vă aleagă', en: 'Why they should pick you' },
     help: {
-      ro: 'Ultimul paragraf înainte de întrebări: licența, asigurarea, felul în care lucrați și lăsați casa la sfârșitul zilei.',
-      en: 'The last paragraph before the questions: licence, insurance, the way you work and how you leave the house at the end of the day.',
+      ro: 'Ultimul paragraf înainte de întrebări: licența, garanția depusă, felul în care lucrați și lăsați casa la sfârșitul zilei.',
+      en: 'The last paragraph before the questions: license, bond, the way you work and how you leave the house at the end of the day.',
     },
     type: 'textarea',
   },

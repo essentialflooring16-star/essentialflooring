@@ -57,6 +57,8 @@ export type LeadEmail = {
   service: string;
   message: string;
   receivedAt?: string;
+  /** The exact sentence the visitor ticked on the form, if it came through. */
+  consentText?: string;
 };
 
 function esc(s: string): string {
@@ -102,7 +104,7 @@ function button(href: string, label: string, fill: string, text: string): string
 }
 
 export function leadEmailHtml(lead: LeadEmail): string {
-  const { name, phone, email, city, service, message, receivedAt } = lead;
+  const { name, phone, email, city, service, message, receivedAt, consentText } = lead;
 
   const rows = [
     row('Phone', `<a href="tel:${esc(telHref(phone))}" style="color:${C.ink};text-decoration:none;font-weight:700;">${esc(phone)}</a>`),
@@ -111,7 +113,10 @@ export function leadEmailHtml(lead: LeadEmail): string {
       : '',
     city ? row('City', esc(city)) : '',
     service ? row('Service', esc(service)) : '',
-    receivedAt ? row('Received', `<span style="color:${C.muted};">${esc(receivedAt)}</span>`, true) : '',
+    receivedAt ? row('Received', `<span style="color:${C.muted};">${esc(receivedAt)}</span>`, !consentText) : '',
+    consentText
+      ? row('Consent', `<span style="color:${C.muted};font-size:14px;">${esc(consentText)}</span>`, true)
+      : '',
   ]
     .filter(Boolean)
     .join('');
@@ -228,7 +233,7 @@ export function leadEmailHtml(lead: LeadEmail): string {
           <tr>
             <td class="pad" style="background-color:${C.green};border-radius:0 0 8px 8px;padding:22px 34px;">
               <p style="margin:0;font-family:${SANS};font-size:12px;line-height:1.7;color:${C.cream};opacity:0.92;">
-                Essential Flooring Inc &nbsp;&middot;&nbsp; Sacramento, CA &nbsp;&middot;&nbsp; CSLB #1117565
+                Essential Flooring Inc &nbsp;&middot;&nbsp; Antelope, CA &nbsp;&middot;&nbsp; CSLB #1117565
               </p>
               <p style="margin:6px 0 0 0;font-family:${SANS};font-size:11px;line-height:1.7;color:${C.cream};opacity:0.6;">
                 Sent automatically by essentialflooringinc.com.${email ? ' Hit reply and it goes straight to them.' : ''}
@@ -255,6 +260,7 @@ export function leadEmailText(lead: LeadEmail): string {
     lead.city ? `City:    ${lead.city}` : '',
     lead.service ? `Service: ${lead.service}` : '',
     lead.receivedAt ? `Received: ${lead.receivedAt}` : '',
+    lead.consentText ? `Consent: ${lead.consentText}` : '',
     lead.message ? `\nWhat they wrote:\n${lead.message}` : '',
     '',
     'Sent automatically by essentialflooringinc.com',
@@ -272,9 +278,11 @@ type Lead = {
   message?: string | null;
   company?: string; // honeypot
   elapsedMs?: number; // cat a stat pe formular inainte sa trimita
+  consent?: boolean;
+  consentText?: string; // propozitia bifata, exact cum a fost afisata
 };
 
-const MAX = { name: 120, phone: 40, email: 160, city: 80, service: 80, message: 3000 } as const;
+const MAX = { name: 120, phone: 40, email: 160, city: 80, service: 80, message: 3000, consent: 400 } as const;
 
 // Cate trimiteri acceptam de la acelasi IP intr-o fereastra de timp.
 const RATE_LIMIT = 4;
@@ -411,6 +419,11 @@ export default async function handler(req: Req, res: Res): Promise<void> {
   const city = cut(body.city, MAX.city);
   const service = cut(body.service, MAX.service);
   const message = cut(body.message, MAX.message);
+  // Consimtamantul se pune in email, NU in randul din tabelul `leads`: tabelul
+  // n-are coloana pentru el, iar un camp necunoscut face insertul sa pice cu
+  // PGRST204 si s-ar pierde exact cererea pe care voiam s-o pastram. SQL-ul
+  // pentru coloana, cand se ruleaza, e in docs/LEGAL.md.
+  const consentText = body.consent ? cut(body.consentText, MAX.consent) : '';
 
   if (!name || !phone) return send(res, { error: 'Name and phone are required' }, 400);
   // Un email invalid ar rupe reply_to, deci il ignoram in loc sa respingem cererea.
@@ -483,7 +496,7 @@ export default async function handler(req: Req, res: Res): Promise<void> {
     receivedAt = new Date().toISOString();
   }
 
-  const lead = { name, phone, email: validEmail, city, service, message, receivedAt };
+  const lead = { name, phone, email: validEmail, city, service, message, receivedAt, consentText };
   const html = leadEmailHtml(lead);
   const text = leadEmailText(lead);
 

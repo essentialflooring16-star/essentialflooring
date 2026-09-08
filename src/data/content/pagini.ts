@@ -195,7 +195,7 @@ export const pagini: ContentField[] = [
     },
     type: 'pairs',
     default:
-      '[{"title":"Licensed and insured","text":"{license}"},{"title":"Founded {year}","text":"{years}+ years of hands-on experience"},{"title":"Free written estimates","text":"no hidden fees"}]',
+      '[{"title":"Licensed and bonded","text":"{license}"},{"title":"Founded {year}","text":"{years}+ years of hands-on experience"},{"title":"Free written estimates","text":"no hidden fees"}]',
     page: '/reviews/',
   },
   {

@@ -1,0 +1,150 @@
+---
+// Cookie policy.
+//
+// The page describes exactly what the code does today, nothing more:
+//   src/lib/analytics.ts   one sessionStorage key, ef_sid, no cookie
+//   src/lib/vitals.ts      the same key, speed measurements only
+//   src/pages/index.astro  a Google map iframe, decorative, behind a veil
+//   src/pages/service-areas/index.astro  a second Google map iframe
+// If any of that changes, this page changes with it, and so does the date.
+import Legal from '../layouts/Legal.astro';
+import { PROSE } from '../lib/legal';
+import { getContent } from '../lib/content';
+
+const c = await getContent();
+const effective = 'September 9, 2026';
+
+// One row per thing that can end up stored in a visitor's browser. Written out
+// rather than generated, because the point of the table is that a person can
+// check it against the site.
+const stored = [
+  {
+    name: 'ef_sid',
+    setBy: 'This website',
+    kind: 'Session storage, not a cookie',
+    purpose:
+      'A random number so that a visit is counted once instead of once per page. It is not linked to your name, your email, your phone number or your IP address.',
+    life: 'Deleted the moment you close the tab.',
+  },
+  {
+    name: 'The Google map',
+    setBy: 'Google, when the map scrolls into view',
+    kind: 'A third party frame. We loaded it on its own and measured: it set no cookie and wrote nothing to storage. Google can change that at any time, and it would be their frame, not our code.',
+    purpose:
+      'What actually leaves is the request itself. Loading the map reaches google.com, maps.googleapis.com and maps.gstatic.com, and those requests carry your IP address and the address of the page you are on. What Google does with that is covered by the Google privacy policy, not by ours. We receive nothing back from it.',
+    life: 'Nothing of ours. Anything Google stores is cleared when you clear site data for google.com.',
+  },
+];
+---
+
+<Legal
+  title="Cookie Policy"
+  description="Essential Flooring sets no cookies of its own. What the site does store in your browser, what the Google map can store, and why you are not asked to click a consent banner."
+  heading="Cookie Policy"
+  lead="This site sets no cookies of its own, runs no advertising pixels and no Google Analytics, and does not follow you to other websites. Two things can still end up in your browser, and this page lists both."
+  effective={effective}
+  path="/cookie-policy/"
+>
+  <h2 class={PROSE.h2}>The short version</h2>
+  <ul class={PROSE.ul}>
+    <li>We set no cookies. There is nothing here that identifies you on your next visit.</li>
+    <li>
+      We store one random number for the length of a browser tab, so a visit is counted once. It
+      disappears when you close the tab.
+    </li>
+    <li>
+      The Google map on two of our pages is the one outside service on this site that can store
+      anything, and it belongs to Google.
+    </li>
+    <li>There is no consent banner, and further down we explain exactly why not.</li>
+  </ul>
+
+  <h2 class={PROSE.h2}>What can be stored in your browser</h2>
+  <p>
+    Two things, and only two. One of them is ours and lasts as long as a browser tab. The other is
+    not really a stored thing at all, it is a request to Google, and it only happens if you scroll
+    far enough to load the map.
+  </p>
+  <div class="grid gap-4 sm:grid-cols-2">
+    {stored.map((row) => (
+      <div class="rounded-card border border-hairline bg-surface-raised p-5 sm:p-6 shadow-card">
+        <p class="font-display font-semibold text-[17px] text-fg">{row.name}</p>
+        <dl class="mt-4 space-y-3 text-[14.5px] leading-relaxed">
+          <div>
+            <dt class="text-[12px] uppercase tracking-[0.14em] text-fg-muted">Set by</dt>
+            <dd class="mt-0.5 text-fg-body">{row.setBy}</dd>
+          </div>
+          <div>
+            <dt class="text-[12px] uppercase tracking-[0.14em] text-fg-muted">Type</dt>
+            <dd class="mt-0.5 text-fg-body">{row.kind}</dd>
+          </div>
+          <div>
+            <dt class="text-[12px] uppercase tracking-[0.14em] text-fg-muted">What it is for</dt>
+            <dd class="mt-0.5 text-fg-body">{row.purpose}</dd>
+          </div>
+          <div>
+            <dt class="text-[12px] uppercase tracking-[0.14em] text-fg-muted">How long it lasts</dt>
+            <dd class="mt-0.5 text-fg-body">{row.life}</dd>
+          </div>
+        </dl>
+      </div>
+    ))}
+  </div>
+  <p>
+    That is the whole list. There is no advertising cookie, no Facebook pixel, no Google Analytics,
+    no session recording, no heat map and no chat widget. Our fonts are served from our own server,
+    not from a font network, so loading a page does not tell anyone else that you did.
+  </p>
+
+  <h2 class={PROSE.h2}>Why the site measures anything at all</h2>
+  <p>
+    We like to know which pages people read and whether the site is fast enough on a phone. That
+    measurement is written by us, stored in our own database, and covered in full in our{' '}
+    <a href="/privacy-policy/" class={PROSE.a}>Privacy Policy</a>. It records the page address, the
+    domain of the site that linked you here, whether you are on a phone, a tablet or a computer, and
+    a few loading times. It does not record who you are, and it never runs at all if your browser
+    sends a Do Not Track or Global Privacy Control signal.
+  </p>
+
+  <h2 class={PROSE.h2}>Why there is no consent banner</h2>
+  <p>
+    Cookie banners come from European law, which requires consent before anything that is not
+    strictly necessary is written to your device. {c.site.legalName} is a California contractor
+    working for homeowners in the Sacramento region. We do not offer our services in the European
+    Union or the United Kingdom and we do not aim this site at people there.
+  </p>
+  <p>
+    The law that applies to us is California law. The California Online Privacy Protection Act asks
+    for a posted privacy policy, which we have. The California Consumer Privacy Act, as amended by
+    the CPRA, works by giving you the right to opt out of the sale or sharing of personal
+    information rather than by asking you to opt in, and we neither sell nor share it. So a banner
+    would ask you to agree to something we are not doing.
+  </p>
+  <div class={PROSE.note}>
+    <strong class={PROSE.strong}>If you would rather not load Google's map:</strong> block third
+    party cookies in your browser, or use its tracking protection. The map is decorative on the home
+    page and a convenience on the service areas page. Nothing else on this site depends on it, and
+    every address and phone number is written out in plain text as well.
+  </div>
+
+  <h2 class={PROSE.h2}>How to clear what is there</h2>
+  <ul class={PROSE.ul}>
+    <li>Closing the tab removes our session number. There is nothing left to delete.</li>
+    <li>
+      Clearing site data for this website in your browser settings removes it immediately, and
+      clearing cookies for google.com removes anything the map has stored.
+    </li>
+    <li>
+      A private or incognito window keeps nothing at all once you close it.
+    </li>
+  </ul>
+
+  <h2 class={PROSE.h2}>If this changes</h2>
+  <p>
+    If we ever add anything that sets a cookie, this page is updated with a new date before it goes
+    live, and if that thing needs your consent, you will be asked for it rather than told about it
+    afterwards. Questions about any of this go to{' '}
+    <a href={`mailto:${c.site.email}`} class={PROSE.a}>{c.site.email}</a> or{' '}
+    <a href={c.site.phoneHref} class={PROSE.a}>{c.site.phone}</a>.
+  </p>
+</Legal>

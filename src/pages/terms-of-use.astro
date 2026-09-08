@@ -1,0 +1,169 @@
+---
+// Terms of use for the website itself.
+//
+// Deliberately narrow: this page governs reading the site and sending the
+// estimate form. The work itself is governed by the signed home improvement
+// contract, which California law fills with required terms of its own, and
+// nothing here is allowed to look like it overrides that.
+import Legal from '../layouts/Legal.astro';
+import { PROSE } from '../lib/legal';
+import { getContent } from '../lib/content';
+
+const c = await getContent();
+const effective = 'September 9, 2026';
+---
+
+<Legal
+  title="Terms of Use"
+  description="The rules for using the Essential Flooring website: what an estimate is and is not, who owns the photographs and text, links to other sites, accessibility, and the law that applies."
+  heading="Terms of Use"
+  lead="These terms cover this website and the estimate form on it. They are short on purpose. The work we do in your home is covered by the written contract you sign, not by this page, and nothing here takes away a right California law gives you."
+  effective={effective}
+  path="/terms-of-use/"
+>
+  <h2 class={PROSE.h2}>Who you are dealing with</h2>
+  <p>
+    This website is published by {c.site.legalName}, a {c.site.entity} run by {c.site.founder},
+    holding California contractor license {c.site.license} in class {c.site.licenseClass}. The full
+    details, and the link to check them on the state register, are in the box at the bottom of this
+    page. Using the site means you accept the terms below. If you do not accept them, please do not
+    use the site.
+  </p>
+
+  <h2 class={PROSE.h2}>What this site is, and what it is not</h2>
+  <p>
+    The site describes the flooring work we do, shows photographs of jobs we have finished, and
+    gives you a way to ask for a free estimate. That is all it is.
+  </p>
+  <ul class={PROSE.ul}>
+    <li>
+      Nothing on the site is a price, a binding offer or a contract. Sending the form does not book
+      anything and does not oblige either of us to anything.
+    </li>
+    <li>
+      Nothing on the site is professional advice about your particular floor. Which material suits
+      your rooms, and whether your subfloor is sound, is something we can only tell you after
+      looking at it.
+    </li>
+    <li>
+      Descriptions of materials come from what manufacturers publish and from our own experience.
+      Products change. Treat them as a guide to the conversation, not as a specification.
+    </li>
+  </ul>
+
+  <h2 class={PROSE.h2}>Estimates</h2>
+  <p>
+    Our estimate is free and carries no obligation. We visit, measure, look at the subfloor and give
+    you a written quote. You are not charged for the visit, we do not take a deposit to produce a
+    quote, and you are free to say no.
+  </p>
+  <p>
+    If you go ahead, the work is done under a written home improvement contract signed by both of
+    us. California law sets out what that contract has to contain, including the payment schedule,
+    the limit on the down payment, what insurance we carry, the mechanics lien warning and your
+    right to cancel. Those points are summarized on our{' '}
+    <a href="/cancellation-and-refunds/" class={PROSE.a}>Cancellations and Refunds</a> page. Where
+    this website and your signed contract say different things, your contract is the one that
+    counts.
+  </p>
+
+  <h2 class={PROSE.h2}>Using the form fairly</h2>
+  <p>
+    The estimate form is for genuine enquiries about flooring work. Please do not use it to send
+    advertising, to submit somebody else's details without their knowledge, or to send automated
+    traffic. We limit how many requests one internet connection can send in a short window, so
+    heavy automated use simply stops working. Everything the form collects, and how long we keep it,
+    is set out in our <a href="/privacy-policy/" class={PROSE.a}>Privacy Policy</a>.
+  </p>
+  <p>
+    Please also do not try to break into any part of the site, copy it wholesale with an automated
+    tool, or interfere with how it works for other people.
+  </p>
+
+  <h2 class={PROSE.h2}>Photographs, text and who owns them</h2>
+  <ul class={PROSE.ul}>
+    <li>
+      <strong class={PROSE.strong}>Our job photographs.</strong> Every picture presented as our work,
+      including the before and after pairs and the portfolio, was taken on our own jobs and belongs
+      to {c.site.legalName}. They show finished floors, not people, and we do not publish customer
+      names or street addresses with them.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>Illustration photographs.</strong> A handful of pictures are stock
+      photographs used only as illustration, never captioned as a job of ours. They are licensed
+      under the Pexels License, which allows commercial use. We keep a list of every one of them
+      with its photographer and its source, and we will tell you which picture is which on request.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>Text, design, logo and icons.</strong> Ours, or licensed to us.
+      The typefaces are open source and served from our own server.
+    </li>
+    <li>
+      <strong class={PROSE.strong}>Reviews.</strong> The reviews on the site were written by our
+      customers on our Google Business Profile and belong to the people who wrote them. We reproduce
+      them unedited and link to the originals.
+    </li>
+  </ul>
+  <p>
+    You are welcome to link to any page here, and to quote a short passage with a link back. Please
+    do not copy the photographs, the text or the design onto another site, or present our finished
+    jobs as somebody else's work. If you believe something on this site infringes your copyright,
+    write to <a href={`mailto:${c.site.email}`} class={PROSE.a}>{c.site.email}</a> with the details
+    and we will take it down while we look into it.
+  </p>
+
+  <h2 class={PROSE.h2}>Links to other sites</h2>
+  <p>
+    We link to our Google Business Profile, to Instagram and Facebook, to WhatsApp, and to the
+    Contractors State License Board. Those are other companies running their own sites under their
+    own rules. Once you follow a link you are on their site, and we are not responsible for what is
+    on it or what they do with your information.
+  </p>
+
+  <h2 class={PROSE.h2}>Keeping the site right, and the site being available</h2>
+  <p>
+    We write the site carefully and correct mistakes as soon as we hear about them, but we cannot
+    promise that every word is free of error or that the site is always reachable. It is hosted by a
+    third party and it can go down. If you spot something wrong, tell us and we will fix it.
+  </p>
+  <p>
+    As far as California law allows, {c.site.legalName} is not liable for indirect or consequential
+    loss arising from your use of this website, such as a decision taken on the strength of a page
+    without speaking to us first. This paragraph is about the website. It does not limit our
+    responsibility for the work we actually carry out for you, which is governed by your contract
+    and by the law, and it does not limit anything that cannot be limited by law.
+  </p>
+
+  <h2 class={PROSE.h2}>Accessibility</h2>
+  <p>
+    This site is built and tested against the Web Content Accessibility Guidelines, version 2.2,
+    level AA. It works with a keyboard alone, respects a reduced motion setting, and every
+    photograph carries a description. Automated testing is not the same as a full audit, so if
+    anything on the site does not work for you, call{' '}
+    <a href={c.site.phoneHref} class={PROSE.a}>{c.site.phone}</a> or write to{' '}
+    <a href={`mailto:${c.site.email}`} class={PROSE.a}>{c.site.email}</a>. We will fix it, and in
+    the meantime we will give you the same information another way.
+  </p>
+
+  <h2 class={PROSE.h2}>Your rights as a consumer</h2>
+  <p>
+    Nothing on this page limits your rights under California law. That includes the right to cancel
+    a home improvement contract signed in your home, the limit on what a contractor may take as a
+    down payment, and your right to complain to the Contractors State License Board about a licensed
+    contractor. All three are explained on our{' '}
+    <a href="/cancellation-and-refunds/" class={PROSE.a}>Cancellations and Refunds</a> page.
+  </p>
+
+  <h2 class={PROSE.h2}>Which law applies</h2>
+  <p>
+    These terms are governed by the law of the State of California. We work in the Sacramento
+    region and any dispute about this website would be dealt with in the California courts. If a
+    court finds one sentence here unenforceable, the rest still stands.
+  </p>
+
+  <h2 class={PROSE.h2}>Changes</h2>
+  <p>
+    If we change these terms, the new version is posted here with a new date at the top. We do not
+    keep visitor accounts or a mailing list, so this page is the only place a change is announced.
+  </p>
+</Legal>
