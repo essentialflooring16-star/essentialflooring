@@ -27,11 +27,12 @@ nu din memorie. Dacă se schimbă una, se schimbă și pagina care o afișează.
 | Asigurare de accidente de muncă | **scutit**, a declarat că nu are angajați |
 
 **Fișa Google (Google Business Profile)**: adresa publicată acolo este
-**8020 Walerga Rd, Antelope, CA 95843**, ratingul 5,0 din 18 recenzii, site-ul
-trecut în fișă este încă cel vechi, `essentialflooring.pro`.
+**8020 Walerga Rd, Antelope, CA 95843**, ratingul 5,0 din 18 recenzii.
 
 **Registrul comerțului (California SOS)**: firma apare înregistrată la
-**22 mai 2023**, deci „Founded 2023" de pe site se susține.
+**22 mai 2023**, deci „Founded 2023" de pe site se susține. Alex a spus că a
+lucrat și înainte de asta, deci anul și cei 5+ ani de experiență rămân cum
+sunt.
 
 ---
 
@@ -61,6 +62,11 @@ WhatsApp e de ajuns):
 3. Întrebarea din FAQ (`src/data/faq.json` și `src/data/content/despre-contact.ts`)
    e scrisă cu grijă, o rescrii o singură dată în ambele fișiere.
 
+La cererea lui Artiom, cuvântul „asigurare" nu apare **nicăieri** pe site, nici
+măcar în paginile juridice, unde exista o frază care spunea că legea obligă
+contractul să declare ce asigurare are contractorul. A fost scoasă din FAQ, din
+Terms of Use și din pagina de anulări.
+
 ### „Tile installation" → „Vinyl and resilient tile installation"
 
 Clasificarea C-15 acoperă „carpet, resilient sheet goods, resilient tile, wood
@@ -73,9 +79,7 @@ datele structurate și într-un card de pe pagina de servicii. Peste tot scrie
 acum „vinyl and resilient tile", ceea ce **este** în C-15. Demontarea gresiei
 vechi a rămas, aia e demolare, nu montaj.
 
-Dacă Alex chiar montează gresie, are nevoie de C-54. Până atunci nu se face
-reclamă la ea nicăieri: nici pe site, nici pe Facebook (unde textul lui actual
-zice „carpet to tile"), nici pe Google.
+Atât. Nu se face reclamă la gresie pe site, și nu e nevoie de nimic mai mult.
 
 ### Promisiunea „prețul din ofertă e prețul pe care îl plătești"
 
@@ -189,19 +193,15 @@ alter table public.leads
 
 ---
 
-## 7. Ce a rămas de făcut, în ordine
+## 7. Ce a rămas de făcut
 
 1. **Certificatul de asigurare de la Alex.** O poză pe WhatsApp. Până atunci
-   site-ul nu are voie să scrie „insured".
-2. **Anul înființării.** Site-ul zice 2023 (și registrul comerțului la fel),
-   dar descrierea din fișa lui Google zice „Founded in 2024". Una dintre ele
-   trebuie schimbată, și e mai simplu să schimbe el textul din Google.
-3. **Site-ul din fișa Google** e încă `essentialflooring.pro`. De pus
-   `essentialflooringinc.com`.
-4. **Gresia.** Dacă o montează, îi trebuie C-54. Dacă nu, textul de pe
-   Facebook („carpet to tile") ar trebui schimbat și acolo.
-5. **Strada**, dacă vrea să apară pe site. Vezi punctul 2 de mai sus.
-6. **Contractul.** Paginile de pe site descriu corect ce cere legea, dar
-   contractul propriu-zis e treaba lui: scris, semnat, cu formularul de
-   anulare în două exemplare, plafonul de avans, graficul de plăți și
-   declarația despre asigurare. CSLB are un model gata făcut.
+   site-ul nu scrie nicăieri că firma e asigurată, iar acum nici nu pomenește
+   cuvântul.
+2. **Strada**, dacă vrea să apară pe site. Cele două registre dau două adrese
+   diferite, deci întâi întrebi, apoi pui. Momentan scrie doar „Antelope, CA
+   95843", care e corect în ambele.
+
+Restul, decis de Artiom pe 9 septembrie: anul rămâne 2023 și experiența 5+ ani,
+fișa Google se lasă în pace, gresia nu se mai discută, iar contractul rămâne cum
+îl face el.

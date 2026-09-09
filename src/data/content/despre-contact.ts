@@ -284,7 +284,7 @@ You receive a clear written quote. No hidden fees.`,
   },
   {
     "q": "Is Essential Flooring licensed and bonded?",
-    "a": "Yes, and you can check every word of that yourself in about a minute. Essential Flooring Inc holds California contractor license CSLB #1117565, classification C-15 Flooring and Floor Covering, issued 7 March 2024 and current through 31 March 2028, with a $25,000 contractor bond filed with Western Surety Company. Type the license number into the Check A License page at cslb.ca.gov and you will see the status, the bond and any complaints on record. California also requires your written home improvement contract to state what insurance we carry, so you get that in writing before you sign anything."
+    "a": "Yes, and you can check every word of that yourself in about a minute. Essential Flooring Inc holds California contractor license CSLB #1117565, classification C-15 Flooring and Floor Covering, issued 7 March 2024 and current through 31 March 2028, with a $25,000 contractor bond filed with Western Surety Company. Type the license number into the Check A License page at cslb.ca.gov and you will see the status, the bond and any complaints on record."
   },
   {
     "q": "What areas do you serve?",
