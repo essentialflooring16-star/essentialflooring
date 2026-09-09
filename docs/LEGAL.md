@@ -38,34 +38,44 @@ sunt.
 
 ## 2. Ce s-a scos de pe site și de ce
 
-### „Insured" → „Bonded"
+### „Insured", scos pe 9 septembrie dimineața și pus la loc seara
 
 Nicăieri, în niciun registru public, nu scrie că firma are asigurare de
-răspundere civilă (general liability). CSLB nu urmărește asta, iar Alex nu a
-trimis niciodată un certificat, deși i s-a cerut încă din august. Site-ul
-scria „Licensed & Insured" în **peste 40 de locuri**, inclusiv pe cele 25 de
-pagini de oraș.
+răspundere civilă (general liability). CSLB nu urmărește asta. Pe 9 septembrie
+dimineața, fiindcă Alex nu trimisese niciun certificat deși i se ceruse din
+august, s-a înlocuit peste tot cu „Licensed & Bonded", plus garanția de
+25.000 $ scrisă explicit acolo unde era o frază întreagă.
 
-S-a înlocuit peste tot cu **„Licensed & Bonded"**, plus garanția de 25.000 $
-scrisă explicit acolo unde era o frază întreagă. Asta e verificabil de oricine
-în 30 de secunde pe site-ul CSLB, și e exact cuvântul pe care îl caută un
-proprietar de casă.
+**În aceeași zi Alex a răspuns**, pe WhatsApp: „Am si asigurare, pune numa
+licensend and insured. Ca aici oameni poate sa ma verifice daca chiar vor."
+Artiom i-a confirmat în scris, la 17:56, că rămâne „Licensed & Insured" pe
+site. Deci s-a pus la loc, în cele 41 de locuri, inclusiv pe cele 25 de pagini
+de oraș, și `insured` din `src/data/site.ts` e acum `true`.
 
-**Ca să pui „insured" înapoi** (după ce Alex trimite certificatul, o poză pe
-WhatsApp e de ajuns):
+Ce s-a păstrat din pasa de dimineață, fiindcă nu ține de asigurare: garanția de
+25.000 $ numită explicit unde era loc, corecțiile de change order, și
+formulările care nu mai promit un preț neschimbat.
 
-1. `src/data/site.ts`, câmpul `insured: false` → `true` și scrie în comentariu
-   de la cine e polița și până când e valabilă.
-2. Caută în tot proiectul `bonded` și `Bonded` și pune la loc formularea care
-   îți place, în perechi: textul din pagină **și** valoarea implicită din
-   `src/data/content/*.ts`, altfel `node scripts/check-content.mjs` pică.
-3. Întrebarea din FAQ (`src/data/faq.json` și `src/data/content/despre-contact.ts`)
-   e scrisă cu grijă, o rescrii o singură dată în ambele fișiere.
+**Ce contează, dacă se ajunge vreodată la discuții:** certificatul tot nu a
+ajuns. Ce avem e declarația lui scrisă, din 9 septembrie, plus faptul că el a
+cerut expres formularea. Aia e proba. Dacă vrei să fii acoperit complet, ceri
+poza certificatului și o pui la dosarul clientului.
 
-La cererea lui Artiom, cuvântul „asigurare" nu apare **nicăieri** pe site, nici
-măcar în paginile juridice, unde exista o frază care spunea că legea obligă
-contractul să declare ce asigurare are contractorul. A fost scoasă din FAQ, din
-Terms of Use și din pagina de anulări.
+Întrebarea din FAQ („Is Essential Flooring licensed and insured?") e scrisă să
+nu mintă: spune că licența și garanția se verifică pe cslb.ca.gov în 30 de
+secunde, și că asigurarea există dar statul nu o publică, deci cine vrea să
+vadă certificatul, cere.
+
+**Dacă vreodată se umblă din nou la formularea asta**, e nevoie de perechi:
+textul din pagină **și** valoarea implicită din `src/data/content/*.ts`,
+altfel `node scripts/check-content.mjs` pică. Întrebarea din FAQ trăiește în
+două fișiere, `src/data/faq.json` și `src/data/content/despre-contact.ts`.
+Cardul de preview, `public/og-default.jpg`, poartă și el linia asta: se
+regenerează cu `node scripts/make-og.mjs`, unde textul e o singură linie.
+
+La cererea lui Artiom, cuvântul „asigurare" nu apare în paginile juridice, unde
+exista o frază care spunea că legea obligă contractul să declare ce asigurare
+are contractorul. A rămas scoasă din Terms of Use și din pagina de anulări.
 
 ### „Tile installation" → „Vinyl and resilient tile installation"
 
@@ -195,9 +205,9 @@ alter table public.leads
 
 ## 7. Ce a rămas de făcut
 
-1. **Certificatul de asigurare de la Alex.** O poză pe WhatsApp. Până atunci
-   site-ul nu scrie nicăieri că firma e asigurată, iar acum nici nu pomenește
-   cuvântul.
+1. **Certificatul de asigurare de la Alex.** O poză pe WhatsApp. Site-ul scrie
+   „Licensed & Insured" pe baza declarației lui scrise din 9 septembrie, nu pe
+   baza unui document văzut de noi. Poza se cere și se pune la dosar.
 2. **Strada**, dacă vrea să apară pe site. Cele două registre dau două adrese
    diferite, deci întâi întrebi, apoi pui. Momentan scrie doar „Antelope, CA
    95843", care e corect în ambele.

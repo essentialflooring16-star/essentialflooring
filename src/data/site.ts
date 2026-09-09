@@ -19,11 +19,13 @@ export const SITE = {
   bondSurety: 'Western Surety Company',
   entity: 'California corporation',
   // Workers' compensation: exempt on the CSLB record, certified as having no
-  // employees. General liability insurance is NOT on any public record and the
-  // client has never sent a certificate, so the site says "bonded", not
-  // "insured". When a certificate of insurance arrives, flip this to true and
-  // put the word back in the places listed in docs/LEGAL.md.
-  insured: false,
+  // employees. General liability is not on any public record, so nobody can
+  // check it the way they can check the licence and the bond. The client
+  // confirmed in writing on WhatsApp, 9 September 2026, that he carries it and
+  // asked for "licensed and insured" on the site, which is what it says. The
+  // certificate itself has still not been sent; if it ever needs defending,
+  // that message is the record. See docs/LEGAL.md section 2.
+  insured: true,
   founded: 2023,
   founder: 'Alexandru Szep',
   experienceYears: 5, // rendered with a '+' suffix; keep numeric for the count-up

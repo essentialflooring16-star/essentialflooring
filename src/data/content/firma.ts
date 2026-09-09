@@ -64,8 +64,8 @@ export const firma: ContentField[] = [
     section: DESPRE,
     label: { ro: 'Numărul de licență CSLB', en: 'CSLB license number' },
     help: {
-      ro: 'Apare cu litere mari pe pagina Despre și pe rândul "Licensed & Bonded" din subsol, de pe prima pagină și de pe paginile de servicii. Scris mai lung de vreo 20 de caractere, sare pe două rânduri pe pagina Despre.',
-      en: 'Shows in large type on the About page and on the "Licensed & Bonded" line in the footer, on the home page and on the service pages. Longer than about 20 characters and it wraps on the About page.',
+      ro: 'Apare cu litere mari pe pagina Despre și pe rândul "Licensed & Insured" din subsol, de pe prima pagină și de pe paginile de servicii. Scris mai lung de vreo 20 de caractere, sare pe două rânduri pe pagina Despre.',
+      en: 'Shows in large type on the About page and on the "Licensed & Insured" line in the footer, on the home page and on the service pages. Longer than about 20 characters and it wraps on the About page.',
     },
     type: 'text',
     default: 'CSLB #1117565',

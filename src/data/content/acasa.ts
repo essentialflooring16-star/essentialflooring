@@ -112,7 +112,7 @@ export const acasa: ContentField[] = [
     },
     type: 'pairs',
     default:
-      '[{"title":"Licensed & bonded","text":"{license}"},{"title":"Mon to Sat","text":"7 AM to 7 PM"},{"title":"{cities} cities and areas","text":"across Northern California"},{"title":"Free estimates","text":"written, no hidden fees"}]',
+      '[{"title":"Licensed & insured","text":"{license}"},{"title":"Mon to Sat","text":"7 AM to 7 PM"},{"title":"{cities} cities and areas","text":"across Northern California"},{"title":"Free estimates","text":"written, no hidden fees"}]',
     page: '/',
     required: true,
   },
@@ -267,7 +267,7 @@ export const acasa: ContentField[] = [
       en: 'The heading on the left, above the four ticked reasons. Past two lines it sits too close to the first tick.',
     },
     type: 'text',
-    default: 'Licensed, bonded and owner operated',
+    default: 'Licensed, insured and owner operated',
     page: '/',
     softMax: 46,
     required: true,

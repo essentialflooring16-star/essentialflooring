@@ -283,8 +283,8 @@ You receive a clear written quote. No hidden fees.`,
     "a": "We will give you a simple checklist ahead of time. In general, remove small and fragile items from the work area, plan for pets to stay in another room, and keep a clear path to the space. Anything else, like furniture or appliance moving, will be agreed on during your estimate, so nothing catches you off guard on the day."
   },
   {
-    "q": "Is Essential Flooring licensed and bonded?",
-    "a": "Yes, and you can check every word of that yourself in about a minute. Essential Flooring Inc holds California contractor license CSLB #1117565, classification C-15 Flooring and Floor Covering, issued 7 March 2024 and current through 31 March 2028, with a $25,000 contractor bond filed with Western Surety Company. Type the license number into the Check A License page at cslb.ca.gov and you will see the status, the bond and any complaints on record."
+    "q": "Is Essential Flooring licensed and insured?",
+    "a": "Yes, and the license part you can check yourself in about a minute. Essential Flooring Inc holds California contractor license CSLB #1117565, classification C-15 Flooring and Floor Covering, issued 7 March 2024 and current through 31 March 2028, with a $25,000 contractor bond filed with Western Surety Company. Type the license number into the Check A License page at cslb.ca.gov and you will see the status, the bond and any complaints on record. The company carries insurance as well. General liability is not something the state publishes, so if you want to see the certificate before we start, just ask."
   },
   {
     "q": "What areas do you serve?",
