@@ -1,9 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Direction A mark: the two parallel planks from the client's own logo,
-       cream over brick, on the ink ground. Squared corners per direction A. -->
-  <rect width="64" height="64" rx="6" fill="#16150f"/>
-  <g transform="rotate(-25 32 32)">
-    <rect x="10" y="22.5" width="36" height="8" fill="#efece4"/>
-    <rect x="18" y="34" width="36" height="8" fill="#c8442a"/>
+  <!-- The two planks from the client's own logo, cream over copper, on the
+       anthracite his brand card uses. Same angle and same tight gap as the
+       lockup in src/components/BrandLogo.astro, so the tab icon, the preview
+       card and the header all carry one mark. Colours sampled from his file:
+       ground #25292C, cream #EFECE3, copper #B5773A. -->
+  <rect width="64" height="64" rx="6" fill="#25292C"/>
+  <g transform="rotate(-19 32 32)">
+    <rect x="7" y="21" width="40" height="8.5" fill="#EFECE3"/>
+    <rect x="17" y="32.5" width="40" height="8.5" fill="#B5773A"/>
   </g>
 </svg>

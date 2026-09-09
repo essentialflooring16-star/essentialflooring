@@ -86,7 +86,12 @@ const schemas = [localBusiness, ...schema];
     <meta name="description" content={c.apply(description)} />
     <link rel="canonical" href={canonical.href} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {/* Google fetches /favicon.ico by convention and shows whatever it finds
+        there, so the .ico is listed first and really exists. Browsers that read
+        SVG take the next line and get the crisp one. */}
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     {/* Browsers do not resolve CSS variables here, so this one hex stays literal.
         Update it alongside --ef-surface-dark when the direction is chosen. */}

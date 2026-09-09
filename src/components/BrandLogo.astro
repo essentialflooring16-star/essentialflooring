@@ -21,20 +21,20 @@ const plankB = onDark ? 'var(--ef-accent-on-dark)' : 'var(--ef-accent-display)';
 
 <span class={`inline-block leading-none select-none ${compact ? '' : 'pb-0.5'}`}>
   <svg
-    width={compact ? 46 : 58}
-    height={compact ? 13 : 16}
-    viewBox="0 0 58 16"
+    width={compact ? 27 : 34}
+    height={compact ? 10 : 13}
+    viewBox="0 0 34 13"
     fill="none"
     aria-hidden="true"
-    class="block mb-[3px]"
+    class={`block ${compact ? 'mb-[-1px]' : 'mb-[-2px]'}`}
   >
-    <g transform="rotate(-14 29 8)">
-      <rect x="1" y="2.2" width="34" height="3.4" fill={plankA} />
-      <rect x="13" y="8.6" width="34" height="3.4" fill={plankB} />
+    <g transform="rotate(-19 17 6.5)">
+      <rect x="2" y="3.1" width="24" height="3.1" fill={plankA} />
+      <rect x="8" y="7.4" width="24" height="3.1" fill={plankB} />
     </g>
   </svg>
   <span
-    class={`block font-brand font-extrabold uppercase tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-r from-55% ${onDark ? 'from-fg-on-dark to-accent-on-dark' : 'from-fg to-accent-display'} ${compact ? 'text-[21px]' : 'text-[26px]'}`}
+    class={`block font-brand font-extrabold uppercase tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-r from-55% ${onDark ? 'from-fg-on-dark to-accent-on-dark' : 'from-fg to-[#96632F]'} ${compact ? 'text-[21px]' : 'text-[26px]'}`}
   >
     Essential
   </span>
@@ -46,9 +46,12 @@ const plankB = onDark ? 'var(--ef-accent-on-dark)' : 'var(--ef-accent-display)';
     <span class={`h-px flex-1 ${onDark ? 'bg-accent-on-dark/60' : 'bg-accent-display/50'}`} aria-hidden="true"></span>
   </span>
   {!compact && (
-    <span class="mt-2 block text-[8.5px] leading-[1.7] tracking-[0.18em] uppercase text-fg-on-dark/60 font-medium">
-      <span class="block whitespace-nowrap">LVP, Laminate &amp; Vinyl</span>
-      <span class="block whitespace-nowrap">Hardwood Refinishing</span>
+    <span class="mt-2 block text-[8px] leading-[1.6] tracking-[0.07em] uppercase text-fg-on-dark/70 font-semibold">
+      <span class="whitespace-nowrap">
+        LVP, Laminate &amp; Vinyl
+        <span class="text-fg-on-dark/40" aria-hidden="true">&#8226;</span>
+      </span>
+      {' '}<span class="whitespace-nowrap">Hardwood Refinishing</span>
     </span>
   )}
 </span>
