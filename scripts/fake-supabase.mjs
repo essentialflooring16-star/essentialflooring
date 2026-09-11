@@ -4,9 +4,18 @@
 // fiecare tab fara un proiect real. Nu inlocuieste nimic din verificarile
 // automate: e o oglinda pentru inspectie vizuala.
 import { createServer } from 'node:http';
+import { readFileSync } from 'node:fs';
 
 const PORT = Number(process.env.PORT || 5599);
 const now = new Date().toISOString();
+
+// Un articol scris in fisier poate fi privit exact cum va arata pe site inainte
+// sa ajunga in cabinet: FAKE_POSTS=cale/catre.json node scripts/fake-supabase.mjs
+function seedFromFile(envVar) {
+  const path = process.env[envVar];
+  if (!path) return [];
+  return JSON.parse(readFileSync(path, 'utf8'));
+}
 
 const USER = { id: '00000000-0000-4000-8000-000000000001', email: 'client@example.com', role: 'authenticated' };
 const SESSION = {
@@ -25,7 +34,7 @@ const TABLES = {
     { id: 1, created_at: now, author: 'John D.', rating: 5, text: 'Great work on our stairs.', city: 'Folsom',
       review_date: '2026-08-01', source: 'google', published: true, sort_order: 1 },
   ],
-  posts: [], portfolio_items: [], web_vitals: [],
+  posts: seedFromFile('FAKE_POSTS'), portfolio_items: [], web_vitals: [],
   // Traficul simulat: 30 de zile cu o forma stabila, ca sa se poata vedea
   // curba din panoul Trafic. Valorile vin dintr-o formula, nu din random, ca
   // doua rulari sa dea aceeasi imagine si capturile sa fie comparabile.
