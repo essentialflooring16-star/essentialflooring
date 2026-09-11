@@ -97,7 +97,7 @@ const SIZES = '(min-width: 1024px) 680px, calc(100vw - 32px)';
     </div>
 
     <div
-      class="mt-4 flex gap-2.5 overflow-x-auto pb-2 snap-x"
+      class="mt-4 -mx-1 flex gap-2.5 overflow-x-auto px-1 pt-1 pb-2 snap-x"
       role="group"
       aria-label="Choose a transformation project"
     >
@@ -107,7 +107,7 @@ const SIZES = '(min-width: 1024px) 680px, calc(100vw - 32px)';
           data-thumb={i}
           aria-pressed={i === 0 ? 'true' : 'false'}
           class:list={[
-            'relative shrink-0 snap-start overflow-hidden rounded-media w-24 aspect-[4/3] transition-all cursor-pointer',
+            'relative flex-[1_1_6rem] min-w-24 snap-start overflow-hidden rounded-media aspect-[4/3] transition-all cursor-pointer',
             i === 0
               ? 'ring-2 ring-accent ring-offset-2 ring-offset-surface'
               : 'opacity-65 hover:opacity-100',

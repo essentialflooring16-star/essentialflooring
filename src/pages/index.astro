@@ -15,6 +15,7 @@ import faqData from '../data/faq.json';
 import pairsData from '../data/before-after.json';
 import { getReviews, ratingSummary } from '../lib/reviews';
 import { getContent } from '../lib/content';
+import heroImage from '../assets/hero/hero-home.jpg';
 
 const c = await getContent();
 
@@ -60,16 +61,23 @@ const showcasePairs = await Promise.all(
     }),
 );
 
-// The hero photograph. Landscape is the constraint that picks it: almost the
-// whole library is vertical phone shots, and hardwood-refinishing-02 is the
-// one high-quality frame that is already 4:3, so a wide crop of it keeps
-// real pixels instead of upscaling a portrait.
-const heroPhoto = photoById('hardwood-refinishing-02');
+// The hero photograph. The job-site frames are honest but they are phone shots
+// of empty houses mid-renovation, and on the opening screen that read as a
+// vacant rental rather than as finished work. This one is a made image, kept
+// deliberately close to what the crew actually builds: warm oak treads over
+// white risers beside a refinished floor. It carries no place label and never
+// claims to be a project, and the real work lives on /portfolio/.
+// Framed 21:9 on purpose. The band is about 2.56:1 on a desktop, so a 16:9
+// frame only loses 9% to the crop and whatever empty wall it holds stays on
+// screen: the composition has to put the floor across three quarters of the
+// frame itself, not rely on object-position to hide the rest.
+const heroAlt =
+  'Warm oak staircase with white risers beside a refinished hardwood floor in a bright home';
 // Cel mai mare paint al paginii. Doua formate, ca telefoanele care stiu AVIF sa
 // ia jumatate din octeti, si trepte mici, fiindca un Moto G cere ~720px, nu 900.
 const HERO_WIDTHS = [560, 760, 900, 1400, 2000, 2600];
-const heroAvif = await getImage({ src: photoImage(heroPhoto.file), widths: HERO_WIDTHS, format: 'avif', quality: 44 });
-const heroWebp = await getImage({ src: photoImage(heroPhoto.file), widths: HERO_WIDTHS, format: 'webp', quality: 70 });
+const heroAvif = await getImage({ src: heroImage, widths: HERO_WIDTHS, format: 'avif', quality: 44 });
+const heroWebp = await getImage({ src: heroImage, widths: HERO_WIDTHS, format: 'webp', quality: 70 });
 
 const previewPhotos = photos
   .filter((p) => p.state === 'after')
@@ -131,7 +139,7 @@ const steps = [
        Direction E: the editorial opening of the premium wood-flooring class
        (tedtodd.co.uk is the palette anchor). The statement comes first, set
        in the serif with one italic copper flourish; the photograph follows,
-       framed in the paper ground, with the place label pinned to its corner.
+       framed in the paper ground, uncaptioned.
        The h1 carries the search terms: contractor plus city on the first
        line, the three services on the second, and the sub-headline under it
        repeats the long-tail phrase (refinishing, vinyl plank, stairs,
@@ -149,10 +157,18 @@ const steps = [
             <textPath href="#stamp-arc" startOffset="0">EST. 2023 · SACRAMENTO CA · LICENSED &amp; INSURED ·</textPath>
           </text>
         </svg>
-        <svg viewBox="0 0 28 28" class="absolute inset-0 m-auto size-11" fill="none">
-          <rect x="4" y="9" width="20" height="4.5" rx="1" transform="rotate(-14 14 11)" fill="var(--ef-accent-fill)" />
-          <rect x="4" y="16.5" width="20" height="4.5" rx="1" transform="rotate(-14 14 18.5)" fill="var(--ef-dark-control)" />
-        </svg>
+        <!-- The logo's own signature in the middle: the two planks over the E,
+             the same angle and gap as BrandLogo.astro and the favicon. The
+             earlier two loose bars read as an equals sign. -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <svg width="44" height="17" viewBox="0 0 34 13" fill="none" class="block mb-[-3px]">
+            <g transform="rotate(-19 17 6.5)">
+              <rect x="2" y="3.1" width="24" height="3.1" fill="var(--ef-ink-900)" />
+              <rect x="8" y="7.4" width="24" height="3.1" fill="var(--ef-accent-display)" />
+            </g>
+          </svg>
+          <span class="font-brand font-extrabold text-[46px] leading-none text-fg">E</span>
+        </div>
       </div>
 
       <!-- The statement enters one line at a time, each line rising out of a
@@ -185,9 +201,6 @@ const steps = [
         >
           {c.site.phone}
         </a>
-        <p class="basis-full sm:basis-auto text-[13.5px] text-fg-muted">
-          {c('home.hero.cta_note')}
-        </p>
       </div>
     </div>
 
@@ -203,27 +216,21 @@ const steps = [
             src={heroWebp.src}
             srcset={heroWebp.srcSet.attribute}
             sizes="100vw"
-            alt={heroPhoto.alt}
+            alt={heroAlt}
             width={heroWebp.attributes.width}
             height={heroWebp.attributes.height}
             loading="eager"
             fetchpriority="high"
             decoding="async"
-            class="parallax-img h-[46svh] min-h-[320px] sm:h-[56svh] lg:h-[64svh] w-full object-cover [object-position:50%_74%]"
+            class="parallax-img h-[46svh] min-h-[320px] sm:h-[56svh] lg:h-[64svh] w-full object-cover [object-position:50%_50%]"
           />
         </picture>
-        <figcaption
-          class="absolute left-4 bottom-4 sm:left-6 sm:bottom-6 inline-flex items-center gap-2.5 rounded-btn bg-scrim-media/55 backdrop-blur-[2px] text-fg-on-media text-[12px] font-semibold uppercase tracking-[0.14em] px-3.5 py-2"
-        >
-          <span class="size-1.5 bg-accent-display" aria-hidden="true"></span>
-          {heroPhoto.city}, California. Our work
-        </figcaption>
       </figure>
     </div>
 
     <!-- Facts, each stamped with the site's own icon set. -->
     <div class="mx-auto max-w-6xl px-4 sm:px-6 mt-8 sm:mt-10 mb-2">
-      <ul class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5 text-[13.5px] text-fg-muted border-t border-hairline pt-6">
+      <ul class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5 text-[13.5px] text-fg-muted pt-2">
         <li class="flex items-center gap-3">
           <Icon name="shield" size={26} class="shrink-0 text-fg" />
           <span><span class="block text-fg font-semibold">Licensed &amp; insured</span>{c.site.license}</span>
@@ -272,7 +279,7 @@ const steps = [
   </section>
 
   <!-- BEFORE / AFTER SHOWCASE -->
-  <section class="py-16 sm:py-24 bg-surface-sunken/60 border-y border-hairline relative overflow-hidden">
+  <section class="py-16 sm:py-24 bg-surface-sunken/60 relative overflow-hidden">
     <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
       <div class="grid lg:grid-cols-[380px_1fr] gap-12 items-start">
         <div class="lg:sticky lg:top-28">
@@ -308,8 +315,9 @@ const steps = [
        Was four centred squares numbered 1 to 4 with a connector line through
        them, which is the stock "how it works" block and reads as filler. It is
        now the same editorial index the services use: the heading holds the
-       left column while the steps scroll past it, each step a row on a
-       hairline with the numeral set in the margin. -->
+       left column while the steps scroll past it, each step a row with the
+       numeral set in the margin. No rules between rows: Artiom does not want
+       divider lines anywhere, the spacing does the separating. -->
   <section class="py-16 sm:py-24 relative">
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
       <div class="grid lg:grid-cols-[340px_1fr] gap-10 lg:gap-16 items-start">
@@ -336,9 +344,9 @@ const steps = [
             </figcaption>
           </figure>
         </div>
-        <ol class="border-t border-hairline">
+        <ol class="space-y-2">
           {steps.map((step, i) => (
-            <li class="m-rise grid grid-cols-[3rem_1fr] sm:grid-cols-[5rem_1fr] gap-x-4 py-7 border-b border-hairline">
+            <li class="m-rise grid grid-cols-[3rem_1fr] sm:grid-cols-[5rem_1fr] gap-x-4 py-5">
               <span class="font-display font-semibold text-[15px] text-accent-on-light tabular-nums pt-1">
                 {String(i + 1).padStart(2, '0')}
               </span>

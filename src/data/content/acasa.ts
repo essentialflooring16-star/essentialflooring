@@ -88,20 +88,6 @@ export const acasa: ContentField[] = [
     required: true,
   },
   {
-    key: 'home.hero.cta_note',
-    group: 'acasa',
-    section: { ro: 'Titlul de sus', en: 'Hero' },
-    label: { ro: 'Nota de lângă buton', en: 'Note next to the button' },
-    help: {
-      ro: 'Rândul mic de lângă buton și numărul de telefon. Bun pentru o promisiune scurtă, de exemplu că devizul e gratuit.',
-      en: 'The small line beside the button and the phone number. Good for one short promise, such as the estimate being free.',
-    },
-    type: 'text',
-    default: 'Free estimates, no call-out fee',
-    page: '/',
-    softMax: 40,
-  },
-  {
     key: 'home.hero.facts',
     group: 'acasa',
     section: { ro: 'Titlul de sus', en: 'Hero' },
