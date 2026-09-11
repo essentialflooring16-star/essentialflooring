@@ -25,6 +25,17 @@ on conflict (email) do nothing;
 -- insert into public.admin_emails (email, note) values ('ark4su@gmail.com', 'artiom')
 --   on conflict (email) do nothing;
 
+-- Adaugat 11.09.2026: verificarea in doi pasi.
+--
+-- Ecranul din cabinet nu e o bariera. /admin e static si public, iar cheia anon
+-- e publica prin design, deci cine stie parola poate lovi direct API-ul si sari
+-- peste orice gard scris in React. Bariera e aici: din clipa in care contul are
+-- un factor CONFIRMAT, sesiunea trebuie sa fie aal2, adica sa fi trecut prin
+-- codul din telefon.
+--
+-- Cat timp contul nu are niciun factor confirmat, aal1 ramane de ajuns. Altfel
+-- nimeni nu ar mai putea intra ca sa porneasca verificarea, iar cabinetul s-ar
+-- inchide singur cu clientul pe dinafara.
 create or replace function public.is_admin()
 returns boolean
 language sql
@@ -32,10 +43,18 @@ stable
 security definer
 set search_path = public
 as $$
-  select exists (
-    select 1 from public.admin_emails
-    where lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
-  );
+  select
+    exists (
+      select 1 from public.admin_emails
+      where lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+    )
+    and (
+      coalesce(auth.jwt() ->> 'aal', 'aal1') = 'aal2'
+      or not exists (
+        select 1 from auth.mfa_factors f
+        where f.user_id = auth.uid() and f.status = 'verified'
+      )
+    );
 $$;
 
 revoke all on function public.is_admin() from public;

@@ -8,6 +8,7 @@ import PortfolioManager from './PortfolioManager';
 import LeadsInbox from './LeadsInbox';
 import BlogManager from './BlogManager';
 import ReviewsManager from './ReviewsManager';
+import SecurityPanel, { MfaChallenge } from './SecurityPanel';
 
 /**
  * Cadrul cabinetului, taiat ca anteta publica a site-ului, ca sa se simta
@@ -48,6 +49,11 @@ export default function AdminApp() {
   const [tab, setTab] = useState<Tab>('leads');
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(0);
+  const [security, setSecurity] = useState(false);
+  // null cat timp nu stim inca, ca sa nu aratam cabinetul o clipa inainte de a
+  // cere codul. 'ask' inseamna: parola a trecut, dar contul are un factor
+  // confirmat si sesiunea e inca aal1.
+  const [gate, setGate] = useState<'unknown' | 'ask' | 'open'>('unknown');
 
   useEffect(() => {
     if (!supabase) {
@@ -62,10 +68,37 @@ export default function AdminApp() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  // Nivelul sesiunii, citit la fiecare schimbare de sesiune. Daca contul are un
+  // factor confirmat, nextLevel devine aal2 si currentLevel ramane aal1 pana
+  // cand codul din telefon e verificat.
+  useEffect(() => {
+    if (!session || !supabase) {
+      setGate('unknown');
+      return;
+    }
+    let alive = true;
+    supabase.auth.mfa
+      .getAuthenticatorAssuranceLevel()
+      .then(({ data }) => {
+        if (!alive) return;
+        const needs = data?.nextLevel === 'aal2' && data?.currentLevel !== 'aal2';
+        setGate(needs ? 'ask' : 'open');
+      })
+      .catch(() => {
+        // Daca nivelul nu se poate citi, cabinetul se deschide in loc sa ramana
+        // agatat pe "se incarca". Nu se pierde nimic: bariera e is_admin() in
+        // baza de date, deci o sesiune aal1 vede panouri goale, nu date.
+        if (alive) setGate('open');
+      });
+    return () => {
+      alive = false;
+    };
+  }, [session]);
+
   // Numarul de cereri necitite calatoreste pe cadru, nu pe panou: o cerere noua
   // se vede de pe orice ecran, nu doar de pe cel pe care nimeni nu-l are deschis.
   useEffect(() => {
-    if (!session || !supabase) return;
+    if (!session || !supabase || gate !== 'open') return;
     let alive = true;
     supabase
       .from('leads')
@@ -77,7 +110,7 @@ export default function AdminApp() {
     return () => {
       alive = false;
     };
-  }, [session, tab]);
+  }, [session, tab, gate]);
 
   // Cortina se inchide singura la Escape si cand ecranul se face lat: altfel un
   // meniu deschis la latime de telefon ramane peste sina, si nimic nu-l inchide.
@@ -100,6 +133,12 @@ export default function AdminApp() {
 
   function go(next: Tab) {
     setTab(next);
+    setSecurity(false);
+    setOpen(false);
+  }
+
+  function goSecurity() {
+    setSecurity(true);
     setOpen(false);
   }
 
@@ -123,6 +162,20 @@ export default function AdminApp() {
   if (!session) return <Login />;
 
   const signOut = () => supabase!.auth.signOut();
+
+  // Intre parola si cabinet: cat timp nu stim nivelul sesiunii nu aratam nimic,
+  // iar daca e nevoie de cod, cabinetul nu se monteaza deloc. Panourile ar cere
+  // oricum date pe care baza de date nu le-ar da la aal1.
+  if (gate === 'unknown') {
+    return (
+      <Centered>
+        <p className="text-fg-muted">{t('app.loading')}</p>
+      </Centered>
+    );
+  }
+  if (gate === 'ask') {
+    return <MfaChallenge onPassed={() => setGate('open')} onSignOut={signOut} />;
+  }
 
   return (
     <div className="min-h-dvh bg-surface">
@@ -148,7 +201,7 @@ export default function AdminApp() {
                 icon={icon}
                 label={t(`app.tab_${key}`)}
                 badge={key === 'leads' ? unread : 0}
-                current={tab === key}
+                current={!security && tab === key}
                 onClick={() => go(key)}
                 index={i}
               />
@@ -157,6 +210,17 @@ export default function AdminApp() {
         </div>
         <div className="grid gap-3">
           <LangSwitch onDark full />
+          <button
+            type="button"
+            onClick={goSecurity}
+            aria-current={security ? 'page' : undefined}
+            className={`flex items-center gap-2.5 rounded-btn px-3.5 py-2.5 text-[13.5px] font-semibold transition-colors ${
+              security ? 'text-accent-on-dark' : 'text-fg-on-dark/60 hover:text-fg-on-dark'
+            }`}
+          >
+            <AdminIcon name="shield" size={17} />
+            {t('security.nav')}
+          </button>
           <a
             href="/"
             className="flex items-center gap-2.5 rounded-btn border border-fg-on-dark/20 px-3.5 py-2.5 text-[13.5px] font-semibold text-fg-on-dark/80 transition-colors hover:border-accent-on-dark hover:text-fg-on-dark"
@@ -233,7 +297,7 @@ export default function AdminApp() {
                 icon={icon}
                 label={t(`app.tab_${key}`)}
                 badge={key === 'leads' ? unread : 0}
-                current={tab === key}
+                current={!security && tab === key}
                 onClick={() => go(key)}
                 index={0}
                 animate={false}
@@ -242,6 +306,14 @@ export default function AdminApp() {
             <div className="mt-4 flex items-center justify-between gap-3 border-t border-fg-on-dark/15 pt-4">
               <LangSwitch onDark />
               <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={goSecurity}
+                  aria-label={t('security.nav')}
+                  className="rounded-btn p-2.5 text-fg-on-dark/75 transition-colors hover:text-fg-on-dark"
+                >
+                  <AdminIcon name="shield" size={19} />
+                </button>
                 <a
                   href="/"
                   aria-label={t('app.view_site')}
@@ -269,12 +341,18 @@ export default function AdminApp() {
         <div className="mx-auto max-w-5xl px-4 pb-24 pt-6 sm:px-8 sm:pt-10">
           {/* Cheia pe tab remonteaza panoul, deci intrarea se joaca la fiecare
               schimbare de sectiune, nu doar o data la incarcarea paginii. */}
-          <div key={tab} className="m-intro">
-            {tab === 'dashboard' && <Dashboard />}
-            {tab === 'leads' && <LeadsInbox />}
-            {tab === 'portfolio' && <PortfolioManager />}
-            {tab === 'reviews' && <ReviewsManager />}
-            {tab === 'blog' && <BlogManager />}
+          <div key={security ? 'security' : tab} className="m-intro">
+            {security ? (
+              <SecurityPanel onDone={() => setSecurity(false)} />
+            ) : (
+              <>
+                {tab === 'dashboard' && <Dashboard />}
+                {tab === 'leads' && <LeadsInbox />}
+                {tab === 'portfolio' && <PortfolioManager />}
+                {tab === 'reviews' && <ReviewsManager />}
+                {tab === 'blog' && <BlogManager />}
+              </>
+            )}
           </div>
         </div>
       </main>

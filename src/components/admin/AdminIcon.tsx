@@ -21,7 +21,8 @@ export type Name =
   | 'menu'
   | 'close'
   | 'external'
-  | 'signout';
+  | 'signout'
+  | 'shield';
 
 const glyphs: Record<Name, string> = {
   // trei coloane care cresc: traficul
@@ -54,6 +55,10 @@ const glyphs: Record<Name, string> = {
   signout: `
     <path d="M11 23.5H6.5A1.5 1.5 0 0 1 5 22V6a1.5 1.5 0 0 1 1.5-1.5H11" />
     <path d="M17.5 8.5 23 14l-5.5 5.5M23 14H10.5" />`,
+  // scut cu bifa: verificarea in doi pasi
+  shield: `
+    <path d="M14 4.2 5.8 7.4v6.4c0 5.1 3.4 8.5 8.2 9.9 4.8-1.4 8.2-4.8 8.2-9.9V7.4z" />
+    <path d="m10.6 13.9 2.5 2.5 4.4-4.7" />`,
 };
 
 export default function AdminIcon({ name, size = 22, className = '' }: Props) {
