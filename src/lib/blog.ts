@@ -37,9 +37,8 @@ async function fetchPosts(): Promise<Post[]> {
   const posts = await res.json();
   if (!Array.isArray(posts)) throw new Error('Published blog posts returned an invalid response.');
   return (posts as Post[]).map((post) => {
-    // A leading Markdown image can also supply a cover, including an existing
-    // site asset. Keep its description for accessible article imagery.
-    if (post.cover_url) return post;
+    // A leading Markdown image is an explicit cover choice, including when an
+    // older uploaded cover exists. Promote it once and preserve its description.
     const image = post.content.match(/^\s*!\[([^\]]*)\]\((\/[^\s)]+|https?:\/\/[^\s)]+)\)\s*(?:\r?\n|$)/);
     return image ? {
       ...post,
