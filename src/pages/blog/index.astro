@@ -44,7 +44,7 @@ const posts = await getPublishedPosts();
           </div>
         </div>
       ) : (
-        <ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <ul class:list={['grid sm:grid-cols-2 gap-6', posts.length >= 3 && 'lg:grid-cols-3']}>
           {posts.map((post, i) => (
             <li class="reveal-scale" style={`transition-delay:${(i % 3) * 60}ms`}>
               <a

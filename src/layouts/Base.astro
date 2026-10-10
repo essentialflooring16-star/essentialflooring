@@ -7,7 +7,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import QuickContact from '../components/QuickContact.astro';
-import { AREA_SERVED } from '../data/site';
+import { AREA_SERVED, SERVICES } from '../data/site';
 import { getContent } from '../lib/content';
 
 const c = await getContent();
@@ -39,10 +39,12 @@ const localBusiness = {
   '@id': `${c.site.domain}/#business`,
   name: c.site.name,
   legalName: c.site.legalName,
+  description: `${c.site.legalName} is a flooring contractor based in ${c.site.address.locality}, ${c.site.address.region}, serving the greater Sacramento area. Services include hardwood floor refinishing, LVP and vinyl plank installation, laminate flooring, carpet installation, and stair installation and refinishing.`,
   url: `${c.site.domain}/`,
   telephone: c.site.phoneSchema,
   email: c.site.email,
   image: businessImage,
+  logo: new URL('/apple-touch-icon.png', Astro.site).href,
   address: {
     '@type': 'PostalAddress',
     addressLocality: c.site.address.locality,
@@ -72,9 +74,32 @@ const localBusiness = {
     'Laminate flooring installation', 'Vinyl and resilient tile installation', 'Carpet installation',
     'Stair installation and refinishing',
   ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Flooring services',
+    itemListElement: SERVICES.map((service) => ({
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Service',
+        name: service.name,
+        url: `${c.site.domain}/services/${service.slug}/`,
+        provider: { '@id': `${c.site.domain}/#business` },
+      },
+    })),
+  },
 };
 
-const schemas = [localBusiness, ...schema];
+const website = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${c.site.domain}/#website`,
+  name: c.site.name,
+  url: `${c.site.domain}/`,
+  inLanguage: 'en-US',
+  publisher: { '@id': `${c.site.domain}/#business` },
+};
+
+const schemas = [localBusiness, ...(Astro.url.pathname === '/' ? [website] : []), ...schema];
 ---
 
 <!doctype html>
@@ -105,8 +130,8 @@ const schemas = [localBusiness, ...schema];
     <meta property="og:description" content={c.apply(description)} />
     <meta property="og:url" content={canonical.href} />
     <meta property="og:image" content={ogImageUrl.href} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    {!ogImage && <meta property="og:image:width" content="1200" />}
+    {!ogImage && <meta property="og:image:height" content="630" />}
     <meta property="og:image:alt" content={ogImageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={c.apply(title)} />

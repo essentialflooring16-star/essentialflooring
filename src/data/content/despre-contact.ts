@@ -36,7 +36,7 @@ export const despre_contact: ContentField[] = [
       en: 'The largest text on the page and the first thing a visitor reads. Past 60 characters it breaks onto three lines and pushes everything below it down.',
     },
     type: 'text',
-    default: 'Quality is the foundation of everything we do',
+    default: 'About Essential Flooring',
     page: '/about/',
     softMax: 60,
   },

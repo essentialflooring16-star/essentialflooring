@@ -6,11 +6,21 @@ import CtaBand from '../components/CtaBand.astro';
 
 import { photoImage, photoById } from '../lib/photos';
 import { getContent } from '../lib/content';
+import { SERVICES } from '../data/site';
 
 const c = await getContent();
 
 const aboutPhoto = photoById('hardwood-refinishing-02');
 const detailPhoto = photoById('stairs-01');
+const aboutSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  '@id': `${c.site.domain}/about/#webpage`,
+  url: `${c.site.domain}/about/`,
+  name: `About ${c.site.name}`,
+  mainEntity: { '@id': `${c.site.domain}/#business` },
+  isPartOf: { '@id': `${c.site.domain}/#website` },
+};
 
 const values = [
   {
@@ -35,6 +45,7 @@ const values = [
 <Base
   title="About Us | Essential Flooring, Sacramento CA"
   description="Essential Flooring was founded in 2023 by Alexandru Szep, a flooring specialist with over 5 years of hands-on experience serving the Sacramento area."
+  schema={[aboutSchema]}
 >
   <section class="pt-10 pb-20">
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
@@ -98,6 +109,31 @@ const values = [
           </div>
         </div>
       </div>
+
+      <section class="mt-16 max-w-3xl" aria-labelledby="company-services">
+        <h2 id="company-services" class="font-display font-semibold text-3xl text-fg tracking-tight">
+          Flooring services in the greater Sacramento area
+        </h2>
+        <p class="mt-5 text-[17px] leading-relaxed text-fg-body">
+          {c.site.legalName} is a flooring contractor based in {c.site.address.locality}, {c.site.address.region},
+          serving the greater Sacramento area. Services include hardwood floor refinishing, LVP and vinyl
+          plank installation, laminate flooring, carpet installation, and stair installation and refinishing.
+        </p>
+        <ul class="mt-5 grid sm:grid-cols-2 gap-3">
+          {SERVICES.map((service) => (
+            <li>
+              <a href={`/services/${service.slug}/`} class="font-medium text-accent-on-light underline underline-offset-4">
+                {service.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="mt-5 text-[16px] leading-relaxed text-fg-body">
+          See our <a href="/service-areas/" class="text-accent-on-light underline underline-offset-4">service areas</a>,
+          browse <a href="/portfolio/" class="text-accent-on-light underline underline-offset-4">completed flooring projects</a>,
+          or <a href="/contact/" class="text-accent-on-light underline underline-offset-4">request a free estimate</a> for your home.
+        </p>
+      </section>
 
       <div class="mt-20">
         <h2 class="reveal font-display font-semibold text-3xl text-fg tracking-tight">

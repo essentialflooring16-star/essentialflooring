@@ -10,24 +10,44 @@ export type Post = {
   excerpt: string;
   content: string;
   cover_url: string | null;
+  cover_alt?: string;
   published: boolean;
 };
 
 const url = import.meta.env.PUBLIC_SUPABASE_URL as string | undefined;
 const key = import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string | undefined;
+let pending: Promise<Post[]> | undefined;
 
-export async function getPublishedPosts(): Promise<Post[]> {
-  if (!url || !key) return [];
-  try {
-    const res = await fetch(
-      `${url}/rest/v1/posts?select=*&published=eq.true&order=created_at.desc`,
-      { headers: { apikey: key, Authorization: `Bearer ${key}` } },
-    );
-    if (!res.ok) return [];
-    return (await res.json()) as Post[];
-  } catch {
-    return [];
-  }
+export function getPublishedPosts(): Promise<Post[]> {
+  if (!url || !key) return Promise.resolve([]);
+  // One snapshot per build keeps the index and article routes in sync. A failed
+  // request must stop publication rather than silently remove existing posts.
+  return pending ??= fetchPosts();
+}
+
+async function fetchPosts(): Promise<Post[]> {
+  const res = await fetch(
+    `${url}/rest/v1/posts?select=*&published=eq.true&order=created_at.desc`,
+    {
+      headers: { apikey: key!, Authorization: `Bearer ${key}` },
+      signal: AbortSignal.timeout(15000),
+    },
+  );
+  if (!res.ok) throw new Error(`Cannot load published blog posts (HTTP ${res.status}).`);
+  const posts = await res.json();
+  if (!Array.isArray(posts)) throw new Error('Published blog posts returned an invalid response.');
+  return (posts as Post[]).map((post) => {
+    // A leading Markdown image can also supply a cover, including an existing
+    // site asset. Keep its description for accessible article imagery.
+    if (post.cover_url) return post;
+    const image = post.content.match(/^\s*!\[([^\]]*)\]\((\/[^\s)]+|https?:\/\/[^\s)]+)\)\s*(?:\r?\n|$)/);
+    return image ? {
+      ...post,
+      cover_url: image[2],
+      cover_alt: image[1],
+      content: post.content.slice(image[0].length),
+    } : post;
+  });
 }
 
 export function postDate(p: Post): string {
