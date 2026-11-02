@@ -1,6 +1,9 @@
 ---
 import { marked } from 'marked';
 import sanitizeHtml from 'sanitize-html';
+import sharp from 'sharp';
+import { readdirSync } from 'node:fs';
+import { join, normalize } from 'node:path';
 import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import CtaBand from '../../components/CtaBand.astro';
@@ -28,7 +31,9 @@ const sanitized = sanitizeHtml(marked.parse(post.content, { async: false }) as s
     'table', 'thead', 'tbody', 'tr', 'th', 'td',
   ],
   allowedAttributes: {
-    a: ['href', 'title'],
+    // target and rel must be allowed here, or the transform below adds them
+    // and sanitize-html strips them again straight after.
+    a: ['href', 'title', 'target', 'rel'],
     img: ['src', 'alt', 'title', 'width', 'height', 'loading', 'decoding'],
   },
   allowedSchemes: ['http', 'https', 'mailto', 'tel'],
@@ -49,8 +54,64 @@ const sanitized = sanitizeHtml(marked.parse(post.content, { async: false }) as s
   },
 });
 
+// Photos referenced as /blog/... live in public/, so their size can be read at
+// build time. Width and height let the browser hold the space before the photo
+// arrives, instead of pushing the text down when it does.
+const PUBLIC_DIR = join(process.cwd(), 'public');
+const localFile = (src: string) => {
+  if (!src.startsWith('/') || src.startsWith('//')) return null;
+  const file = normalize(join(PUBLIC_DIR, decodeURIComponent(src.split(/[?#]/)[0])));
+  return file.startsWith(PUBLIC_DIR) ? file : null;
+};
+async function localSize(src: string) {
+  const file = localFile(src);
+  if (!file) return null;
+  try {
+    const { width, height } = await sharp(file).metadata();
+    return width && height ? { width, height } : null;
+  } catch {
+    return null;
+  }
+}
+
+// scripts/make-cover-variants.mjs writes AVIF copies of the JPG covers before
+// each build (name-800w.avif, name-1600w.avif). Use whichever exist; a cover
+// without copies, like one uploaded from the cabinet, stays a plain JPG.
+function avifSrcset(src: string) {
+  const m = src.match(/^\/blog\/([^/?#]+)\.(?:jpe?g|png)$/i);
+  if (!m) return null;
+  let files: string[] = [];
+  try {
+    files = readdirSync(join(PUBLIC_DIR, 'blog'));
+  } catch {
+    return null;
+  }
+  const prefix = `${m[1]}-`;
+  const set = files
+    .filter((f) => f.startsWith(prefix) && /^\d+w\.avif$/.test(f.slice(prefix.length)))
+    .map((f) => ({ f, w: parseInt(f.slice(prefix.length), 10) }))
+    .sort((a, b) => a.w - b.w)
+    .map(({ f, w }) => `/blog/${f} ${w}w`);
+  return set.length ? set.join(', ') : null;
+}
+
+const cover = post.cover_url
+  ? { size: await localSize(post.cover_url), avif: avifSrcset(post.cover_url) }
+  : null;
+
+const bodySrcs = [...new Set([...sanitized.matchAll(/<img src="([^"]+)"/g)].map((m) => m[1]))];
+const bodySizes = new Map(
+  await Promise.all(bodySrcs.map(async (src) => [src, await localSize(src.replace(/&amp;/g, '&'))] as const)),
+);
+const sized = sanitized.replace(/<img src="([^"]+)"([^>]*)>/g, (tag, src: string, rest: string) => {
+  const size = bodySizes.get(src);
+  return size && !/\swidth=/.test(rest)
+    ? `<img src="${src}" width="${size.width}" height="${size.height}"${rest}>`
+    : tag;
+});
+
 const sections: { id: string; label: string }[] = [];
-const html = sanitized.replace(/<h2>([\s\S]*?)<\/h2>/g, (_, heading: string) => {
+const html = sized.replace(/<h2>([\s\S]*?)<\/h2>/g, (_, heading: string) => {
   const id = `section-${sections.length + 1}`;
   // The label is already sanitized HTML; remove formatting but keep entities.
   sections.push({ id, label: heading.replace(/<[^>]*>/g, '') });
@@ -78,10 +139,15 @@ const schema = {
   publisher: { '@id': `${c.site.domain}/#business` },
   ...(post.cover_url ? { image: new URL(post.cover_url, Astro.site).href } : {}),
 };
+
+// Google shows about 60 characters of a title. A long headline keeps its own
+// words and drops the brand, rather than losing its ending to "...".
+const branded = `${post.title} | Essential Flooring`;
+const pageTitle = branded.length <= 60 ? branded : post.title;
 ---
 
 <Base
-  title={`${post.title} | Essential Flooring`}
+  title={pageTitle}
   description={post.excerpt || `${post.title}. Flooring tips and project stories from Essential Flooring, Sacramento CA.`}
   ogImage={post.cover_url ?? undefined}
   ogImageAlt={post.cover_alt}
@@ -104,13 +170,27 @@ const schema = {
         {post.excerpt && <p class="mt-5 text-[18px] sm:text-[20px] leading-relaxed text-fg-muted">{post.excerpt}</p>}
       </header>
 
+      {/* The cover is the largest thing on screen when the article opens, so
+          it loads first, and from an AVIF sized to the phone when one exists. */}
       {post.cover_url && (
-        <img
-          src={post.cover_url}
-          alt={post.cover_alt || `Cover image for ${post.title}`}
-          class="mt-8 w-full aspect-[16/9] object-cover rounded-media shadow-lift"
-          decoding="async"
-        />
+        <picture>
+          {cover?.avif && (
+            <source
+              type="image/avif"
+              srcset={cover.avif}
+              sizes="(min-width: 816px) 768px, calc(100vw - 32px)"
+            />
+          )}
+          <img
+            src={post.cover_url}
+            alt={post.cover_alt || `Cover image for ${post.title}`}
+            width={cover?.size?.width}
+            height={cover?.size?.height}
+            class="mt-8 w-full aspect-[16/9] object-cover rounded-media shadow-lift"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </picture>
       )}
 
       {sections.length > 2 && (

@@ -8,3 +8,6 @@ dist/
 .vercel
 .env*
 scratch_out/
+
+# AVIF copies of blog covers, made by scripts/make-cover-variants.mjs on every build
+public/blog/*-[0-9]*w.avif
