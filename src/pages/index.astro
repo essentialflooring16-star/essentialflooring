@@ -281,7 +281,11 @@ const steps = [
   <!-- BEFORE / AFTER SHOWCASE -->
   <section class="py-16 sm:py-24 bg-surface-sunken/60 relative overflow-hidden">
     <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
-      <div class="grid lg:grid-cols-[380px_1fr] gap-12 items-start">
+      <!-- grid-cols-1 and min-w-0 keep the column at the width of the screen.
+           Without them the row of six thumbnails (96px minimum each) set the
+           column to 626px, and on a phone the heading and the slider were cut
+           off on the right by the section's overflow-hidden. -->
+      <div class="grid grid-cols-1 lg:grid-cols-[380px_minmax(0,1fr)] gap-12 items-start">
         <div class="lg:sticky lg:top-28">
           <SectionHeading
             eyebrow="Before and after"
@@ -300,7 +304,7 @@ const steps = [
             </a>
           </div>
         </div>
-        <div class="m-rise">
+        <div class="m-rise min-w-0">
           <ShowcaseSlider pairs={showcasePairs} />
         </div>
       </div>
@@ -539,7 +543,7 @@ const steps = [
           : 'Our reviews live on our Google Business Profile, along with photos from recent jobs around Sacramento.'}
       </p>
       <a
-        href={hasReviews ? '/reviews' : c.site.googleProfile}
+        href={hasReviews ? '/reviews/' : c.site.googleProfile}
         target={hasReviews ? undefined : '_blank'}
         rel={hasReviews ? undefined : 'noopener'}
         class="reveal mt-6 inline-flex items-center gap-2 rounded-btn bg-control-dark hover:bg-control-dark-hover text-fg-on-dark font-semibold px-6 py-3 transition-colors"
