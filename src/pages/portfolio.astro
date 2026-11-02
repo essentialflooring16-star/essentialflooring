@@ -6,24 +6,55 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Gallery from '../components/Gallery.astro';
 import { galleryPhotos, photoImage, CATEGORY_LABELS } from '../lib/photos';
+import { getPortfolioUploads } from '../lib/portfolio';
 import pairsData from '../data/before-after.json';
 import { getContent } from '../lib/content';
 
 const c = await getContent();
 
-const items = await Promise.all(
-  galleryPhotos.map(async (p) => {
-    const full = await getImage({ src: photoImage(p.id), width: 1600, format: 'webp', quality: 74 });
-    const thumb = await getImage({ src: photoImage(p.id), width: 640, format: 'webp', quality: 68 });
-    return {
-      src: full.src,
-      thumb: thumb.src,
+// A tile is about 175px wide on a phone and 355px on a desktop, so the phone
+// takes the 360px thumbnail and only a large or dense screen the 640px one.
+const thumbs = async (src: Parameters<typeof getImage>[0]['src'], extra = {}) => {
+  const [full, small, large] = await Promise.all([
+    getImage({ src, ...extra, width: 1600, format: 'webp', quality: 74 }),
+    getImage({ src, ...extra, width: 360, format: 'webp', quality: 68 }),
+    getImage({ src, ...extra, width: 640, format: 'webp', quality: 68 }),
+  ]);
+  return { src: full.src, thumb: large.src, thumbSrcset: `${small.src} 360w, ${large.src} 640w` };
+};
+
+const uploads = (
+  await Promise.all(
+    (await getPortfolioUploads()).map(async (row) => {
+      try {
+        const alt = row.alt || row.caption || 'Flooring project by Essential Flooring';
+        return {
+          ...(await thumbs(row.image_url, { inferSize: true })),
+          alt,
+          caption: row.caption || '',
+          category: row.category || 'other',
+          origin: row.image_url,
+        };
+      } catch {
+        // A photo that cannot be read at build time is left to the browser
+        // fetch in Gallery.astro, which shows it at full size as before.
+        return null;
+      }
+    }),
+  )
+).filter((item) => item !== null);
+
+const items = [
+  ...uploads,
+  ...(await Promise.all(
+    galleryPhotos.map(async (p) => ({
+      ...(await thumbs(photoImage(p.id))),
       alt: p.alt,
       caption: p.caption,
       category: p.category,
-    };
-  }),
-);
+    })),
+  )),
+];
 
 // All 12 before/after pairs, rendered as static side-by-side images. The home
 // page keeps the interactive slider for the best six; here the point is

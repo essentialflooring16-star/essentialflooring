@@ -18,6 +18,12 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  image: {
+    // Photos uploaded from the cabinet live in Supabase Storage. Allowing the
+    // host lets portfolio.astro resize them at build time; without it getImage
+    // passes the full upload through untouched.
+    remotePatterns: [{ protocol: 'https', hostname: '**.supabase.co' }],
+  },
   build: {
     // One stylesheet, about 14 KB compressed, inlined into each page. On a
     // phone that removes a whole round trip from the critical path, which is

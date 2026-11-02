@@ -24,6 +24,29 @@ const CATEGORIES = [
   ['other', 'portfolio.category_other'],
 ] as const;
 
+// O poza de pe telefon are 3-8 MB la 4000 px, iar site-ul nu arata niciodata
+// una mai lata de 1600 px. Asa ca se micsoreaza aici, inainte sa plece din
+// cabinet, si galeria nu mai descarca megabytes pentru o miniatura. Un format
+// pe care browserul nu il poate citi (HEIC in afara de Safari) pleaca asa cum e.
+const MAX_EDGE = 2000;
+
+async function shrink(file: File): Promise<File> {
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, MAX_EDGE / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    const blob = await new Promise<Blob | null>((done) => canvas.toBlob(done, 'image/jpeg', 0.82));
+    if (!blob || blob.size >= file.size) return file;
+    return new File([blob], `${file.name.replace(/\.[^.]+$/, '')}.jpg`, { type: 'image/jpeg' });
+  } catch {
+    return file;
+  }
+}
+
 export default function PortfolioManager() {
   const { t } = useT();
   const [items, setItems] = useState<Item[]>([]);
@@ -45,17 +68,19 @@ export default function PortfolioManager() {
     e.preventDefault();
     const form = e.currentTarget;
     const fd = new FormData(form);
-    const file = fd.get('photo') as File | null;
-    if (!file || file.size === 0) {
+    const picked = fd.get('photo') as File | null;
+    if (!picked || picked.size === 0) {
       setMsg(t('portfolio.error_no_file'));
-      return;
-    }
-    if (file.size > 8 * 1024 * 1024) {
-      setMsg(t('portfolio.error_too_large'));
       return;
     }
     setBusy(true);
     setMsg(null);
+    const file = await shrink(picked);
+    if (file.size > 8 * 1024 * 1024) {
+      setMsg(t('portfolio.error_too_large'));
+      setBusy(false);
+      return;
+    }
     try {
       const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
       const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;

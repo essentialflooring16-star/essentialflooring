@@ -8,6 +8,9 @@
 export type GalleryItem = {
   src: string;
   thumb: string;
+  thumbSrcset?: string;
+  /** Storage URL of a cabinet upload, so the browser fetch can skip it. */
+  origin?: string;
   alt: string;
   caption: string;
   category: string;
@@ -52,7 +55,7 @@ const IDLE = 'bg-surface-raised border border-hairline text-fg-body hover:border
 
   <ul data-grid class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
     {items.map((item) => (
-      <li data-category={item.category}>
+      <li data-category={item.category} data-origin={item.origin}>
         <button
           type="button"
           data-open
@@ -64,6 +67,8 @@ const IDLE = 'bg-surface-raised border border-hairline text-fg-body hover:border
         >
           <img
             src={item.thumb}
+            srcset={item.thumbSrcset}
+            sizes="(min-width: 1152px) 355px, (min-width: 1024px) calc(33vw - 30px), (min-width: 640px) calc(50vw - 34px), calc(50vw - 22px)"
             alt={item.alt}
             loading="lazy"
             decoding="async"
@@ -242,16 +247,23 @@ const IDLE = 'bg-surface-raised border border-hairline text-fg-body hover:border
         .then((rows) => {
           const template = grid.querySelector('li');
           if (!template) return;
-          rows.reverse().forEach((row: any) => {
+          // Uploads that were there at the last build are already in the HTML.
+          const built = new Set(
+            Array.from(grid.querySelectorAll('li[data-origin]')).map((li) => (li as HTMLElement).dataset.origin),
+          );
+          rows.filter((row: any) => !built.has(row.image_url)).reverse().forEach((row: any) => {
             const li = template.cloneNode(true) as HTMLLIElement;
             const alt = row.alt || row.caption || 'Flooring project by Essential Flooring';
             li.dataset.category = row.category || 'other';
+            li.removeAttribute('data-origin');
             const btn = li.querySelector('[data-open]') as HTMLElement;
             btn.dataset.src = row.image_url;
             btn.dataset.alt = alt;
             btn.dataset.caption = row.caption || '';
             btn.setAttribute('aria-label', `Open photo: ${row.caption || alt}`);
             const img = li.querySelector('img') as HTMLImageElement;
+            // The template's srcset would win over src and show its own photo.
+            img.removeAttribute('srcset');
             img.src = row.image_url;
             img.alt = alt;
             const cap = li.querySelector('span:last-of-type') as HTMLElement;
