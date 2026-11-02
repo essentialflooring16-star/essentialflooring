@@ -140,10 +140,10 @@ const schema = {
   ...(post.cover_url ? { image: new URL(post.cover_url, Astro.site).href } : {}),
 };
 
-// Google shows about 60 characters of a title. A long headline keeps its own
+// Google cuts a title at about 65 characters. A long headline keeps its own
 // words and drops the brand, rather than losing its ending to "...".
 const branded = `${post.title} | Essential Flooring`;
-const pageTitle = branded.length <= 60 ? branded : post.title;
+const pageTitle = branded.length <= 65 ? branded : post.title;
 ---
 
 <Base
