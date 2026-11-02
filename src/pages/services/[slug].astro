@@ -18,6 +18,7 @@ import stockLaminate from '../../assets/stock/hero-laminate.jpg';
 import stockCarpet from '../../assets/stock/hero-carpet.jpg';
 import servicesCopy from '../../data/services-copy.json';
 import { getContent } from '../../lib/content';
+import { getPublishedPosts } from '../../lib/blog';
 import { parsePairs, parseQA } from '../../data/content/types';
 
 const c = await getContent();
@@ -88,6 +89,26 @@ const serviceSchema = {
 };
 
 const otherServices = SERVICES.filter((s) => s.slug !== page.slug);
+
+// Articles that answer questions about this service. A post qualifies when the
+// service is named in its title or summary, a passing mention in the body is
+// not enough, so a new article finds its service pages by itself.
+const POST_WORDS: Record<string, RegExp> = {
+  'hardwood-floor-refinishing': /refinish|hardwood|sanding/i,
+  'lvp-vinyl-plank-flooring': /\blvp\b|vinyl/i,
+  'stairs-installation-refinishing': /stair/i,
+  'laminate-flooring': /laminate/i,
+  'carpet-installation': /carpet/i,
+};
+const words = POST_WORDS[page.slug];
+const relatedPosts = words
+  ? (await getPublishedPosts())
+      .map((p) => ({ p, score: (words.test(p.title) ? 3 : 0) + (words.test(p.excerpt ?? '') ? 2 : 0) }))
+      .filter((x) => x.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 2)
+      .map((x) => x.p)
+  : [];
 
 const STOCK_HERO: Record<string, { src: ImageMetadata; alt: string }> = {
   'hardwood-floor-refinishing': { src: stockHardwood, alt: 'Wide plank hardwood floor in a bright bedroom with a mountain view' },
@@ -262,6 +283,30 @@ const hero = STOCK_HERO[page.slug] ?? {
       </div>
     </div>
   </section>
+
+  <!-- FROM THE BLOG -->
+  {relatedPosts.length > 0 && (
+    <section class="pb-16">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <h2 class="reveal font-display font-semibold text-2xl text-fg tracking-tight mb-8">
+          From the blog
+        </h2>
+        <div class="grid sm:grid-cols-2 gap-5">
+          {relatedPosts.map((p) => (
+            <a
+              href={`/blog/${p.slug}/`}
+              class="reveal group rounded-card border border-hairline bg-surface-raised p-6 shadow-card hover:shadow-lift transition-shadow"
+            >
+              <h3 class="font-display font-semibold text-[18px] text-fg group-hover:text-accent-on-light transition-colors">
+                {p.title}
+              </h3>
+              {p.excerpt && <p class="mt-2 text-[14px] leading-relaxed text-fg-muted">{p.excerpt}</p>}
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
 
   <!-- OTHER SERVICES -->
   <section class="pb-20">
